@@ -324,7 +324,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   // 동료는 판 밖 패시브만 (단계 0~3, 상점에서 다시 사면 오른다)
   const KINDS = {
     ryuto: { name: '류토', role: '가속', race: '토끼', col: 'guard', desc: (L) => `라운드마다 가속 관문 ${L}개 · 콤보 20에 수행 일격` },
-    sato: { name: '사토', role: '보호', race: '토끼', col: 'petal', desc: (L) => `적 차례마다 솜구름 (투사체 ${L}발) · 전투당 한 번, 체력 40% 아래면 보호막 +${3 + 2 * L}` },
+    sato: { name: '사토', role: '보호', race: '토끼', col: 'petal', desc: (L) => `전투마다 솜구름 (투사체 ${L}발까지, 다시 차지 않음) · 전투당 한 번, 체력 40% 아래면 보호막 +${3 + 2 * L}` },
     oto: { name: '오토', role: '퇴마', race: '토끼', col: 'keep', desc: (L) => `라운드마다 봉인 (피해 +${20 + 10 * L}%) · 발마다 부적 ${L}장` },
     santo: { name: '산토', role: '살림', race: '토끼', col: 'spark', desc: (L) => `발마다 타격 +${L} · 승리 골드 +${2 * L}` },
   };
@@ -678,7 +678,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     clearField();
     S.gimmick = null; S.armorOpen = 0; S.rage = false; S.mul = { hp: 1, atk: 1 };
     S.mapT = 0; S.portalCD = 0; S.emote = null;
-    S.special = special || null; S.bGold = { combo: 0 }; S.satoUsed = false;
+    S.special = special || null; S.bGold = { combo: 0 }; S.satoUsed = false; S.satoCloud = S.levels.sato;
     S.ball.x = 480; S.ball.y = 540;
     if (type === 'battle') {
       S.battles++;
@@ -1669,10 +1669,10 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
       syncUI(true);
       return;
     }
-    if (S.levels.sato > 0 && foes().length) {
+    if (S.levels.sato > 0 && S.satoCloud > 0 && foes().length) {
       const b = S.ball, shooter = alive().filter((e) => e.intent && (e.intent.t === 'shot' || e.intent.t === 'fan'))
         .flatMap((e) => sourcesOf(e, e.intent)).sort((a, c) => hyp(a.x - b.x, a.y - b.y) - hyp(c.x - b.x, c.y - b.y))[0];
-      if (shooter) { const a = Math.atan2(shooter.y - b.y, shooter.x - b.x); S.clouds.push({ x: b.x + Math.cos(a) * (b.r + 46), y: b.y + Math.sin(a) * (b.r + 46), r: 28 + 3 * S.levels.sato, t: 0, hp: S.levels.sato }); sfx.pop(); }
+      if (shooter) { const a = Math.atan2(shooter.y - b.y, shooter.x - b.x); S.clouds.push({ x: b.x + Math.cos(a) * (b.r + 46), y: b.y + Math.sin(a) * (b.r + 46), r: 28 + 3 * S.levels.sato, t: 0, hp: S.satoCloud }); sfx.pop(); }
     }
     if (S.levels.sato > 0 && !S.satoUsed && S.main.hp < S.main.maxHp * 0.4 && foes().length) {
       S.satoUsed = true;
@@ -1747,7 +1747,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
         a.x += a.vx * dt; a.y += a.vy * dt;
         if (a.x < -20 || a.x > W + 20 || a.y < -20 || a.y > H + 20) { a.dead = true; continue; }
         const cl = (S.clouds || []).find((c) => hyp(c.x - a.x, c.y - a.y) < c.r + a.r);
-        if (cl) { a.dead = true; burst(a.x, a.y, kcol('sato'), 8); sfx.block(); float(cl.x, cl.y - cl.r - 12, '막음', kcol('sato'), 15); if (--cl.hp <= 0) { S.clouds = S.clouds.filter((c) => c !== cl); burst(cl.x, cl.y, T.panel, 14); sfx.pop(); } continue; }
+        if (cl) { a.dead = true; burst(a.x, a.y, kcol('sato'), 8); sfx.block(); S.satoCloud = Math.max(0, S.satoCloud - 1); float(cl.x, cl.y - cl.r - 12, S.satoCloud ? `막음 · 남은 ${S.satoCloud}` : '막음 · 끝', kcol('sato'), 15); if (--cl.hp <= 0) { S.clouds = S.clouds.filter((c) => c !== cl); burst(cl.x, cl.y, T.panel, 14); sfx.pop(); } continue; }
         const stone = S.walls.find((w) => segDist(a.x, a.y, w) < w.t + a.r);
         if (stone) { a.dead = true; burst(a.x, a.y, T.muted, 8); sfx.stone(); continue; }
         const box = S.crates.find((c) => !c.dead && hyp(c.x - a.x, c.y - a.y) < c.r + a.r);
