@@ -332,7 +332,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   const kcol = (k) => T[KINDS[k].col];
   const HEROES = {
     hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 5연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
-    rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 사방으로 부적 16번 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
+    rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 0.5초마다 사방으로 부적 6장 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
   };
   const P = (t, v, o) => ({ t, v, ...o });
   const FOES = {
@@ -400,7 +400,8 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   // ---------- 상점 ----------
   // 진열: 메인 강화 + 동료 3 · 장치 2 · 아이템 3. 수치는 모두 임시
   // 난이도: 적 공격 배율 · 회복량 (임시)
-  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: 5 };
+  // storm: 부적 폭풍 (몇 초마다 · 한 번에 몇 장 · 한 장 피해 배율 · 폭풍 중 공이 닿을 때 연타 +n · 피해 배율)
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: 5, storm: { every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.25 } };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
   const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
@@ -1352,7 +1353,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     if (keep && S.hero !== 'rito' && (sk.active || sh.sinceHit > 0.25)) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
     if (keep && S.hero === 'rito') {
       sh.fireT = (sh.fireT || 0) - dt;
-      if (sh.fireT <= 0) { if (sk.active) { sh.fireT = 0.25; ritoVolley(); } else { sh.fireT = 0.3 * Math.pow(0.8, up('rate')); ritoShot(); } }
+      if (sh.fireT <= 0) { if (sk.active) { sh.fireT = BAL.storm.every; ritoVolley(); } else { sh.fireT = 0.3 * Math.pow(0.8, up('rate')); ritoShot(); } }
     }
     stepMine(dt);
     if (S.ally) stepAlly(dt);
@@ -1422,7 +1423,8 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   }
   function ritoVolley() {
     const sk = S.skill; sk.vol = (sk.vol || 0) + 1;
-    for (let i = 0; i < 8; i++) charmShot(sk.vol * 0.2 + i * Math.PI / 4, 820 * speedMul(), 2, true);
+    const n = BAL.storm.n;
+    for (let i = 0; i < n; i++) charmShot(sk.vol * 0.35 + i * Math.PI * 2 / n, 820 * speedMul(), 2, true);
     sfx.paper(); sfx.zap();
   }
   // 동료로 합류한 메인: 판 위 유닛. 자기 공격 방식을 줄인 형태로 돕는다
@@ -1476,7 +1478,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   }
   function charmHit(e, m) {
     const sh = S.shot, sk = S.skill;
-    let mul = (m.skill ? 0.85 : m.ally ? 0.45 : 0.6) * Math.min(2.5, 1 + 0.03 * sh.combo) * m.mul; if (m.skill) sk.hits++;
+    let mul = (m.skill ? BAL.storm.dmg : m.ally ? 0.45 : 0.6) * Math.min(2.5, 1 + 0.03 * sh.combo) * m.mul; if (m.skill) sk.hits++;
     const pw = sh.mul * (sh.weapon === 'sword' ? 1.5 : 1) * (sh.size > 0 ? 1.5 : sh.size < 0 ? 0.7 : 1) * (sh.gateT > 0 ? 1.3 : 1);
     if (damage(e, (atkNow() * mul + sh.bonus) * pw) === false) return;
     sh.combo++; sh.hits++; sh.sinceHit = 0; onCombo();
@@ -1510,7 +1512,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     if (e.cd > 0) return;
     e.cd = 0.05;
     const sh = S.shot, sk = S.skill;
-    let k = Math.min(6, 3 + Math.floor(sh.combo / 12)) + sh.extra + (sk.active ? 2 : 0);
+    let k = Math.min(6, 3 + Math.floor(sh.combo / 12)) + sh.extra + (sk.active ? BAL.storm.extra : 0);
     e.strikeMul = 1;
     if (e.trait === 'bark' && e.cracks < 3) {
       e.cracks++;
@@ -1537,7 +1539,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     if (!e.alive) { e.strikes = 0; return; }
     const sh = S.shot, sk = S.skill;
     let mul = 0.5 * Math.min(2.5, 1 + 0.03 * sh.combo) * e.strikeMul;
-    if (sk.active) { mul *= 1.6; sk.hits++; for (let i = 0; i < 3; i++) addPetal(e.x, e.y, true); }
+    if (sk.active) { mul *= BAL.storm.mul; sk.hits++; for (let i = 0; i < 3; i++) addPetal(e.x, e.y, true); }
     const pw = sh.mul * (sh.weapon === 'sword' ? 1.5 : 1) * (sh.size > 0 ? 1.5 : sh.size < 0 ? 0.7 : 1) * (sh.gateT > 0 ? 1.3 : 1);
     if (damage(e, (atkNow() * mul + sh.bonus) * pw) === false) { e.strikes = 0; return; }
     if (sh.fire && !e.gimmick && !e.off && !e.burnShot) { e.burnShot = true; e.burn = Math.max(e.burn || 0, 4 + Math.floor(sh.combo / 10)); e.burnT = 3; float(e.x + e.r, e.y - e.r, '화상', T.dash, 16); }
