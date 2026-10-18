@@ -331,7 +331,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   const KIND_ORDER = ['ryuto', 'sato', 'oto', 'santo'];
   const kcol = (k) => T[KINDS[k].col];
   const HEROES = {
-    hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 25연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
+    hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 5연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
     rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 사방으로 부적 16번 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
   };
   const P = (t, v, o) => ({ t, v, ...o });
@@ -400,7 +400,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   // ---------- 상점 ----------
   // 진열: 메인 강화 + 동료 3 · 장치 2 · 아이템 3. 수치는 모두 임시
   // 난이도: 적 공격 배율 · 회복량 (임시)
-  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2 };
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: 5 };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
   const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
@@ -1247,7 +1247,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     S.skill = { active: true, t: 0, hits: 0 };
     if (from === 'aim') shotSetup();
     const segs = []; let x = S.ball.x, y = S.ball.y, last = null;
-    for (let i = 0; i < 25 + 5 * up('iai'); i++) {
+    for (let i = 0; i < BAL.iai + 5 * up('iai'); i++) {
       const pool = targets().filter((e) => e !== last), t = pool.length ? pickOne(pool) : last;
       let a = Math.random() * Math.PI * 2, L = 320;
       if (t) { a = Math.atan2(t.y - y, t.x - x) + (Math.random() - 0.5) * 0.3; L = hyp(t.x - x, t.y - y) + 90 + Math.random() * 140; last = t; }
