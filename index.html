@@ -220,7 +220,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     <aside class="hero" id="hero" aria-label="하나토">
       <img id="portrait" alt="하나토" width="230" height="281">
       <div class="hero-name">하나토</div>
-      <div class="hero-stat">공격 7 · 방어 2</div>
+      <div class="hero-stat" id="heroStat">공격 8 · 방어 2</div>
       <div class="line2"><span id="hpText">100 / 100</span><span id="shieldText"></span></div>
       <div class="bar"><i id="hpBar"></i></div>
       <div class="line2"><span>투지</span><span id="gaugeText">0 / 45</span></div>
@@ -282,7 +282,6 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
       <section aria-label="설정">
         <h2>설정</h2>
         <div class="opts">
-          <label><input type="checkbox" id="optHoming" checked> 자동 유도</label>
           <label><input type="checkbox" id="optCutin" checked> 스킬 컷씬</label>
           <label><input type="checkbox" id="optSound" checked> 소리</label>
         </div>
@@ -325,15 +324,15 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   // 동료는 판 밖 패시브만 (단계 0~3, 상점에서 다시 사면 오른다)
   const KINDS = {
     ryuto: { name: '류토', role: '가속', race: '토끼', col: 'guard', desc: (L) => `라운드마다 가속 관문 ${L}개 · 콤보 20에 수행 일격` },
-    sato: { name: '사토', role: '보호', race: '토끼', col: 'petal', desc: (L) => `적 차례마다 솜구름 방패 · 체력 40% 아래면 보호막 +${4 + 2 * L}` },
+    sato: { name: '사토', role: '보호', race: '토끼', col: 'petal', desc: (L) => `적 차례마다 솜구름 (투사체 ${L}발) · 전투당 한 번, 체력 40% 아래면 보호막 +${3 + 2 * L}` },
     oto: { name: '오토', role: '퇴마', race: '토끼', col: 'keep', desc: (L) => `라운드마다 봉인 (피해 +${20 + 10 * L}%) · 발마다 부적 ${L}장` },
     santo: { name: '산토', role: '살림', race: '토끼', col: 'spark', desc: (L) => `발마다 타격 +${L} · 승리 골드 +${2 * L}` },
   };
   const KIND_ORDER = ['ryuto', 'sato', 'oto', 'santo'];
   const kcol = (k) => T[KINDS[k].col];
   const HEROES = {
-    hanato: { name: '하나토', race: '토끼', skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 25연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
-    rito: { name: '리토', race: '토끼', skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 사방으로 부적 16번 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
+    hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 25연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
+    rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 사방으로 부적 16번 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
   };
   const P = (t, v, o) => ({ t, v, ...o });
   const FOES = {
@@ -400,6 +399,8 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   const ROUL = [{ m: 0.5, label: '×½', c: 'danger' }, { m: 1, label: '×1', c: 'muted' }, { m: 2, label: '×2', c: 'gold' }, { m: 3, label: '×3', c: 'petal' }];
   // ---------- 상점 ----------
   // 진열: 메인 강화 + 동료 3 · 장치 2 · 아이템 3. 수치는 모두 임시
+  // 난이도: 적 공격 배율 · 회복량 (임시)
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2 };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
   const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
@@ -412,7 +413,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     fire: { name: '불꽃 고리', board: 'fire' },
     crate: { name: '상자', desc: '투사체를 막는다 · 깨지면 타격 +3' },
     bomb: { name: '폭탄', board: 'bomb', desc: '닿으면 터진다 · 범위 피해 40' },
-    heal: { name: '회복', use: true, desc: '체력 +25' },
+    heal: { name: '회복', use: true, desc: `체력 +${BAL.heal}` },
   };
   const itemDesc = (k) => ITEMS[k].desc || BOARD[ITEMS[k].board].desc;
   const UPGRADES = {
@@ -430,7 +431,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     ],
     common: [
       { id: 'atk', name: '공격력 +2', desc: () => `공격력 ${atkNow()} → ${atkNow() + 2}`, max: 5 },
-      { id: 'hp', name: '최대 체력 +15', desc: () => `최대 체력 ${S.main.maxHp} → ${S.main.maxHp + 15}`, max: 5 },
+      { id: 'hp', name: '최대 체력 +10', desc: () => `최대 체력 ${S.main.maxHp} → ${S.main.maxHp + 10}`, max: 3 },
       { id: 'speed', name: '공 속도 +8%', desc: '공 · 부적 속도 +8%', max: 3 },
     ],
   };
@@ -457,7 +458,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     { id: 'puffs', name: '버섯 밭', kind: 'special' },
   ];
 
-  const S = { opts: { homing: true, cutin: true, sound: true }, uiT: 0 };
+  const S = { opts: { cutin: true, sound: true }, uiT: 0 };
   let T = {};
   const TOKENS = ['ink', 'muted', 'line', 'accent', 'accent-ink', 'chip-ink', 'danger', 'gold', 'dash', 'guard', 'spark', 'finale', 'multi', 'keep', 'petal', 'board', 'board-line', 'foe', 'foe-fill', 'panel', 'bg'];
   function readTokens() {
@@ -601,7 +602,8 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
 
   // ---------- 챕터 흐름 ----------
   function newRun() {
-    S.main = { hp: 100, maxHp: 100, atk: 7, def: 2, shield: 0, flash: 0 };
+    const h0 = HEROES.hanato;
+    S.main = { hp: h0.hp, maxHp: h0.hp, atk: h0.atk, def: h0.def, shield: 0, flash: 0 };
     S.levels = { ryuto: 0, sato: 0, oto: 0, santo: 0 };
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
     S.gold = 0; S.devices = []; S.held = []; S.up = {}; S.ally = null; S.trap = 0; S.unlock = 0;
@@ -621,7 +623,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     const box = document.createElement('div'); box.className = 'cards two';
     Object.entries(HEROES).forEach(([k, h], i) => {
       const src = k === 'hanato' ? $('#portrait').dataset.hanato : ART_SRC.rito;
-      const html = `<img class="hero-pick" alt="${h.name}" src="${src}"><b>${h.name}</b><span class="lv">공격 · ${h.style}</span><div class="eff">${h.desc}</div><div class="eff"><b>${h.skill}</b> · ${h.sdesc}</div>`;
+      const html = `<img class="hero-pick" alt="${h.name}" src="${src}"><b>${h.name}</b><span class="lv">체력 ${h.hp} · 공격 ${h.atk} · 방어 ${h.def}</span><span class="lv">${h.style}</span><div class="eff">${h.desc}</div><div class="eff"><b>${h.skill}</b> · ${h.sdesc}</div>`;
       box.append(button(html, 'card hero-card', 'hero' + i, () => setHero(k)));
     });
     $('#ovBody').append(box);
@@ -630,6 +632,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   function setHero(k) {
     S.hero = k;
     const h = HEROES[k];
+    Object.assign(S.main, { hp: h.hp, maxHp: h.hp, atk: h.atk, def: h.def });
     $('#portrait').src = k === 'hanato' ? $('#portrait').dataset.hanato : ART_SRC.rito;
     $('#portrait').alt = h.name; $('#hero').setAttribute('aria-label', h.name);
     $('.hero-name').textContent = h.name; $('#talkWho').textContent = h.name; $('#skillBtn').textContent = h.skill;
@@ -662,7 +665,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   function blankShot() { return { gated: new Set(), gateT: 0, t: 0, combo: 0, hits: 0, dealt: 0, sinceHit: 0, base: BASE_SPEED, extra: 0, bonusT: 0, bonus: 0, mul: 1, plusN: 0, weapon: null, fire: false, size: 0, used: new Set(), inside: new Set(), coins: new Set() }; }
   function makeFoe(key, x, y, hpMul, atkMul) {
     const f = FOES[key];
-    const pattern = f.p.map((it) => ({ ...it, v: it.t === 'shield' ? it.v : Math.round(it.v * atkMul) }));
+    const pattern = f.p.map((it) => ({ ...it, v: it.t === 'shield' ? it.v : Math.round(it.v * atkMul * BAL.foeAtk) }));
     const hp = Math.round(f.hp * hpMul);
     return { key, trait: f.trait || null, cracks: 0, blinkT: 1 + Math.random() * 3, fadeIn: 0, tpCD: 0, name: f.name, gimmick: f.gimmick || null, hp, maxHp: hp, shownHp: hp, ghostT: 0, shield: 0, r: f.r, x, y, boss: !!f.boss, pattern, pi: 0, intent: { ...pattern[0] }, alive: true, flash: 0, squash: 0, act: 0, cd: 0, strikes: 0, strikeT: 0, strikeMul: 1 };
   }
@@ -675,13 +678,13 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     clearField();
     S.gimmick = null; S.armorOpen = 0; S.rage = false; S.mul = { hp: 1, atk: 1 };
     S.mapT = 0; S.portalCD = 0; S.emote = null;
-    S.special = special || null; S.bGold = { combo: 0 };
+    S.special = special || null; S.bGold = { combo: 0 }; S.satoUsed = false;
     S.ball.x = 480; S.ball.y = 540;
     if (type === 'battle') {
       S.battles++;
       const enc = ENCOUNTERS[Math.min(S.battles, ENCOUNTERS.length) - 1];
       S.mul = { hp: enc.hp, atk: enc.atk };
-      S.enemies = enc.foes.map(([k, x, y]) => makeFoe(k, x, y, enc.hp, enc.atk));
+      S.enemies = enc.foes.map(([k, x, y]) => makeFoe(k, x, y, enc.hp * BAL.foeHp, enc.atk));
       buildMap(enc.map);
       banner(`전투 ${S.battles} · ${enc.tag}`, T.accent);
     } else if (type === 'mid') {
@@ -1062,8 +1065,14 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     S.stock = {
       a: pa,
       dev: shuffle(DEVICES.slice()).slice(0, SHOP.deviceN).map((k) => ({ g: 'dev', k })),
-      items: shuffle(Object.keys(ITEMS)).slice(0, SHOP.itemN).map((k) => ({ g: 'item', k })),
+      items: pickItems(SHOP.itemN).map((k) => ({ g: 'item', k })),
     };
+  }
+  // 아이템 진열: 무작위, 회복만 두 배로 잘 뜬다 (BAL.healWeight)
+  function pickItems(n) {
+    const bag = Object.keys(ITEMS).flatMap((k) => Array(k === 'heal' ? BAL.healWeight : 1).fill(k)), got = [];
+    while (got.length < n && bag.length) { const k = bag[Math.floor(Math.random() * bag.length)]; got.push(k); for (let i = bag.length - 1; i >= 0; i--) if (bag[i] === k) bag.splice(i, 1); }
+    return got;
   }
   function priceOf(o) {
     if (o.g === 'up') return PRICE.upgrade;
@@ -1116,7 +1125,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     if (blockOf(o)) return;
     if (o.g === 'dev' && S.devices.length >= SHOP.deviceMax) { openSwap(o.k, () => { S.gold -= priceOf(o); o.sold = true; sfx.buy(); renderShop(); }, renderShop); return; }
     S.gold -= priceOf(o);
-    if (o.g === 'up') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 15; S.main.hp += 15; } }
+    if (o.g === 'up') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 10; S.main.hp += 10; } }
     else if (o.g === 'ally') S.levels[o.k]++;
     else if (o.g === 'main') S.ally = { kind: o.k, x: -999, y: -999, r: 26, cd: 0, jig: 0 };
     else if (o.g === 'dev') S.devices.push(o.k);
@@ -1195,7 +1204,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   function useItem(i) {
     const k = S.held[i];
     S.held.splice(i, 1);
-    if (k === 'heal') { const m = S.main, v = Math.min(25, m.maxHp - m.hp); m.hp += v; float(S.ball.x, S.ball.y - 56, '+' + v, T.keep, 26, true); sfx.pickup('heart'); for (let j = 0; j < 10; j++) addPetal(S.ball.x, S.ball.y, true); }
+    if (k === 'heal') { const m = S.main, v = Math.min(BAL.heal, m.maxHp - m.hp); m.hp += v; float(S.ball.x, S.ball.y - 56, '+' + v, T.keep, 26, true); sfx.pickup('heart'); for (let j = 0; j < 10; j++) addPetal(S.ball.x, S.ball.y, true); }
     renderSlots(); syncUI(true);
   }
 
@@ -1340,7 +1349,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     const base = sh.base * (sk.active ? 1.35 : 1) * (sh.slowT > 0 ? 0.32 : 1);
     const ns = keep ? (sh.slowT > 0 ? Math.min(sp, base) : sp > base ? Math.max(base, sp - 520 * dt) : base) : Math.max(0, sp - DECEL * dt);
     if (sp > 0) { b.vx *= ns / sp; b.vy *= ns / sp; }
-    if (keep && S.hero !== 'rito' && (sk.active || (S.opts.homing && sh.sinceHit > 0.25))) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
+    if (keep && S.hero !== 'rito' && (sk.active || sh.sinceHit > 0.25)) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
     if (keep && S.hero === 'rito') {
       sh.fireT = (sh.fireT || 0) - dt;
       if (sh.fireT <= 0) { if (sk.active) { sh.fireT = 0.25; ritoVolley(); } else { sh.fireT = 0.3 * Math.pow(0.8, up('rate')); ritoShot(); } }
@@ -1663,10 +1672,11 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     if (S.levels.sato > 0 && foes().length) {
       const b = S.ball, shooter = alive().filter((e) => e.intent && (e.intent.t === 'shot' || e.intent.t === 'fan'))
         .flatMap((e) => sourcesOf(e, e.intent)).sort((a, c) => hyp(a.x - b.x, a.y - b.y) - hyp(c.x - b.x, c.y - b.y))[0];
-      if (shooter) { const a = Math.atan2(shooter.y - b.y, shooter.x - b.x); S.clouds.push({ x: b.x + Math.cos(a) * (b.r + 46), y: b.y + Math.sin(a) * (b.r + 46), r: 30 + 4 * S.levels.sato, t: 0 }); sfx.pop(); }
+      if (shooter) { const a = Math.atan2(shooter.y - b.y, shooter.x - b.x); S.clouds.push({ x: b.x + Math.cos(a) * (b.r + 46), y: b.y + Math.sin(a) * (b.r + 46), r: 28 + 3 * S.levels.sato, t: 0, hp: S.levels.sato }); sfx.pop(); }
     }
-    if (S.levels.sato > 0 && S.main.hp < S.main.maxHp * 0.4 && foes().length) {
-      const v = 4 + 2 * S.levels.sato; S.main.shield += v; float(S.ball.x, S.ball.y - 60, `사토 · 보호막 +${v}`, kcol('sato'), 20, true);
+    if (S.levels.sato > 0 && !S.satoUsed && S.main.hp < S.main.maxHp * 0.4 && foes().length) {
+      S.satoUsed = true;
+      const v = 3 + 2 * S.levels.sato; S.main.shield += v; float(S.ball.x, S.ball.y - 60, `사토 · 보호막 +${v}`, kcol('sato'), 20, true);
     }
     for (const e of foes()) if (e.burnT > 0) { damage(e, e.burn, '화상'); e.burnT--; burst(e.x, e.y, T.dash, 8); }
     if (foes().length === 0) {
@@ -1737,7 +1747,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
         a.x += a.vx * dt; a.y += a.vy * dt;
         if (a.x < -20 || a.x > W + 20 || a.y < -20 || a.y > H + 20) { a.dead = true; continue; }
         const cl = (S.clouds || []).find((c) => hyp(c.x - a.x, c.y - a.y) < c.r + a.r);
-        if (cl) { a.dead = true; burst(a.x, a.y, kcol('sato'), 8); sfx.block(); float(cl.x, cl.y - cl.r - 12, '막음', kcol('sato'), 15); continue; }
+        if (cl) { a.dead = true; burst(a.x, a.y, kcol('sato'), 8); sfx.block(); float(cl.x, cl.y - cl.r - 12, '막음', kcol('sato'), 15); if (--cl.hp <= 0) { S.clouds = S.clouds.filter((c) => c !== cl); burst(cl.x, cl.y, T.panel, 14); sfx.pop(); } continue; }
         const stone = S.walls.find((w) => segDist(a.x, a.y, w) < w.t + a.r);
         if (stone) { a.dead = true; burst(a.x, a.y, T.muted, 8); sfx.stone(); continue; }
         const box = S.crates.find((c) => !c.dead && hyp(c.x - a.x, c.y - a.y) < c.r + a.r);
@@ -2619,10 +2629,16 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
       ctx.globalAlpha = 0.5 * vis; ctx.lineWidth = 2 + l.s; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + l.w, y - l.w * 0.13); ctx.stroke();
     }
     ctx.restore();
+    const art = ART[S.hero === 'rito' ? 'rito' : 'hanato'];
+    if (art) {
+      const ah = H * 0.92, aw = art.width * ah / art.height, ax = W * 0.76 + (1 - easeOut((k - 0.03) / 0.28)) * W * 0.45;
+      ctx.save(); ctx.globalAlpha = vis; ctx.shadowColor = 'rgba(58, 16, 34, 0.5)'; ctx.shadowBlur = 26;
+      ctx.drawImage(art, ax - aw / 2, H - ah + 6, aw, ah); ctx.restore();
+    }
     ctx.globalAlpha = vis;
-    const tx = -360 + easeBack((k - 0.08) / 0.32) * (W * 0.5 + 360);
+    const tx = -360 + easeBack((k - 0.08) / 0.32) * (W * 0.3 + 360);
     ctx.textAlign = 'center';
-    ctx.font = `88px ${FONT_DISPLAY}`; ctx.lineJoin = 'round'; ctx.lineWidth = 12; ctx.strokeStyle = '#3a1022';
+    ctx.font = `80px ${FONT_DISPLAY}`; ctx.lineJoin = 'round'; ctx.lineWidth = 12; ctx.strokeStyle = '#3a1022';
     const hh = HEROES[S.hero || 'hanato'];
     ctx.strokeText(hh.skill, tx, H * 0.5); ctx.fillStyle = '#ffffff'; ctx.fillText(hh.skill, tx, H * 0.5);
     ctx.font = `26px ${FONT_DISPLAY}`; ctx.lineWidth = 7; ctx.strokeText(hh.name, tx, H * 0.5 + 64); ctx.fillStyle = '#ffe3ee'; ctx.fillText(hh.name, tx, H * 0.5 + 64);
@@ -2665,7 +2681,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   $('#skillBtn').addEventListener('click', () => { audio(); trySkill(); });
   document.addEventListener('click', (ev) => { if (ev.target.closest && ev.target.closest('.btn, .card')) sfx.ui(); });
   $('#restart').addEventListener('click', () => { hideOverlay(); newRun(); });
-  for (const [id, key] of [['optHoming', 'homing'], ['optCutin', 'cutin'], ['optSound', 'sound']]) {
+  for (const [id, key] of [['optCutin', 'cutin'], ['optSound', 'sound']]) {
     $('#' + id).addEventListener('change', (ev) => { S.opts[key] = ev.target.checked; savePrefs(); });
   }
 
@@ -2721,6 +2737,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     $('#mHits').textContent = S.run.totalHits + (S.phase === 'shot' ? S.shot.hits : 0);
     $('#mSkill').textContent = S.run.skillUses;
     $('#goldText').textContent = S.gold;
+    $('#heroStat').textContent = `공격 ${atkNow()} · 방어 ${m.def}`;
     for (let i = 0; i < SHOP.itemSlots; i++) { const b = document.getElementById('slot' + i); if (b) b.disabled = !S.held[i] || S.phase !== 'aim'; }
   }
 
@@ -2728,7 +2745,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
   function savePrefs() { try { localStorage.setItem('furryup-v3', JSON.stringify(S.opts)); } catch (e) { /* 없어도 된다 */ } }
   function loadPrefs() {
     try { const o = JSON.parse(localStorage.getItem('furryup-v3') || 'null'); if (o) Object.assign(S.opts, o); } catch (e) { /* 없어도 된다 */ }
-    $('#optHoming').checked = S.opts.homing; $('#optCutin').checked = S.opts.cutin; $('#optSound').checked = S.opts.sound;
+    $('#optCutin').checked = S.opts.cutin; $('#optSound').checked = S.opts.sound;
   }
   let last = 0;
   function frame(t) {
@@ -2759,6 +2776,7 @@ h2 { font-size: 12px; letter-spacing: .08em; color: var(--muted); margin: 0; fon
     addGold(n) { S.gold += n; if (S.phase === 'shop') renderShop(); syncUI(true); },
     forceEvent(id) { S.forceEvent = id; },
     forceMain() { S.forceMain = true; },
+    sim(sec) { const n = Math.round(sec * 60); for (let i = 0; i < n; i++) update(1 / 60); syncUI(true); return S.phase; },
     rerender() { renderSlots(); renderPanel(); syncUI(true); },
     restock() { if (S.phase !== 'shop') return false; rollStock(); renderShop(); return true; },
   };
