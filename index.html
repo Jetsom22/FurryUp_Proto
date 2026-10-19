@@ -2505,7 +2505,7 @@ body { display: grid; place-items: center; }
     $('#battle').hidden = v !== 'battle'; $('#story').hidden = v !== 'story'; $('#overlay').hidden = v !== 'scene';
   }
   function showOverlay(title, kind) {
-    S.keys = null; S.swapCancel = null;
+    S.keys = null; S.swapCancel = null; S.drawN = (S.drawN || 0) + 1;
     $('#ovTitle').textContent = title || '';
     $('#ovTitle').hidden = !title;
     $('#ovBody').innerHTML = '';
@@ -2716,7 +2716,7 @@ body { display: grid; place-items: center; }
     if (R.ach.length) gain += `<h4>도전과제 ${R.ach.length}개 달성</h4><div class="grow"><span class="dot" style="--c:var(--accent-2)">${ico('crown')}</span><div>${R.ach.map((a) => a.name).join(' · ')}<small>원정대 본부 도전과제에서 받는다</small></div></div>`;
     const bros = [S.hero, ...crew].slice(0, 5);
     $('#ovBody').innerHTML = `<div class="shout res-shout" data-mo="off" style="left:120px;top:80px;font-size:128px;transform:rotate(-5deg)">${chars(win ? '챕터 클리어!' : '원정 실패…')}</div>`
-      + `<div class="led res res-led" style="left:150px;top:330px;width:660px">${rows.map(([k, v]) => `<div class="led__row" style="margin-top:12px"><span>${k}</span><b data-g="${'8'.repeat(String(v).length)}">${v}</b></div>`).join('')}</div>`
+      + `<div class="led res res-led" style="left:150px;top:330px;width:660px">${rows.map(([k, v]) => { const fin = typeof v === 'number' ? String(v).padStart(3, '0') : String(v); return `<div class="led__row" style="margin-top:12px"><span>${k}</span><b data-g="${'8'.repeat(fin.length)}" data-cnt="${fin}" data-cnt-at="0.9">${fin}</b></div>`; }).join('')}</div>`
       + `<div class="rbox" style="left:860px;top:140px;width:560px;transform:rotate(1deg)">${gain}</div>`
       + bros.map((k, i) => (HEROES[k]
         ? `<div class="res-bro" data-mo="off" style="--k:${i};left:1450px;top:240px;transform:rotate(-4deg)"><img class="sticker" alt="" src="${heroSrc(k)}" style="height:560px"></div>`
@@ -2728,7 +2728,7 @@ body { display: grid; place-items: center; }
     stop.style.cssText = '--k:1;left:1520px;top:910px;transform:rotate(3deg)';
     pick.append(again, stop); $('#ovBody').append(pick);
     renderTrack();
-    moEnter('result', 'res-go');
+    if (moEnter('result', 'res-go')) resCount($('#ovBody'));
     again.focus({ preventScroll: true });
     syncUI(true);
   }
@@ -2738,7 +2738,7 @@ body { display: grid; place-items: center; }
   // 칸이 가득 차면 교체 창 (FixSwap): 내보내는 것을 되팔기 값(refund, 동료는 ★ 하나마다)으로 돌려받는다
   const FIX = { rows: 3, reroll: 2, refund: { dev: 2, item: 1, ally: 3 } };
   const FIX_ROWS = [['ally', '동료 영입'], ['up', '메인 강화'], ['dev', '장치'], ['item', '보급품']];
-  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', poor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: '고마워! 이걸로 맛있는 거 사 먹어야지.', reroll: '잠깐, 수레 안쪽에서 새 물건 꺼내 올게!', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.', sold: '그건 벌써 팔렸어.' };
+  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', pick: (n, pr) => `${n}? 눈이 높구먼! ${pr}엽전이야.`, poor: '에이, 엽전이 모자라네. 찜해 두면 다음 정비까지 챙겨 둘게.', buyPoor: '엽전이 모자라네. 찜해 두면 챙겨 둘게.', rerollPoor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: (n, pr) => `${n} 잘 골랐어! 엽전 ${pr} 받을게.`, reroll: '새 물건 꺼내 왔어! 찜한 건 그대로 뒀어.', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.', sold: '그건 벌써 팔렸어.' };
   function openShop() {
     S.phase = 'shop';
     clearField();
@@ -2854,26 +2854,34 @@ body { display: grid; place-items: center; }
       S.gain = null; S.stock = null; S.fix = null; S.keys = null; nextNode();
     });
     next.style.cssText = 'left:1490px;top:948px;transform:rotate(-1.5deg);z-index:7'; $('#ovBody').append(next);
-    // 손맛
-    const say = (t) => { S.fixSay = t; const b = $('#ovBody .fix-bub'); if (b) { b.innerHTML = `<b>오토</b>${t}`; SQ(b); } };
+    // 손맛 (원본 FixMain): 고르면 상세 · 말풍선이 바뀐다. 찜은 표시만
     for (const b of document.querySelectorAll('#ovBody .fix-it[data-r]')) b.addEventListener('click', () => {
       const o = S.stock[b.dataset.r][+b.dataset.i];
-      if (o === fix.sel) { SQ(b); return; }
+      if (o === fix.sel) return;
       fix.sel = o; fix.sell = -1;
-      S.fixSay = o.sold ? OTO_SAY.sold : S.gold < priceOf(o) ? OTO_SAY.poor : `${itemInfo(o).name}? ${priceOf(o)}엽전이야. 눈이 높구먼!`;
-      renderShop(); SQ($('#ovBody .fix-it.sel'));
+      S.fixSay = o.sold ? OTO_SAY.sold : S.gold < priceOf(o) ? OTO_SAY.poor : OTO_SAY.pick(itemInfo(o).name, priceOf(o));
+      renderShop();
     });
     if (sel) {
-      $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); POP($('#ovBody .fix-it.sel')); });
+      $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); });
       $('#fixBuy').addEventListener('click', () => buy(sel));
     }
+    // 원본 doReroll: 찜하지 않은 물건이 차례로 접혔다 펴지며 (반쯤 접혔을 때 새 물건으로) 바뀐다. 손잡이가 돌고 오토가 말한다
     $('#fixReroll').addEventListener('click', () => {
       const btn = $('#fixReroll');
-      if (S.gold < fix.reroll) { SHK(btn); say(OTO_SAY.poor); return; }
+      if (S.gold < fix.reroll) { SHK(btn); fixSay(OTO_SAY.rerollPoor); return; }
+      const old = [...document.querySelectorAll('#ovBody .fix-it')].map((e) => [e.className, e.innerHTML]);
       S.gold -= fix.reroll; fix.reroll++; fix.sel = null; S.fixSay = OTO_SAY.reroll; sfx.buy();
       rollStock(); renderShop();
-      $('#fixReroll').classList.add('spin');
-      for (const it of document.querySelectorAll('#ovBody .fix-it:not(.pin)')) if (!reduceMotion) it.animate([{ scale: '.04 1' }, { scale: '1.06 1', offset: 0.6 }, { scale: '1 1' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+      RE($('#fixReroll'), 'spin');
+      document.querySelectorAll('#ovBody .fix-it').forEach((e, i) => {
+        if (e.classList.contains('pin') || !old[i]) return;
+        const nw = [e.className, e.innerHTML];
+        [e.className, e.innerHTML] = old[i];
+        e.animate([{ scale: '1 1', translate: '0 0' }, { scale: '0 1', translate: '0 -10px', offset: 0.45 }, { scale: '0 1', translate: '0 -30px', offset: 0.5 }, { scale: '1 1', translate: '0 0' }], { duration: RM ? 1 : 520, delay: RM ? 0 : i * 45, easing: 'ease-in-out' });
+        setTimeout(() => { [e.className, e.innerHTML] = nw; }, RM ? 0 : i * 45 + 250);
+      });
+      fixSay(OTO_SAY.reroll);
     });
     for (const d of document.querySelectorAll('#ovBody .fix-dev button')) d.addEventListener('click', () => {
       const i = +d.dataset.dev;
@@ -2894,21 +2902,53 @@ body { display: grid; place-items: center; }
     else { S.held.push(o.k); META.seen.dev[o.k] = 1; }
     META.stat.party = Math.max(META.stat.party, crewList().length);
   }
+  // 원본 say: 오토의 말이 바뀌며 말풍선이 통 눌린다
+  function fixSay(t) { S.fixSay = t; const b = $('#ovBody .fix-bub'); if (b) { b.innerHTML = `<b>오토</b>${t}`; RE(b, 'talk'); } }
+  // 원본 roll: 엽전 숫자가 굴러 바뀌고 동전이 눌린다. 원본 fix-coinpop: 엽전 아래로 -값이 떠오른다
+  function fixRoll(from, to) {
+    const coin = $('#ovBody .fix-coin b'); if (!coin) return;
+    const t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / 600); coin.textContent = Math.round(from + (to - from) * k); if (k < 1) requestAnimationFrame(f); })(t0);
+    coin.parentNode.animate([{ scale: '1 1' }, { scale: '1.2 .82' }, { scale: '.94 1.06' }, { scale: '1 1' }], { duration: 450 });
+  }
+  function coinPop(pr) {
+    const coin = $('#ovBody .fix-coin b'); if (!coin) return;
+    const p = document.createElement('span'), c = FC(coin); p.className = 'fix-coinpop'; p.textContent = '-' + pr; p.style.left = (c[0] - 20) + 'px'; p.style.top = (c[1] + 30) + 'px';
+    FLY_ROOT().appendChild(p); setTimeout(() => p.remove(), 1100);
+  }
+  // 원본 target: 장치 → 빈 장치 칸, 동료 → 빈 자리 (있던 동료면 그 자리), 보급품 → 빈 깡통, 메인 강화 → 메인 와펜. after = 산 뒤 다시 그린 화면에서
+  function fixSpot(o, after) {
+    if (o.g === 'dev') return after ? $(`#ovBody .fix-dev [data-dev="${S.devices.length - 1}"]`) : $('#ovBody .fix-dev > span');
+    if (o.g === 'ally' || o.g === 'main') { const i = crewList().indexOf(o.k); return i >= 0 ? document.querySelectorAll('#ovBody .fix-mate')[i] : $('#ovBody .fix-mate.empty'); }
+    if (o.g === 'item') return after ? $(`#ovBody .fix-tins > div:nth-child(${S.held.length}) span`) : $('#ovBody .fix-tins span.empty');
+    return $('#ovBody .fix-hero');
+  }
   function buy(o) {
-    const pr = priceOf(o), card = $(`#ovBody .fix-it.sel`);
-    if (o.sold) { SHK(card); return; }
-    if (S.gold < pr) { SHK(card); S.fixSay = OTO_SAY.poor; renderShop(); SHK($('#ovBody .fix-it.sel')); return; }
-    const done = () => {
-      o.info = itemInfo(o);
-      S.gold -= pr; give(o); o.sold = true; o.pin = false;
-      if (S.levels.santo > 0) META.stat.santoBuys++;
-      S.fixSay = OTO_SAY.buy; sfx.buy();
-      renderPanel(); renderSlots(); renderShop();
-      const s = $('#ovBody .fix-it.sel'); POP(s); BUMP($('#ovBody .fix-coin'));
-    };
+    if (o.sold) return;
+    const pr = priceOf(o);
+    if (S.gold < pr) { fixSay(OTO_SAY.buyPoor); return; }
     const full = fullOf(o);
-    if (full) { const I = itemInfo(o); openSwap({ kind: full, name: I.name, tg: I.tg, ef: I.ef, pt: o.k, price: pr, done, cancel: renderShop }); return; }
-    done();
+    if (full) { const I = itemInfo(o); openSwap({ kind: full, name: I.name, tg: I.tg, ef: I.ef, pt: o.k, price: pr, done: () => bought(o, pr, false), cancel: renderShop }); return; }
+    bought(o, pr, true);
+  }
+  // 원본 doBuy: 물건 조각이 수레에서 들어갈 칸으로 포물선을 그리며 날아가 칸이 눌리고, 엽전이 굴러 내려가며 -값이 뜬다
+  // fly = false: 교체 창에서 이미 날아 들어갔다
+  function bought(o, pr, fly) {
+    const it = $('#ovBody .fix-it.sel'), pt = fly && it && it.querySelector('.pt'), tg = pt && fixSpot(o, false), g0 = S.gold, n0 = S.drawN;
+    o.info = itemInfo(o);
+    S.gold -= pr; give(o); o.sold = true; o.pin = false;
+    if (S.levels.santo > 0) META.stat.santoBuys++;
+    sfx.buy();
+    renderPanel(); renderSlots();
+    const say = OTO_SAY.buy(o.info.name, pr);
+    const land = () => { S.fixSay = say; renderShop(); const t2 = fly && fixSpot(o, true); if (t2) t2.animate([{ scale: '1 1' }, { scale: '1.3 .75' }, { scale: '.9 1.12' }, { scale: '1 1' }], { duration: 480, easing: 'ease-out' }); };
+    if (!tg) { land(); fixRoll(g0, S.gold); coinPop(pr); fixSay(say); return; }
+    const a = FC(pt), b = FC(tg), f = document.createElement('div');
+    f.className = 'fix-fly'; f.style.setProperty('--c', getComputedStyle(pt).backgroundColor); f.innerHTML = pt.innerHTML;
+    f.style.left = a[0] + 'px'; f.style.top = a[1] + 'px'; FLY_ROOT().appendChild(f);
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    f.animate([{ translate: '0 0', scale: '1' }, { translate: `${dx * 0.5}px ${dy * 0.5 - 180}px`, scale: '1.35', offset: 0.45 }, { translate: `${dx}px ${dy}px`, scale: '.9' }], { duration: RM ? 1 : 720, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).onfinish = () => { f.remove(); if (S.drawN === n0) land(); };
+    it.classList.add('sold'); it.classList.remove('sel');
+    fixRoll(g0, S.gold); coinPop(pr); fixSay(say);
   }
   // 교체 창 (FixSwap): 정비 화면 위를 덮는 캔버스. 왼쪽 새로 들어올 것, 오른쪽 지금 칸 (모두 같은 크기), 아래 되팔기 계산과 사지 않기 · 교체
   // kind: ally · dev · item. done/cancel은 교체 · 취소 뒤에 부른다. 이벤트에서 장치를 얻을 때도 쓴다 (price 0)
@@ -2937,18 +2977,37 @@ body { display: grid; place-items: center; }
       const nm = w.kind === 'ally' ? KINDS[slots[i]].name : w.kind === 'dev' ? BOARD[slots[i]].name : ITEMS[slots[i]].name, rf = refund(i);
       sum.innerHTML = `내보내기 · <b>${nm}</b> → 되팔기 <b>엽전 +${rf}</b><br>${w.price ? `${w.name} 값 ${w.price} − ${rf} = 실제로 내는 엽전 <b>${Math.max(0, w.price - rf)}</b> (지금 엽전 ${S.gold})` : `엽전 +${rf}을 받고 ${w.name}${josa(w.name, '을', '를')} 넣어요`}`;
     };
-    for (const s of document.querySelectorAll('#ovBody .fix-slot')) { s.addEventListener('mouseenter', () => set(+s.dataset.i)); s.addEventListener('click', () => { set(+s.dataset.i); SQ(s); }); }
+    for (const s of document.querySelectorAll('#ovBody .fix-slot')) { s.addEventListener('mouseenter', () => set(+s.dataset.i)); s.addEventListener('click', () => set(+s.dataset.i)); }
     set(0);
     const close = () => { S.swapCancel = null; S.keys = keys0; };
     const keys0 = S.keys;
-    const cancel = () => { close(); w.cancel(); };
+    let going = false;
+    const cancel = () => { if (going) return; close(); w.cancel(); };
+    // 원본 doSwap: 내보내는 것이 빙글 돌며 날아 나가고 +되팔기 값이 뜬다. 새 것이 그 칸으로 날아 들어가 칸이 눌린 뒤 교체한다
     go.addEventListener('click', () => {
-      const i = pick, k = slots[i];
-      close();
-      S.gold += refund(i);
-      if (w.kind === 'ally') S.levels[k] = 0; else if (w.kind === 'dev') S.devices.splice(i, 1); else S.held.splice(i, 1);
-      sfx.coin(1);
-      w.done();
+      if (going) return;
+      going = true;
+      const i = pick, k = slots[i], rf = refund(i), s = $(`#ovBody .fix-slot[data-i="${i}"]`), big = $('#ovBody .fix-newc .big'), r = FLY_ROOT();
+      close(); S.keys = {};
+      const img = s.querySelector('img') || s.firstElementChild, a = FC(big), b = FC(img);
+      const out = document.createElement('div'); out.className = 'fix-fly'; out.style.width = out.style.height = '78px'; out.style.margin = '-39px 0 0 -39px'; out.innerHTML = img.outerHTML; out.style.left = b[0] + 'px'; out.style.top = b[1] + 'px'; r.appendChild(out);
+      out.animate([{ translate: '0 0', scale: '1', rotate: '0deg', opacity: 1 }, { translate: '260px -60px', scale: '.6', rotate: '40deg', opacity: 0 }], { duration: RM ? 1 : 600, easing: 'ease-in', fill: 'forwards' }).onfinish = () => out.remove();
+      const p = document.createElement('span'); p.className = 'fix-coinpop'; p.textContent = '+' + rf; p.style.left = (b[0] + 300) + 'px'; p.style.top = (b[1] - 30) + 'px'; r.appendChild(p); setTimeout(() => p.remove(), 1100);
+      const f = document.createElement('div'); f.className = 'fix-fly'; f.style.width = f.style.height = '120px'; f.style.margin = '-60px 0 0 -60px'; f.innerHTML = big.innerHTML; f.style.setProperty('--c', getComputedStyle(big).backgroundColor);
+      f.style.left = a[0] + 'px'; f.style.top = a[1] + 'px'; r.appendChild(f);
+      const dx = b[0] - a[0], dy = b[1] - a[1];
+      f.animate([{ translate: '0 0', scale: '1' }, { translate: `${dx * 0.5}px ${dy * 0.5 - 140}px`, scale: '1.1', offset: 0.5 }, { translate: `${dx}px ${dy}px`, scale: '.65' }], { duration: RM ? 1 : 700, delay: RM ? 0 : 150, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).onfinish = () => {
+        f.remove();
+        if (w.kind === 'ally' && (KINDS[w.pt] || HEROES[w.pt])) s.style.setProperty('--c', `var(--char-${w.pt})`);
+        s.innerHTML = `${w.kind === 'ally' && (KINDS[w.pt] || HEROES[w.pt]) ? faceImg(w.pt) : `<span style="width:56px;height:56px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--spirit);color:var(--ink)">${w.kind === 'dev' ? devFace(w.pt) : ico(ITEM_ICO[w.pt] || 'bag')}</span>`}<div><b>${w.name}</b><small>${w.tg}</small><p>${w.ef} · 새로 들어옴</p></div><span class="rf" style="opacity:0"></span>`;
+        s.animate([{ scale: '1 1' }, { scale: '1.06 .86' }, { scale: '.98 1.04' }, { scale: '1 1' }], { duration: 480, easing: 'ease-out' });
+        setTimeout(() => {
+          S.keys = keys0; S.gold += rf;
+          if (w.kind === 'ally') S.levels[k] = 0; else if (w.kind === 'dev') S.devices.splice(i, 1); else S.held.splice(i, 1);
+          sfx.coin(1);
+          w.done();
+        }, RM ? 0 : 480);
+      };
     });
     $('#swapCancel').addEventListener('click', cancel);
     S.swapCancel = cancel;
@@ -2993,7 +3052,7 @@ body { display: grid; place-items: center; }
   const fmtN = (v) => Math.round(v).toLocaleString('en-US');
   const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return c >= 0 && c <= 11171 && c % 28 ? a : b; };
   const add = (html) => $('#ovBody').insertAdjacentHTML('beforeend', html);
-  const chipHtml = (k) => `<span class="og-chip${k === 'jelly' ? ' j' : ''}" data-cur="${k}"><i>${ico(MONEY[k].ico)}</i><span class="n">${fmtN(META[k])}</span><small>${MONEY[k].name}</small></span>`;
+  const chipHtml = (k) => `<span class="og-chip${k === 'jelly' ? ' j' : ''}" data-cur="${k}"><i>${ico(MONEY[k].ico)}</i>${fmtN(META[k])}<small>${MONEY[k].name}</small></span>`;
   const costHtml = (k, v) => `<span class="og-cost ${k === 'jelly' ? 'j' : k === 'coin' ? 'g' : 'm'}"><i>${ico(k === 'jelly' ? 'carrot' : k === 'coin' ? 'coin' : 'star')}</i>${typeof v === 'number' ? fmtN(v) : v}</span>`;
   const pipsHtml = (n, max) => `<span class="og-pips">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
   const patch = (k, size, extra) => `<span class="og-patch" style="width:${size}px;height:${size}px;--c:var(--char-${k})${extra || ''}">${faceImg(k, 'fill')}</span>`;
@@ -3016,7 +3075,6 @@ body { display: grid; place-items: center; }
     if (back !== false) $('#ogBack').addEventListener('click', back || showLobby);
     $('#ogGear').addEventListener('click', () => setMenu(true));
   }
-  const refreshChips = () => { for (const el of document.querySelectorAll('#ovBody .og-chip[data-cur]')) el.querySelector('.n').textContent = fmtN(META[el.dataset.cur]); };
   function ogBtn(label, cls, id, style, fn, off) {
     const b = button(label, 'og-btn' + (cls ? ' ' + cls : ''), id, fn);
     b.style.cssText = style; if (off) b.classList.add('off');
@@ -3035,35 +3093,39 @@ body { display: grid; place-items: center; }
   // ---------- 디자인 시스템 모션 (bundle.js의 motion을 옮김) ----------
   // 화면에 처음 들어올 때만 차례로 붙는다 (위 → 아래, 왼 → 오른). 같은 화면을 다시 그리면 등장 연출을 건너뛰고 대기 움직임만 남긴다
   const MO_ENTER = [
-    ['.og-bar, .tmap', 'mo-drop', 0.55, 'var(--mo-spring)'],
-    ['.og-sheet, .panel, .led, .shp-cork', 'mo-drop', 0.6, 'var(--mo-spring)'],
-    ['.og-tabs, .tapekeys', 'mo-unroll', 0.5, 'var(--mo-out)'],
-    ['img.sticker, .fig, .shp-hero', 'mo-rise', 0.75, 'var(--mo-spring)'],
+    ['.og-bar, .tmap, .bingo', 'mo-drop', 0.55, 'var(--mo-spring)'],
+    ['.og-sheet, .panel, .stall, .led, .shp-cork', 'mo-drop', 0.6, 'var(--mo-spring)'],
+    ['.og-tabs, .tapekeys, .lines', 'mo-unroll', 0.5, 'var(--mo-out)'],
+    ['img.sticker, .who, .fig, .shp-hero', 'mo-rise', 0.75, 'var(--mo-spring)'],
     ['.shout', 'mo-punch', 0.6, 'var(--mo-pop)'],
-    ['.og-btn, .ticket, .boardsign, .og-title, .og-back', 'mo-slap', 0.5, 'var(--mo-pop)'],
-    ['.mate, .say, .gold, .burst, .og-patch, .shp-card, .shp-memo', 'mo-slap', 0.45, 'var(--mo-pop)'],
+    ['.foe', 'mo-sprout', 0.55, 'var(--mo-pop)'],
+    ['.og-btn, .ticket, .boardsign, .hang, .og-title, .og-back', 'mo-slap', 0.5, 'var(--mo-pop)'],
+    ['.mate, .m4, .stamp, .say, .gold, .capsule, .skill, .burst, .og-patch, .shp-card, .shp-memo, .pins > span, .candy, .hex, .prize, .ball, .pow', 'mo-slap', 0.45, 'var(--mo-pop)'],
   ];
-  const MO_IDLE = [['img.sticker', 'breathe'], ['.shout', 'wobble'], ['.og-btn.p', 'pulse'], ['.shp-memo', 'sway']];
+  const MO_IDLE = [['img.sticker, .who', 'breathe'], ['.foe__art', 'bob'], ['.shout', 'wobble'], ['.og-btn.p', 'pulse'], ['.hang, .shp-memo', 'sway']];
   const GO = ['lob-go', 'cdx-go', 'shp-go', 'ttl-go', 'evt-go', 'res-go'];
   let moKey = '';
-  function moIdle(el) { for (const [sel, k] of MO_IDLE) if (el.matches(sel)) { el.style.setProperty('--mo-i', (-Math.random() * 3).toFixed(2) + 's'); el.classList.add('mo-idle-' + k); return; } }
+  // 화면 연출(-go)이 이미 움직이는 것은 공통 등장 · 대기 움직임을 얹지 않는다 (원본 busy)
+  const moBusy = (el) => { const a = getComputedStyle(el).animationName; return a && a !== 'none' && a.indexOf('mo-') !== 0; };
+  function moIdle(el) { if (moBusy(el)) return; for (const [sel, k] of MO_IDLE) if (el.matches(sel)) { el.style.setProperty('--mo-i', (-Math.random() * 3).toFixed(2) + 's'); el.classList.add('mo-idle-' + k); return; } }
+  // 처음 들어온 화면이면 true (화면 스크립트의 START를 이때만 부른다)
   function moEnter(key, go) {
     const app = $('#app'), root = $('#ovBody'), fresh = key !== moKey;
     moKey = key;
     if (fresh) { for (const c of GO) app.classList.remove(c); if (go && !reduceMotion) { void app.offsetWidth; app.classList.add(go); } }
     const idle = () => root.querySelectorAll(MO_IDLE.map((x) => x[0]).join(',')).forEach((el) => { if (!el.classList.contains('mo-in') && !el.closest('[data-mo="off"]')) moIdle(el); });
     if (!fresh || reduceMotion) {
-      // 다시 그린 화면: 화면 연출(-go)의 등장은 끝난 자리로, 반복 움직임은 그대로
-      for (const el of root.querySelectorAll('*')) for (const a of el.getAnimations()) if (Number.isFinite(a.effect.getTiming().iterations) && a.effect.getTiming().iterations < 50) a.finish();
-      idle(); return;
+      // 다시 그린 화면: 화면 연출(-go)의 등장은 끝난 자리로 (의사 요소 포함), 반복 움직임은 그대로
+      for (const a of root.getAnimations({ subtree: true })) { const tm = a.effect.getTiming(); if (Number.isFinite(tm.iterations) && tm.iterations < 50) a.finish(); }
+      idle(); return false;
     }
     const rr = root.getBoundingClientRect(), seen = new Set(), list = [];
     for (const [sel, k, t, e] of MO_ENTER) {
       for (const el of root.querySelectorAll(sel)) {
         if (seen.has(el) || el.closest('[data-mo="off"]')) continue;
         let p = el.parentElement, skip = false;
-        if (!/rise|punch/.test(k)) while (p && p !== root) { if (seen.has(p)) { skip = true; break; } p = p.parentElement; }
-        if (skip) continue;
+        if (!/rise|punch|sprout/.test(k)) while (p && p !== root) { if (seen.has(p)) { skip = true; break; } p = p.parentElement; }
+        if (skip || moBusy(el)) continue;
         seen.add(el); const r = el.getBoundingClientRect();
         list.push({ el, k, t, e, o: (r.top - rr.top) * 0.6 + (r.left - rr.left) * 0.4 });
       }
@@ -3078,12 +3140,65 @@ body { display: grid; place-items: center; }
       it.el.addEventListener('animationend', function f(ev) { if (ev.target !== it.el || ev.animationName !== it.k) return; it.el.removeEventListener('animationend', f); it.el.classList.remove('mo-in'); moIdle(it.el); });
     });
     idle();
+    return true;
   }
   // 손맛: 눌림 · 고개 젓기 · 톡 (Web Animations, 동작 줄이기면 건너뛴다)
   const SQ = (el) => { if (!reduceMotion && el) el.animate([{ scale: '1 1' }, { scale: '1.1 .86', offset: 0.3 }, { scale: '.95 1.07', offset: 0.62 }, { scale: '1 1' }], { duration: 420, easing: 'ease-out' }); };
   const SHK = (el) => { if (!reduceMotion && el) el.animate([{ translate: '0 0' }, { translate: '-9px 0' }, { translate: '8px 0' }, { translate: '-5px 0' }, { translate: '3px 0' }, { translate: '0 0' }], { duration: 420, easing: 'ease-out' }); };
   const POP = (el) => { if (!reduceMotion && el) el.animate([{ scale: '0', opacity: 0 }, { scale: '1.6', opacity: 1, offset: 0.55 }, { scale: '1' }], { duration: 420, easing: 'ease-out' }); };
-  const BUMP = (el) => { if (el) { el.classList.remove('cdx-bump'); void el.offsetWidth; el.classList.add('cdx-bump'); } };
+  // ---------- 디자인 시스템 화면 스크립트 (컴포넌트마다 preview.html에 붙은 것을 그대로) ----------
+  // RE · FMT · CNT · TYPE · NUM · CHIPV · CHIPSET · FLY · FLIP는 원본 함수. 원본은 같은 DOM을 고치고 이 프로토는 화면을 다시 그리므로
+  // 날아가는 조각 · 떠오르는 숫자는 다시 그려도 남는 #overlay에 붙이고, 연출이 끝난 뒤에 조용히 다시 그린다 (later)
+  const RM = reduceMotion;
+  function RE(el, c) { if (!el) return; el.classList.remove(c); void el.offsetWidth; el.classList.add(c); }
+  function FMT(v) { return Math.round(v).toLocaleString('en-US'); }
+  function CNT(el, a, b, ms) { if (!el) return; if (RM) { el.textContent = FMT(b); return; } const t0 = performance.now(); (function s(t) { const k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = FMT(a + (b - a) * e); if (k < 1) requestAnimationFrame(s); })(t0); }
+  function TYPE(el, txt, ms) { if (!el) return; clearInterval(el.__tw); if (RM) { el.textContent = txt; return; } let i = 0; el.textContent = ''; el.__tw = setInterval(() => { i++; el.textContent = txt.slice(0, i); if (i >= txt.length) clearInterval(el.__tw); }, ms || 32); }
+  function NUM(chip) { for (const n of chip.childNodes) if (n.nodeType === 3 && /\d/.test(n.nodeValue)) return n; return null; }
+  function CHIPV(chip) { const n = NUM(chip); return n ? parseInt(n.nodeValue.replace(/[^0-9]/g, ''), 10) : 0; }
+  function CHIPSET(chip, a, b) { const n = NUM(chip); if (!n) return; if (RM) { n.nodeValue = FMT(b); return; } const t0 = performance.now(); (function s(t) { const k = Math.min(1, (t - t0) / 600), e = 1 - Math.pow(1 - k, 3); n.nodeValue = FMT(a + (b - a) * e); if (k < 1) requestAnimationFrame(s); })(t0); RE(chip, 'cdx-bump'); }
+  function FLY(src, dst, root, done) {
+    if (RM || !src || !dst) { if (done) done(); return; }
+    const rr = root.getBoundingClientRect(), sc = rr.width / root.offsetWidth, a = src.getBoundingClientRect(), b = dst.getBoundingClientRect();
+    const c = src.cloneNode(true); c.style.cssText = `position:absolute;margin:0;z-index:60;left:${(a.left - rr.left) / sc}px;top:${(a.top - rr.top) / sc}px;pointer-events:none`; root.appendChild(c);
+    const dx = (b.left + b.width / 2 - (a.left + a.width / 2)) / sc, dy = (b.top + b.height / 2 - (a.top + a.height / 2)) / sc;
+    const an = c.animate([{ translate: '0 0', scale: '1', rotate: '0deg' }, { translate: `${dx * 0.45}px ${dy * 0.45 - 170}px`, scale: '1.45', rotate: '-12deg', offset: 0.45 }, { translate: `${dx}px ${dy}px`, scale: '.5', rotate: '8deg', opacity: 0.4 }], { duration: 720, easing: 'cubic-bezier(.45,0,.4,1)' });
+    an.onfinish = () => { c.remove(); if (done) done(); };
+  }
+  function FLIP(els, mid) {
+    if (RM) { mid(); return; }
+    let n = 0;
+    els.forEach((e) => { e.animate([{ scale: '1 1' }, { scale: '.04 1' }], { duration: 130, easing: 'ease-in', fill: 'forwards' }).onfinish = () => { if (++n < els.length) return; mid(); els.forEach((x) => { x.getAnimations().forEach((a) => a.cancel()); x.animate([{ scale: '.04 1' }, { scale: '1.06 1', offset: 0.6 }, { scale: '1 1' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' }); }); }; });
+  }
+  // 날아가는 조각을 붙이는 곳 (화면을 다시 그려도 남는다), 그 안의 가운데 좌표 (원본 FixMain · FixSwap의 C)
+  const FLY_ROOT = () => $('#overlay');
+  const FC = (el) => { const r = FLY_ROOT(), a = r.getBoundingClientRect(), b = el.getBoundingClientRect(), k = a.width / r.offsetWidth; return [(b.left - a.left + b.width / 2) / k, (b.top - a.top + b.height / 2) / k]; };
+  // 연출이 끝난 뒤 조용히 다시 그리기. n0 = 연출을 시작할 때의 화면 번호, 그 사이 다른 화면으로 갔으면 하지 않는다
+  const later = (fn, ms, n0 = S.drawN) => { setTimeout(() => { if (S.drawN === n0) fn(); }, ms); };
+  // 원본 bundle.js: 버튼 · 탭 · 쪽지 · 키를 누르면 찌그러진다
+  $('#app').addEventListener('pointerdown', (e) => { const b = e.target.closest('.og-btn, .ticket, .og-tab, .m4, .shp-card, .key'); if (b) RE(b, 'mo-press'); });
+  // OgLobby: [data-cnt] 숫자와 재화 칩이 0부터 세어 올라간다
+  function lobCount(r) {
+    const L = [];
+    r.querySelectorAll('[data-cnt]').forEach((el) => { L.push([el, el.getAttribute('data-cnt'), parseFloat(el.getAttribute('data-cnt-at') || '.6')]); });
+    r.querySelectorAll('.og-chip').forEach((c, i) => { let t = null; c.childNodes.forEach((n) => { if (n.nodeType === 3 && /\d/.test(n.textContent)) t = n; }); if (t) { const sp = document.createElement('span'); sp.textContent = t.textContent; c.replaceChild(sp, t); sp.setAttribute('data-cnt', sp.textContent); L.push([sp, sp.textContent, 0.4 + i * 0.15]); } });
+    L.forEach((x) => {
+      const el = x[0], fin = x[1], n = parseInt(fin.replace(/,/g, ''), 10), com = fin.indexOf(',') >= 0, fmt = (v) => (com ? v.toLocaleString('en-US') : String(v));
+      let t0 = null;
+      el.textContent = fmt(0);
+      setTimeout(() => { function st(ts) { if (!t0) t0 = ts; const p = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(Math.round(n * e)); if (p < 1) requestAnimationFrame(st); else el.textContent = fin; } requestAnimationFrame(st); }, x[2] * 1000);
+    });
+  }
+  // CampResult: 칠판 숫자가 0부터 세어 올라가고 (앞자리 0 유지), 다 세면 통 튄다
+  function resCount(r) {
+    r.querySelectorAll('[data-cnt]').forEach((el, i) => {
+      const fin = el.getAttribute('data-cnt'), n = parseInt(fin.replace(/,/g, ''), 10), w = fin.length, pad = /^0/.test(fin), com = fin.indexOf(',') >= 0, d0 = parseFloat(el.getAttribute('data-cnt-at') || '0.6') * 1000 + i * 180, dur = 1000;
+      const fmt = (v) => { let s = String(v); if (com) s = v.toLocaleString('en-US'); if (pad) while (s.length < w) s = '0' + s; return s; };
+      let t0 = null;
+      el.textContent = fmt(0);
+      setTimeout(() => { function st(ts) { if (!t0) t0 = ts; const p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(Math.round(n * e)); if (p < 1) requestAnimationFrame(st); else { el.textContent = fin; RE(el, 'bump'); } } t0 = null; requestAnimationFrame(st); }, d0);
+    });
+  }
 
   // 타이틀 (CampTitle): 전구 두른 나무 간판, 한 글자씩 떨어지는 제목, 흩어 놓은 이름표 메뉴, 겹쳐 붙인 형제
   function showTitle() {
@@ -3138,7 +3253,7 @@ body { display: grid; place-items: center; }
       + `<div class="log">${P.line}</div>`
       + `<div class="row"><i>${ico('skill')}</i><div><b>${h.skill}<em>스킬 · 투지 ${h.gauge}</em></b><p>${h.sdesc}</p></div></div>`
       + `<div class="row"><i>${ico('passive')}</i><div><b>${P.passive}<em>패시브</em></b><p>${h.desc}</p></div></div>`
-      + `<div class="lob-stats">${stats.map(([n, v, max, c], i) => `<span>${n}</span><u style="--k:${i};--v:${Math.min(100, Math.round(v / max * 100))};--c:var(--${c})"></u><em>${v}</em>`).join('')}</div>`
+      + `<div class="lob-stats">${stats.map(([n, v, max, c], i) => `<span>${n}</span><u style="--k:${i};--v:${Math.min(100, Math.round(v / max * 100))};--c:var(--${c})"></u><em data-cnt="${v}" data-cnt-at="${(0.7 + 0.12 * i).toFixed(2)}">${v}</em>`).join('')}</div>`
       + `<div class="lob-rec"><b>원정 기록</b><div class="r"><span>최고 1장 ${rec.best}/${CHAPTER.length}</span><span>클리어 ${rec.clears}</span><span>쓰러짐 ${rec.runs - rec.clears}</span></div>`
       + `<b style="margin-top:14px">자주 함께한 동료</b><div class="m">${mates.map((n) => patch(n, 62)).join('')}${'<span class="og-patch sil" style="width:62px;height:62px;--c:var(--deep)"></span>'.repeat(Math.max(0, 3 - mates.length))}</div></div></div></div>`
       + `<div class="lob-board" style="left:1180px;top:126px;width:690px;height:226px"><span class="cork"></span><div class="paper" style="--k:0;left:34px;top:36px;width:370px;transform:rotate(-2deg)"><b>이번 원정 소식</b><p>진료소 뒤뜰까지 덩굴이 내려왔다! 약재 상자를 되찾아 올 원정대를 모집합니다.</p></div><div class="paper" style="--k:1;left:430px;top:52px;width:220px;transform:rotate(3deg)"><b style="font-size:22px">${rumor[0]}</b><p>${rumor[1]}</p></div></div>`
@@ -3157,7 +3272,7 @@ body { display: grid; place-items: center; }
     sign(4, 'l', 1380, 870, 1, 'play', '기록', `컷씬 ${cgN} · 대사록 ${storyN}`, '', () => showGallery(k));
     S.keys = { c: () => showSelect(h.fac, k), Enter: () => go.click() };
     go.focus({ preventScroll: true });
-    moEnter('lobby', 'lob-go');
+    if (moEnter('lobby', 'lob-go')) lobCount($('#ovBody'));
     syncUI(true);
   }
 
@@ -3179,7 +3294,7 @@ body { display: grid; place-items: center; }
     tabs(list, 560, 112, fac, (f) => showSelect(f));
     const sel = $('#ovBody .sel');
     let cur = foc;
-    const go = ogBtn('이 친구로 출발', 'p', 'selGo', 'left:1090px;top:968px;transform:rotate(-1.5deg);z-index:8', () => { if (unlocked(cur)) beginRun(cur); else { SHK(go); showShop('main', cur); } });
+    const go = ogBtn('이 친구로 출발', 'p', 'selGo', 'left:1090px;top:968px;transform:rotate(-1.5deg);z-index:8', () => { if (unlocked(cur)) beginRun(cur); else { showShop('main', cur); } });
     const ch = ogBtn('챕터 고르기', '', 'selChapter', 'left:560px;top:978px;transform:rotate(1.5deg);z-index:8;font-size:28px', () => unlocked(cur) && showChapter(cur));
     const face = (side) => {
       if (sel.dataset.f !== side) { sel.dataset.f = side; const n = sel.querySelector(`.half.${side} .nm`); n.classList.remove('lob-hit'); void n.offsetWidth; n.classList.add('lob-hit'); }
@@ -3258,21 +3373,21 @@ body { display: grid; place-items: center; }
     let svg = '';
     for (const id of ['hp', 'atk', 'gauge', 'def', 'spd']) {
       const [x2, y2] = pinL(id), done = gLv(k, id) > 0;
-      svg += `<path class="${done ? 'done' : 'todo'} yr" pathLength="1" d="M192 257 C242 ${done ? 263 : 283} 248 ${y2 + (done ? 6 : 26)} ${x2} ${y2}" style="--d:${(1.12 + 0.12 * ['hp', 'atk', 'gauge', 'def', 'spd'].indexOf(id)).toFixed(2)}s"/>`;
+      svg += `<path class="${done ? 'done' : 'todo'} yr" data-b="${id}"${done ? '' : ` data-done="M192 257 C242 263 248 ${y2 + 6} ${x2} ${y2}"`} pathLength="1" d="M192 257 C242 ${done ? 263 : 283} 248 ${y2 + (done ? 6 : 26)} ${x2} ${y2}" style="--d:${(1.12 + 0.12 * ['hp', 'atk', 'gauge', 'def', 'spd'].indexOf(id)).toFixed(2)}s"/>`;
     }
     const [sx, sy] = [CARD_AT.skill[0] - 2, CARD_AT.skill[1] + 43];
     for (const id of Object.keys(skill.need)) {
       const [x1, y1] = pinR(id), met = gLv(k, id) >= skill.need[id];
       const d = `M${x1} ${y1} C${x1 + 50} ${y1 + 14} ${sx - 50} ${sy + 14} ${sx} ${sy}`;
-      svg += met ? `<path class="${gLv(k, 'skill') ? 'done' : 'todo'} yr" pathLength="1" d="${d}" style="--d:1.72s"/>` : `<path class="plan" d="${d}"/>`;
+      svg += met ? `<path class="${gLv(k, 'skill') ? 'done' : 'todo'} yr" data-b="skill" pathLength="1" d="${d}" style="--d:1.72s"/>` : `<path class="plan" d="${d}"/>`;
     }
     let cork = `<svg viewBox="0 0 816 514">${svg}</svg>`;
     for (const g of GROW) {
       const L = gLv(k, g.id), [x, y, w] = CARD_AT[g.id], isOpen = growOpen(k, g), st = !isOpen ? 'lock' : g.id === sel ? 'on' : L > 0 ? 'lit' : 'todo';
       const cost = L < g.max && g.cost.length ? costHtml('medal', g.cost[L]) : '';
-      cork += `<button type="button" class="shp-card ${st}" data-g="${g.id}" style="left:${x}px;top:${y}px;width:${w}px;--r:${[-1.5, 1.2, -1, 1.5, -1.2, 1, 2][GROW.indexOf(g)]}deg;--c:var(--${g.col});--d:${(0.55 + 0.12 * GROW.indexOf(g)).toFixed(2)}s">`
+      cork += `<button type="button" class="shp-card ${st}" data-g="${g.id}" style="left:${x}px;top:${y}px;width:${w}px;--r:${[-1.5, 1.2, -1, 1.5, -1.2, 1, 2][GROW.indexOf(g)]}deg;--c:var(--${g.col});--d:${(0.55 + 0.12 * GROW.indexOf(g)).toFixed(2)}s;--cd:1.9s">`
         + `<div class="nd">${ico(isOpen ? g.ico : 'lock')}</div><div class="tx"><b>${growName(k, g)}</b>${isOpen ? `<div class="row">${pipsHtml(L, g.max)}${cost}</div>` : `<span class="lk">${Object.entries(g.need).map(([id, n]) => `${growOf(id).name} ${n}`).join(' · ')}에서 열림</span>`}</div></button>`;
-      if (g.id !== 'skill') { const [px, py] = g.id === 'base' ? [192, 257] : pinL(g.id); cork += `<span class="shp-pin" style="left:${px}px;top:${py}px;--pc:var(--${L > 0 || g.id === 'base' ? 'accent' : 'accent-2'});--d:${(0.85 + 0.12 * GROW.indexOf(g)).toFixed(2)}s"></span>`; }
+      if (g.id !== 'skill') { const [px, py] = g.id === 'base' ? [192, 257] : pinL(g.id); cork += `<span class="shp-pin" data-n="${g.id}" style="left:${px}px;top:${py}px;--pc:var(--${L > 0 || g.id === 'base' ? 'accent' : 'accent-2'});--d:${(0.85 + 0.12 * GROW.indexOf(g)).toFixed(2)}s"></span>`; }
       if (g.need) cork += isOpen ? '' : `<span class="shp-tape" style="left:${x + w / 2}px;top:${y}px;--d:1.57s"></span>`;
       if (skill.need[g.id]) { const [px, py] = pinR(g.id); cork += `<span class="shp-pin" style="left:${px}px;top:${py}px;--pc:var(--${L >= skill.need[g.id] ? 'accent' : 'accent-2'});--d:1.09s"></span>`; }
     }
@@ -3296,16 +3411,38 @@ body { display: grid; place-items: center; }
         return `<button type="button" class="shp-rel${have ? '' : ' lock'}" data-rel="${id}" style="--d:${(1.3 + 0.06 * i).toFixed(2)}s"><i style="--c:var(--${have ? 'accent-2' : 'deep'})">${ico(have ? r.ico : 'lock')}</i><div><b>${have ? r.name : '???'}</b><p>${have ? r.desc() : relicSrc(id)}</p></div><em class="${eq ? 'eq' : ''}">${eq ? '장착 중' : have ? '보유' : r.from ? '보스' : '도전과제'}</em></button>`; }).join('')
       + '</div></div>'
       + '<div class="tapekeys" style="left:40px;top:1010px;z-index:7"><span><span class="key">Q</span><span class="key">E</span>캐릭터</span><span><span class="key">클릭</span>칸 고르기</span><span><span class="key">Enter</span>강화</span><span><span class="key">Esc</span>설정</span></div>');
-    const cost = !maxed && g.cost.length ? g.cost[L] : 0, can = cost && growOpen(k, g) && META.medal >= cost;
+    const cost = !maxed && g.cost.length ? g.cost[L] : 0, can = cost && growOpen(k, g) && META.medal >= cost, mc = $('#ovBody .og-chip[data-cur="medal"]');
+    let lock = 0;
+    // 원본 GROW: 점 하나가 톡 켜지고 쪽지가 눌린다. 처음 찍은 쪽지는 핀 · 실이 이어지고, 미리보기 숫자가 오르고, 비용이 훈장 칩으로 날아가 칩이 줄어든다
     const up = ogBtn(maxed || !cost ? '강화 끝' : `강화<small>원정 훈장 ${cost}</small>`, can ? 'p shp-up' : 'shp-up', 'growUp', 'left:1470px;top:948px;transform:rotate(-2deg);z-index:9', () => {
-      const card = $(`#ovBody .shp-card[data-g="${sel}"]`);
-      if (!can) { SHK(card); SHK(up); BUMP($('#ovBody .og-chip[data-cur="medal"]')); return; }
+      const c = $(`#ovBody .shp-card[data-g="${sel}"]`);
+      if (lock) return;
+      if (!can) { SHK(c); SHK(up); RE(mc, 'cdx-bump'); return; }
+      lock = 1;
+      const m = META.medal, ps = c.querySelectorAll('.og-pips i'), co = c.querySelector('.og-cost'), n0 = S.drawN;
       META.medal -= cost; META.grow[k][sel] = L + 1; saveMeta(); sfx.buy();
-      showGrowth(k, sel);
-      const c2 = $(`#ovBody .shp-card[data-g="${sel}"]`); SQ(c2); POP(c2 && c2.querySelectorAll('.og-pips i')[L]); BUMP($('#ovBody .og-chip[data-cur="medal"]'));
+      ps[L].classList.add('on'); POP(ps[L]); SQ(c);
+      if (c.classList.contains('todo')) {
+        c.classList.remove('todo'); c.classList.add('lit');
+        for (const p of document.querySelectorAll(`#ovBody .shp-pin[data-n="${sel}"]`)) { p.style.setProperty('--pc', 'var(--accent)'); POP(p); }
+        for (const p of document.querySelectorAll(`#ovBody path.todo[data-b="${sel}"]`)) { p.classList.remove('todo'); p.classList.add('done'); if (p.dataset.done) p.style.d = `path("${p.dataset.done}")`; }
+      }
+      const cb = $('#ovBody .shp-cmp b');
+      if (cb && g.id !== 'base') { const [[, a2, b3]] = growLine(k, g, L + 1); cb.innerHTML = L + 1 >= g.max ? `<em>${a2}</em>` : `<s>${a2}</s>→ <em>${b3}</em>`; SQ(cb); }
+      FLY(co, mc, FLY_ROOT(), () => {
+        CHIPSET(mc, m, META.medal);
+        if (L + 1 >= g.max) { if (!RM) co.animate([{ scale: '1' }, { scale: '0', opacity: 0 }], { duration: 240, fill: 'forwards' }).onfinish = () => co.remove(); else co.remove(); }
+        later(() => showGrowth(k, sel), 620, n0);
+      });
     });
     if (!can) up.classList.add('off');
-    for (const c of document.querySelectorAll('#ovBody .shp-card')) c.addEventListener('click', () => { if (c.classList.contains('lock')) { SHK(c); return; } showGrowth(k, c.dataset.g); SQ($(`#ovBody .shp-card[data-g="${c.dataset.g}"]`)); });
+    // 원본: 쪽지를 고르면 마커 동그라미가 바로 그려지고 (--cd 0s) 쪽지가 눌린다. 이미 고른 쪽지는 눌리기만
+    for (const c of document.querySelectorAll('#ovBody .shp-card')) c.addEventListener('click', () => {
+      if (c.classList.contains('lock')) { SHK(c); return; }
+      c.style.setProperty('--cd', '0s'); if (c.classList.contains('on')) { SQ(c); return; }
+      showGrowth(k, c.dataset.g);
+      const c2 = $(`#ovBody .shp-card[data-g="${c.dataset.g}"]`); c2.style.setProperty('--cd', '0s'); RE(c2, 'on'); SQ(c2);
+    });
     for (const r of document.querySelectorAll('#ovBody .shp-rel')) r.addEventListener('click', () => {
       const id = r.dataset.rel;
       if (!META.relics[id]) { SHK(r); return; }
@@ -3323,7 +3460,8 @@ body { display: grid; place-items: center; }
 
   // 상점 (OgShop): 산토의 「퍼리퍼리 창고」. 탭 = 동료 해금 · 메인 캐릭터 · 시작 보급 · 꾸미기(검토 중)
   // 선반 두 단에 밧줄로 매단 꼬리표 (보유 / 살 수 있음 / 모자람 / 잠김), 오른쪽 상세와 「해금하기」, 아래 「오늘의 추천」
-  const SANTO_SAY = { hello: '어서 와. 외상은 안 돼. 당근젤리 한 알까지 정확히 받을 거야.', own: '그건 벌써 네 거야. 같은 걸 두 번 팔진 않아.', poor: '모자라. 원정 한 번 더 다녀와.', lock: '그건 아직 안 팔아. 조건부터 채우고 와.', done: '거래 끝. 영수증은 없어.' };
+  const SANTO_SAY = { hello: '어서 와. 외상은 안 돼. 당근젤리 한 알까지 정확히 받을 거야.', own: '그건 벌써 네 거야. 같은 걸 두 번 팔진 않아.', poor: '모자라. 원정 한 번 더 다녀와.', lock: '그건 아직 안 팔아. 조건부터 채우고 와.', done: '거래 끝. 영수증은 없어.',
+    no: { poor: '모자라. 젤리 더 벌어 와.', own: '이미 네 거라니까.', lock: '그건 진열 전이야. 손대지 마.' } };
   function todayPicks() {
     const slot = Math.floor(Date.now() / (TODAY.hours * 3600e3)), pool = shopGoods('all').filter((o) => o.st === 'buy' || o.st === 'poor');
     const out = []; let s = slot;
@@ -3359,12 +3497,14 @@ body { display: grid; place-items: center; }
       const tail = o.st === 'own' ? '<span class="shp-own">보유</span>' : o.st === 'lock' ? `<div class="shp-why">${ico('lock')} ${o.why}</div>` : `${o.full ? `<s style="font:400 14px/1 var(--font-market-label);color:var(--ink-muted);margin-right:6px">${fmtN(o.full)}</s>` : ''}${costHtml('jelly', o.price)}`;
       h2 += `<button type="button" class="shp-good ${o.st === 'buy' ? '' : o.st === 'lock' ? 'lk' : o.st}${o === cur ? ' on' : ''}" data-mo="off" data-i="${i}" style="left:${XS[i % 4]}px;top:${YS[i >> 2]}px;transform:rotate(${[-1.5, 1, -1, 1.5, 1, -1.5, 1, -1][i]}deg);--d:${(0.35 + 0.09 * i).toFixed(2)}s">${obj}<b>${o.name}</b><p>${o.sub}</p>${tail}</button>`;
     });
-    // 상세
-    const curObj = cur.g === 'supply' ? `<span class="og-patch" style="--c:var(--accent-2);display:grid;place-items:center">${ico(cur.ico)}</span>` : (KINDS[cur.id] || HEROES[cur.id]) ? `<span class="og-patch" style="--c:var(--char-${cur.id})">${faceImg(cur.id, 'fill')}</span>` : `<span class="og-patch" style="--c:var(--deep)">${silSvg(cur.race)}</span>`;
-    const note = cur.st === 'buy' ? `<b>구매 전 확인</b> 당근젤리 ${fmtN(META.jelly)} → ${fmtN(META.jelly - cur.price)} 남아요. 해금은 되돌릴 수 없어요.`
-      : cur.st === 'poor' ? `<b>젤리 모자람</b> ${fmtN(cur.price)} 중 ${fmtN(cur.price - META.jelly)}이 모자라요. 원정을 한 번 더 다녀와요.`
-        : cur.st === 'own' ? '<b>보유 중</b> 이미 원정대에 있어요.' : `<b>아직 못 사요</b> ${cur.why}.`;
-    h2 += `<div class="og-sheet" style="left:1490px;top:196px;width:400px;height:650px;transform:rotate(1.2deg);z-index:5"><div class="shp-detail">${curObj}<div class="nm">${cur.name}</div><div class="rl">${cur.rl}</div><ul>${cur.ul.map((t) => `<li>${t}</li>`).join('')}</ul></div><div class="shp-note">${note}</div></div>`;
+    // 상세 (원본 S(i): 고른 꼬리표가 바뀌면 상세 · 확인 쪽지 · 버튼만 고친다)
+    const detHtml = (o) => `${o.g === 'supply' ? `<span class="og-patch" style="--c:var(--accent-2);display:grid;place-items:center">${ico(o.ico)}</span>` : (KINDS[o.id] || HEROES[o.id]) ? `<span class="og-patch" style="--c:var(--char-${o.id})">${faceImg(o.id, 'fill')}</span>` : `<span class="og-patch" style="--c:var(--deep)">${silSvg(o.race)}</span>`}<div class="nm">${o.name}</div><div class="rl">${o.rl}</div><ul>${o.ul.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+    const noteHtml = (o) => (o.st === 'buy' ? `<b>구매 전 확인</b> 당근젤리 ${fmtN(META.jelly)} → ${fmtN(META.jelly - o.price)} 남아요. 해금은 되돌릴 수 없어요.`
+      : o.st === 'poor' ? `<b>젤리 모자람</b> ${fmtN(o.price)} 중 ${fmtN(o.price - META.jelly)}이 모자라요. 원정을 한 번 더 다녀와요.`
+        : o.st === 'own' ? '<b>보유 중</b> 이미 원정대에 있어요.' : `<b>아직 못 사요</b> ${o.why}.`);
+    const labelOf = (o) => (o.st === 'buy' ? `해금하기<small>당근젤리 ${fmtN(o.price)}</small>` : o.st === 'poor' ? `젤리 모자람<small>당근젤리 ${fmtN(o.price)}</small>` : o.st === 'own' ? '보유 중' : `잠김<small>${o.why}</small>`);
+    const sayOf = (o) => (o.st === 'buy' ? `${o.name}? ${fmtN(o.price)}. 깎아 달라는 말은 넣어 둬.` : SANTO_SAY[o.st === 'own' ? 'own' : o.st === 'poor' ? 'poor' : 'lock']);
+    h2 += `<div class="og-sheet" style="left:1490px;top:196px;width:400px;height:650px;transform:rotate(1.2deg);z-index:5"><div class="shp-detail">${detHtml(cur)}</div><div class="shp-note">${noteHtml(cur)}</div></div>`;
     // 오늘의 추천
     const hh = Math.floor(today.left / 3600e3), mm = Math.floor(today.left % 3600e3 / 60e3);
     h2 += `<div class="shp-today" style="left:520px;top:888px;transform:rotate(-1.5deg)"><b>오늘의 추천<small>${hh}시간 ${mm}분 뒤 교체</small></b>`
@@ -3375,20 +3515,38 @@ body { display: grid; place-items: center; }
       + '<div class="shp-sign" style="left:40px;top:860px;transform:rotate(-4deg)">퍼리퍼리 창고<small>주인 · 산토 (외상 사절)</small></div>'
       + '<div class="tapekeys" style="left:1080px;top:1018px;z-index:9"><span><span class="key">Q</span><span class="key">E</span>탭</span><span><span class="key">클릭</span>고르기</span><span><span class="key">Enter</span>해금</span><span><span class="key">Esc</span>설정</span></div>';
     add(h2);
-    const label = cur.st === 'buy' ? `해금하기<small>당근젤리 ${fmtN(cur.price)}</small>` : cur.st === 'poor' ? `젤리 모자람<small>당근젤리 ${fmtN(cur.price)}</small>` : cur.st === 'own' ? '보유 중' : `잠김<small>${cur.why}</small>`;
-    const buyB = ogBtn(label, cur.st === 'buy' ? 'p shp-buy' : 'shp-buy off', 'shopBuy', 'left:1540px;top:880px;transform:rotate(-1.5deg);z-index:9', () => {
-      if (cur.st !== 'buy') { SHK(buyB); SHK($('#ovBody .shp-good.on')); const l = $('#ovBody .shp-line'); if (l) l.textContent = SANTO_SAY[cur.st === 'own' ? 'own' : cur.st === 'poor' ? 'poor' : 'lock']; return; }
-      META.jelly -= cur.price;
-      if (cur.g === 'ally') { META.allies[cur.id] = true; META.seen.ally[cur.id] = 1; } else if (cur.g === 'main') { META.mains[cur.id] = true; META.seen.main[cur.id] = 1; } else META.supply[cur.id] = true;
+    const G = [...document.querySelectorAll('#ovBody .shp-good')], det = $('#ovBody .shp-detail'), note = $('#ovBody .shp-note'), line = $('#ovBody .shp-line'), kp = $('#ovBody .shp-keeper'), jc = $('#ovBody .og-chip[data-cur="jelly"]');
+    let ci = goods.indexOf(cur), lock = 0;
+    const buyB = ogBtn(labelOf(cur), cur.st === 'buy' ? 'p shp-buy' : 'shp-buy off', 'shopBuy', 'left:1540px;top:880px;transform:rotate(-1.5deg);z-index:9', () => BUY());
+    const fill = (i) => { const o = goods[i]; det.innerHTML = detHtml(o); note.innerHTML = noteHtml(o); buyB.innerHTML = labelOf(o); buyB.classList.toggle('off', o.st !== 'buy'); buyB.classList.toggle('p', o.st === 'buy'); };
+    // 원본 PICK: 꼬리표가 눌리고, 상세 · 확인 쪽지가 뒤집히며 바뀌고, 버튼이 눌리고, 산토가 한 글자씩 말한다
+    const PICK = (i) => { if (lock) return; const g = G[i]; SQ(g); if (i === ci) return; ci = i; G.forEach((o) => o.classList.toggle('on', o === g)); FLIP([det, note], () => fill(i)); setTimeout(() => SQ(buyB), 260); TYPE(line, sayOf(goods[i]), 30); };
+    // 원본 BUY: 못 사면 버튼 · 꼬리표가 고개를 젓는다. 사면 젤리 칩이 줄고, 값표가 산토에게 날아가 「보유」 도장이 찍힌다
+    const BUY = () => {
+      const g = G[ci], o = goods[ci];
+      if (lock) return;
+      if (o.st !== 'buy') { SHK(buyB); SHK(g.querySelector('.og-patch, .ic, .shp-sil')); TYPE(line, SANTO_SAY.no[o.st === 'poor' ? 'poor' : o.st === 'own' ? 'own' : 'lock'], 30); return; }
+      lock = 1;
+      const c = g.querySelector('.og-cost'), j = META.jelly, n0 = S.drawN;
+      META.jelly -= o.price;
+      if (o.g === 'ally') { META.allies[o.id] = true; META.seen.ally[o.id] = 1; } else if (o.g === 'main') { META.mains[o.id] = true; META.seen.main[o.id] = 1; } else META.supply[o.id] = true;
       saveMeta(); sfx.buy();
-      showShop(tab, cur.id, SANTO_SAY.done);
-      const g = $('#ovBody .shp-good.on'); POP(g && g.querySelector('.shp-own')); SQ(g); BUMP($('#ovBody .og-chip[data-cur="jelly"]'));
-    });
-    for (const g of document.querySelectorAll('#ovBody .shp-good')) g.addEventListener('click', () => { const o = goods[+g.dataset.i]; showShop(tab, o.id, o.st === 'buy' ? `${o.name}? ${fmtN(o.price)}. 깎아 달라는 말은 넣어 둬.` : SANTO_SAY[o.st === 'own' ? 'own' : o.st === 'poor' ? 'poor' : 'lock']); SQ($('#ovBody .shp-good.on')); });
+      CHIPSET(jc, j, META.jelly);
+      FLY(c, kp, FLY_ROOT(), () => {
+        SQ(kp);
+        const st = document.createElement('span'); st.className = 'shp-own'; st.textContent = '보유'; g.appendChild(st);
+        if (!RM) st.animate([{ scale: '2.6', opacity: 0 }, { scale: '.9', opacity: 1, offset: 0.6 }, { scale: '1' }], { duration: 420, easing: 'ease-out' });
+        setTimeout(() => SQ(g), 200); o.st = 'own'; fill(ci); SQ(buyB); TYPE(line, SANTO_SAY.done, 34);
+        later(() => showShop(tab, o.id, SANTO_SAY.done), 700, n0);
+      });
+      if (!RM) c.animate([{ scale: '1' }, { scale: '0', opacity: 0 }], { duration: 240, easing: 'ease-in', fill: 'forwards' }).onfinish = () => c.remove(); else c.remove();
+    };
+    G.forEach((g, i) => g.addEventListener('click', () => PICK(i)));
     for (const p of document.querySelectorAll('#ovBody .shp-pick[data-id]')) p.addEventListener('click', () => showShop(p.dataset.tab, p.dataset.id, '오늘만 깎아 주는 거야. 내일 오면 제값이야.'));
     const TABS = ['ally', 'main', 'supply'], ti = TABS.indexOf(tab);
     S.keys = { q: () => showShop(TABS[(ti + 2) % 3]), e: () => showShop(TABS[(ti + 1) % 3]), Enter: () => buyB.click() };
-    moEnter('shop' + tab, 'shp-go');
+    // 원본 START: 처음 들어오면 산토의 말이 비었다가 한 글자씩
+    if (moEnter('shop' + tab, 'shp-go')) { const hello = line.textContent; line.textContent = ''; later(() => TYPE(line, hello, 30), 950); }
     syncUI(true);
   }
 
@@ -3437,15 +3595,20 @@ body { display: grid; place-items: center; }
         + `<div class="cdx-k">${e.dev ? '효과' : e.foe ? '정보' : '스킬'}</div><div class="cdx-v">${e.ok ? e.sk : '???'}</div><div class="cdx-k">${e.dev ? '쓰는 마을' : e.foe ? '특징' : '타입 능력'}</div><div class="cdx-v">${e.ok ? e.ps : '???'}</div><div class="cdx-k">획득 경로</div><div class="cdx-v">${e.how}</div>`;
       co.innerHTML = (e.c || []).map(([n, a, m]) => `<span>${n}</span>${m > 10 ? `<span class="cdx-pg" style="--v:${Math.round(100 * a / m)}%"><i></i></span>` : pipsHtml(a, m)}<em>${a}/${m}</em>`).join('');
     };
+    // 원본 FLIP: 마우스를 올린 항목으로 오른쪽 캔버스가 접혔다가 (fo) 내용을 바꿔 펴진다 (fi)
+    const art = $('#ovBody .cdx-art'), tx = $('#ovBody .cdx-tx'), co = $('#ovBody .cdx-coll');
+    let ft = null;
+    const flip = (i) => { clearTimeout(ft); if (RM) { show(i); return; } [art, tx, co].forEach((x) => { x.classList.remove('fi'); x.classList.add('fo'); }); ft = setTimeout(() => { show(i); [art, tx, co].forEach((x) => { x.classList.remove('fo'); void x.offsetWidth; x.classList.add('fi'); }); }, 130); };
     for (const it of document.querySelectorAll('#ovBody .cdx-it')) {
-      const pick = () => { for (const x of document.querySelectorAll('#ovBody .cdx-it.cur')) x.classList.remove('cur'); it.classList.add('cur'); show(+it.dataset.k); if (!list[+it.dataset.k].ok) SHK(it.querySelector('.og-patch')); };
-      it.addEventListener('mouseenter', pick); it.addEventListener('click', pick);
+      const pick = () => { for (const x of document.querySelectorAll('#ovBody .cdx-it.cur')) x.classList.remove('cur'); it.classList.add('cur'); flip(+it.dataset.k); };
+      it.addEventListener('mouseenter', pick); it.addEventListener('click', () => { if (!it.classList.contains('cur')) pick(); });
     }
     for (const f of document.querySelectorAll('#ovBody .cdx-filt button')) f.addEventListener('click', () => showCodex(tab, f.dataset.race, '', back));
     show(sel || 0);
     const ri = races.indexOf(race), ti = T4.findIndex(([t]) => t === tab);
     S.keys = { Tab: () => showCodex(T4[(ti + 1) % 4][0], '', '', back), q: () => showCodex(tab, races[(ri + races.length - 1) % races.length], '', back), e: () => showCodex(tab, races[(ri + 1) % races.length], '', back) };
-    moEnter('codex' + tab + race, 'cdx-go');
+    // 원본 START: 수집률이 0부터 세어 올라간다
+    if (moEnter('codex' + tab + race, 'cdx-go')) { [art, tx, co].forEach((x) => x.classList.remove('fo', 'fi')); CNT($('#ovBody .cdx-cnt'), 0, got, 1100); }
     syncUI(true);
   }
 
@@ -3488,23 +3651,33 @@ body { display: grid; place-items: center; }
     h2 += '<div class="abs" style="left:1480px;top:978px;z-index:3;width:380px"><div class="cdx-legend"><span><i style="background:var(--spirit)"></i>진행 중</span><span><i style="background:var(--accent)"></i>받기</span><span><i style="background:var(--surface-2)"></i>완료</span><span><i style="background:var(--mat-1);outline:1px solid var(--on-dark)"></i>숨김</span></div></div>'
       + '<div class="tapekeys" style="left:60px;top:1030px;z-index:7"><span><span class="key">Enter</span>모두 받기</span><span><span class="key">클릭</span>받기</span><span><span class="key">Esc</span>설정</span></div>';
     add(h2);
-    const get = (id) => { const a = ACH.find((x) => x.id === id); if (!achReady(a)) return false; claim(a); saveMeta(); sfx.coin(2); return true; };
+    // 원본 CLAIM: 「받기!」가 사라지고 「완료」 도장이 쾅, 받을 보상 수가 줄고 달성 수가 오른다. 훈장 보상은 훈장 칩으로 날아가 칩이 오르고, 해금 보상은 통 튄다
+    const medal = $('#ovBody .og-chip[data-cur="medal"]'), pend = $('#ovBody .cdx-pend'), rate = $('#ovBody .cdx-side-rate .cdx-cnt'), n0 = S.drawN;
+    const CLAIM = (sl, cb) => {
+      const a = ACH.find((x) => x.id === sl.dataset.a);
+      if (!sl.classList.contains('ready') || !achReady(a)) { if (cb) cb(); return; }
+      claim(a); saveMeta(); sfx.coin(2);
+      sl.classList.remove('ready'); sl.classList.add('done');
+      const g = sl.querySelector('.cdx-get'); if (g) { g.classList.add('cdx-gone'); setTimeout(() => g.remove(), 260); }
+      const st = document.createElement('span'); st.className = 'cdx-stamp cdx-slamnow'; st.textContent = '완료'; sl.appendChild(st);
+      pend.textContent = Math.max(0, +pend.textContent - 1);
+      const rv = +rate.textContent; CNT(rate, rv, rv + 1, 500); RE(rate.parentNode, 'cdx-bump');
+      const c = sl.querySelector('.og-cost');
+      if (c) { const n = parseInt(c.textContent.replace(/[^0-9]/g, ''), 10) || 0; FLY(c, medal, FLY_ROOT(), () => { const v = CHIPV(medal); CHIPSET(medal, v, v + n); if (cb) cb(); }); }
+      else { RE(sl.querySelector('.cdx-unl'), 'cdx-bump'); setTimeout(() => { if (cb) cb(); }, 350); }
+    };
+    // 다 받은 뒤 옆 줄 · 다음 목표 · 버튼을 맞추려 조용히 다시 그린다
+    const redraw = (got) => later(() => showAch(`받았다: ${got.map((a) => rwText(a.rw)).join(' · ')}`), 620, n0);
+    // 원본 모두 받기: 받을 쪽지를 0.32초 간격으로 차례로
     const allB = ogBtn(`모두 받기<small>${ready.length}개</small>`, ready.length ? 'p' : '', 'achAll', 'left:1500px;top:570px;transform:rotate(-2deg);z-index:4', () => {
-      if (!ready.length) { SHK(allB); return; }
-      for (const a of ready) get(a.id);
-      showAch(`받았다: ${ready.map((a) => rwText(a.rw)).join(' · ')}`);
-      for (const a of ready) POP($(`#ovBody .cdx-slip[data-a="${a.id}"] .cdx-stamp`));
-      BUMP($('#ovBody .og-chip[data-cur="medal"]'));
+      const L = [...document.querySelectorAll('#ovBody .cdx-slip.ready')];
+      (function nx() { const x = L.shift(); if (S.drawN !== n0) return; if (!x) { allB.classList.add('off'); return; } CLAIM(x, L.length ? null : () => redraw(ready)); setTimeout(nx, 320); })();
     });
     if (!ready.length) allB.classList.add('off');
-    for (const s of document.querySelectorAll('#ovBody .cdx-slip[data-a]')) s.addEventListener('click', () => {
-      if (!get(s.dataset.a)) { SHK(s); return; }
-      const a = ACH.find((x) => x.id === s.dataset.a);
-      showAch(`받았다: ${rwText(a.rw)}`);
-      POP($(`#ovBody .cdx-slip[data-a="${a.id}"] .cdx-stamp`)); BUMP($('#ovBody .og-chip[data-cur="medal"]'));
-    });
+    for (const s of document.querySelectorAll('#ovBody .cdx-slip[data-a]')) s.addEventListener('click', () => { if (s.classList.contains('ready')) CLAIM(s, () => redraw([ACH.find((x) => x.id === s.dataset.a)])); });
     S.keys = { Enter: () => allB.click() };
-    moEnter('ach', 'cdx-go');
+    // 원본 START: 달성 수가 0부터 세어 올라간다
+    if (moEnter('ach', 'cdx-go')) CNT(rate, 0, doneN, 1100);
     syncUI(true);
   }
 
@@ -3544,11 +3717,16 @@ body { display: grid; place-items: center; }
       $('#ovActions').append(button('돌아가기', 'ticket', 'cgBack', () => showGallery(k)));
     });
     if (!first) again.classList.add('off'); if (!cg) big.classList.add('off');
-    for (const f of document.querySelectorAll('#ovBody .cdx-fr')) f.addEventListener('click', () => (f.classList.contains('lkf') ? SHK(f) : big.click()));
-    for (const s of document.querySelectorAll('#ovBody .cdx-sc')) s.addEventListener('click', () => (+s.dataset.no && seen.includes(+s.dataset.no) ? replay(+s.dataset.no) : SHK(s)));
+    // 원본: 잠긴 액자는 흔들리고 (shake), 열린 액자를 고르면 오른쪽 크게 보기가 다시 들어온다 (again)
+    const view = $('#ovBody .cdx-view');
+    for (const f of document.querySelectorAll('#ovBody .cdx-fr')) {
+      f.addEventListener('click', () => { if (f.classList.contains('lkf')) { RE(f, 'shake'); return; } for (const x of document.querySelectorAll('#ovBody .cdx-fr.cur')) x.classList.remove('cur'); f.classList.add('cur'); RE(view, 'again'); });
+      f.addEventListener('animationend', (e) => { if (e.animationName === 'cdx-shake') f.classList.remove('shake'); });
+    }
+    for (const s of document.querySelectorAll('#ovBody .cdx-sc')) s.addEventListener('click', () => { if (+s.dataset.no && seen.includes(+s.dataset.no)) replay(+s.dataset.no); });
     const mains = Object.keys(HEROES).filter(unlocked), mi = mains.indexOf(k);
     S.keys = { Tab: () => showGallery(mains[(mi + 1) % mains.length]), Enter: () => again.click() };
-    moEnter('gallery' + k, 'cdx-go');
+    if (moEnter('gallery' + k, 'cdx-go')) view.classList.remove('again');
     syncUI(true);
   }
   // ---------- 아이템 슬롯 (조준 중에만) ----------
