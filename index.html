@@ -746,7 +746,7 @@ body { display: grid; place-items: center; }
   //   skillT 촉수 잔치 초 · skillEvery 잔치 동안 몇 번 빨 때마다 발 끝 들이켜기를 한 번 주는가
   const GOO = { tick: 0.25, pool: 0.12, poolR: 56 };
   const SLIME = { step: 18, r: 32, life: 2.4, mul: 0.7, bonus: 0.5, skillT: 1, shield: 15, crack: 4, field: { R: 260, rings: 5, speed: 320, life: 5, mul: 0.7 }, up: { life: 0.4, wide: 0.15, field: 1 } };
-  const STRAW = { n: 3, R: 140, tick: 0.3, mul: 0.25, bonus: 0.5, burst: 2.4, back: 0.5, torment: 0.2, drain: 0.1, rest: 0.55, restMin: 40, k: 200, damp: 8, pull: 18000, pullMax: 24000, yank: 120, minSpeed: 150, recover: 900, maxSpeed: 1600, twang: 45, skillT: 2, skillEvery: 3, up: { n: 1, suck: 0.25, gulp: 0.3 } };
+  const STRAW = { n: 3, R: 140, tick: 0.3, mul: 0.25, bonus: 0.5, burst: 4, back: 0.6, torment: 0.2, drain: 0.1, rest: 0.55, restMin: 40, k: 200, damp: 8, pull: 18000, pullMax: 24000, yank: 120, minSpeed: 150, recover: 900, maxSpeed: 1600, twang: 45, skillT: 2, skillEvery: 3, up: { n: 1, suck: 0.25, gulp: 0.3 } };
   // 퐁숭 독: 발이 끝날 때 걸고, 그때와 다음 발 끝에 한 번씩 (화상과 같은 때)
   const POISON = { turns: 2, mul: 0.6 };
   // 갯민숭달팽이 시너지 = Figma '작은 해양 생물' (보호막 5/5/10/15/20, 2명 이상 보호막을 가진 아군 피해 +15%, 4명 이상 보호막 획득이 스테이지 시작 → 턴 시작).
