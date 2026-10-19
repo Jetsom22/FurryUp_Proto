@@ -1350,6 +1350,22 @@ body { display: grid; place-items: center; }
 .K .grow .dot .fu-ico { width: 30px; height: 30px; }
 /* v0.10 원정대 본부 (디자인 시스템 og_*)를 이 프로토에 붙이며 더한 것: 버튼으로 바꾼 부품, 그림 없는 캐릭터 첫 글자, 유물 선반 스크롤 */
 #overlay[data-kind="og"]:not([hidden]) ~ .menu-btn, #overlay[data-kind="fix"]:not([hidden]) ~ .menu-btn { display: none; }
+/* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
+.K .lob-sel .sel .half { pointer-events: none; }
+.K .lob-sel .sel .half img.sticker, .K .lob-sel .sel .half .card, .K .lob-sel .sel .half .nm { pointer-events: auto; cursor: pointer; }
+/* 정비 고정 회복: 수레 들보에 늘 걸린 꼬리표. 새로 고침에 안 바뀌고 정비마다 하나 */
+.K .fix-rest { position: absolute; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 7px 14px 7px 8px; background: var(--surface); color: var(--ink); cursor: pointer; text-align: left;
+  outline: 2px dashed var(--stitch); outline-offset: -5px; box-shadow: 0 5px 0 0 rgba(0,0,0,.3); transform: rotate(1.5deg); transition: transform .3s cubic-bezier(.34,1.6,.5,1), box-shadow .2s; }
+.K .fix-rest::before, .K .fix-rest::after { content: ""; position: absolute; top: -12px; width: 3px; height: 14px; background: var(--rope); }
+.K .fix-rest::before { left: 24px; } .K .fix-rest::after { right: 24px; }
+.K .fix-rest:hover { transform: translateY(-3px) rotate(1deg); }
+.K .fix-rest .pt { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--c); color: var(--ink); box-shadow: 0 0 0 3px var(--cream), 0 0 0 5px var(--mat-2); }
+.K .fix-rest .pt .fu-ico { width: 24px; height: 24px; }
+.K .fix-rest b { display: block; font: 400 21px/1 var(--font-market-display); }
+.K .fix-rest small { display: block; margin-top: 4px; font: 400 13px/1 var(--font-market-label); color: var(--ink-muted); }
+/* 고른 표시는 .on (.sel은 캐릭터 선택 틀 이름과 겹친다) */
+.K .fix-rest.on { box-shadow: 0 0 0 5px var(--accent), 0 7px 0 5px rgba(0,0,0,.25); }
+.K .fix-rest.sold { opacity: .6; } .K .fix-rest.sold .og-cost, .K .fix-rest.poor .og-cost { opacity: .55; }
 .K .og-tab:disabled, .K .lob-sign:disabled { cursor: default; }
 .K .og-tab:disabled { opacity: .75; }
 .K .og-patch .ini { width: 100%; height: 100%; display: grid; place-items: center; font: 400 34px/1 var(--font-market-display); color: var(--ink); }
@@ -1655,9 +1671,10 @@ body { display: grid; place-items: center; }
   // iai: 벚꽃 난무 (처음 직선 수 · 강화 한 단계에 늘어나는 수 · 한 선 피해 배율)
   // storm: 부적 폭풍 (지속 초 · 강화 한 단계에 늘어나는 초 · 몇 초마다 · 한 번에 몇 장 · 한 장 피해 배율 · 폭풍 중 공이 닿을 때 연타 +n · 피해 배율)
   // gaugeUp: 투지 충전 강화 한 단계에 전투 시작 투지
-  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: { n: 3, up: 2, mul: 1.2 }, gaugeUp: 4, storm: { t: 2, up: 0.5, every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.1 } };
+  // fixHeal: 정비마다 늘 있는 「고정 회복」의 회복량 (값은 PRICE.fixHeal). 보급품 회복(heal)보다 적고 싸다, 사면 바로 회복
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, fixHeal: 10, iai: { n: 3, up: 2, mul: 1.2 }, gaugeUp: 4, storm: { t: 2, up: 0.5, every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.1 } };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
-  const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12 };
+  const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12, fixHeal: 2 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
   // 판 위 장치는 팩션마다 몫이 있다 (FACTIONS.devices). DEVICES는 지금 런의 몫 (setHero에서 바꾼다). 아이템은 아직 같이 쓴다
   // HOLD는 다른 종족 몫으로 보관 (배정 미정). 정의(BOARD · ITEMS)와 동작은 남겨 둔다
@@ -2738,11 +2755,12 @@ body { display: grid; place-items: center; }
   // 칸이 가득 차면 교체 창 (FixSwap): 내보내는 것을 되팔기 값(refund, 동료는 ★ 하나마다)으로 돌려받는다
   const FIX = { rows: 3, reroll: 2, refund: { dev: 2, item: 1, ally: 3 } };
   const FIX_ROWS = [['ally', '동료 영입'], ['up', '메인 강화'], ['dev', '장치'], ['item', '보급품']];
-  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', pick: (n, pr) => `${n}? 눈이 높구먼! ${pr}엽전이야.`, poor: '에이, 엽전이 모자라네. 찜해 두면 다음 정비까지 챙겨 둘게.', buyPoor: '엽전이 모자라네. 찜해 두면 챙겨 둘게.', rerollPoor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: (n, pr) => `${n} 잘 골랐어! 엽전 ${pr} 받을게.`, reroll: '새 물건 꺼내 왔어! 찜한 건 그대로 뒀어.', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.', sold: '그건 벌써 팔렸어.' };
+  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', pick: (n, pr) => `${n}? 눈이 높구먼! ${pr}엽전이야.`, poor: '에이, 엽전이 모자라네. 찜해 두면 다음 정비까지 챙겨 둘게.', buyPoor: '엽전이 모자라네. 찜해 두면 챙겨 둘게.', rerollPoor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: (n, pr) => `${n} 잘 골랐어! 엽전 ${pr} 받을게.`, reroll: '새 물건 꺼내 왔어! 찜한 건 그대로 뒀어.', full: '체력이 가득이야. 다치면 그때 와!', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.', sold: '그건 벌써 팔렸어.' };
   function openShop() {
     S.phase = 'shop';
     clearField();
     S.fix = { reroll: FIX.reroll, sel: null, sell: -1 };
+    S.fixHeal = { g: 'heal' }; // 고정 회복: 새로 고침과 상관없이 정비마다 하나
     rollStock();
     const g = S.gain;
     S.fixSay = g && g.sum > 0 ? `${g.parts.filter(([, v]) => v > 0).map(([n, v]) => `${n} +${v}`).join(' · ')}! 엽전 ${g.sum} 챙겼네. 뭐 살래?` : OTO_SAY.hello;
@@ -2774,6 +2792,7 @@ body { display: grid; place-items: center; }
     return got;
   }
   function priceOf(o) {
+    if (o.g === 'heal') return PRICE.fixHeal;
     if (o.g === 'up') return PRICE.upgrade;
     if (o.g === 'ally') return PRICE.ally[Math.min(2, S.levels[o.k])];
     if (o.g === 'main') return PRICE.main;
@@ -2796,6 +2815,7 @@ body { display: grid; place-items: center; }
   const crewList = () => [...KIND_ORDER.filter((k) => S.levels[k] > 0), ...(S.ally ? [S.ally.kind] : [])];
   function itemInfo(o) {
     const pr = priceOf(o), hn = HEROES[S.hero].name;
+    if (o.g === 'heal') { const m = S.main; return { name: '고정 회복', tg: '바로 회복 · 정비마다 늘 하나', ef: `${hn} 체력 +${BAL.fixHeal} · 보급품 회복(+${BAL.heal})보다 적고 싸요`, pt: `<span class="pt" style="--c:var(--hp)">${ico('heal')}</span>`, pr, dest: `<b>${hn}</b> 체력 ${m.hp} → ${Math.min(m.maxHp, m.hp + BAL.fixHeal)}` }; }
     if (o.g === 'ally') { const L = S.levels[o.k], K = KINDS[o.k]; return { name: L ? `${K.name} ★${L + 1}` : K.name, tg: L ? `${K.role} 승급` : `${K.role} ★ · ${K.race}`, ef: L ? `이미 있는 ${K.name}${josa(K.name, '이', '가')} ★${L + 1}로 · ${SHORT[o.k](L + 1)}` : SHORT[o.k](1), pt: `<span class="pt" style="--c:var(--char-${o.k})">${faceImg(o.k)}</span>`, pr, dest: L ? `이미 있는 <b>${K.name}</b>${josa(K.name, '이', '가')} ★${L + 1}로 올라가요` : `<b>동료 빈 자리</b>에 들어가요 (${crewList().length}/4 → ${crewList().length + 1}/4)` }; }
     if (o.g === 'main') return { name: HEROES[o.k].name, tg: '메인 합류 · 판 위 유닛', ef: HEROES[o.k].unit, pt: `<span class="pt" style="--c:var(--char-${o.k})">${faceImg(o.k)}</span>`, pr, dest: `판 위 유닛으로 <b>동료 빈 자리</b>에 들어가요` };
     if (o.g === 'up') { const d = typeof o.u.desc === 'function' ? o.u.desc() : o.u.desc; return { name: o.u.name, tg: d, ef: `${hn}에게만 · ${up(o.u.id)}/${o.u.max}단계`, pt: `<span class="pt" style="--c:var(--accent-2)">${ico(UP_ICO[o.u.id])}</span>`, pips: pipsHtml(up(o.u.id), o.u.max), pr, dest: `<b>${hn}</b>에게 바로 (${up(o.u.id)} → ${up(o.u.id) + 1}단계)` }; }
@@ -2807,7 +2827,7 @@ body { display: grid; place-items: center; }
     S.phase = 'shop'; S.keys = {};
     showOverlay('', 'fix');
     const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), n = raceCount(F.race), fix = S.fix;
-    const all = FIX_ROWS.flatMap(([r]) => S.stock[r]).filter(Boolean);
+    const all = [...FIX_ROWS.flatMap(([r]) => S.stock[r]).filter(Boolean), S.fixHeal];
     let sel = fix.sel && all.includes(fix.sel) ? fix.sel : all.find((o) => !o.sold && S.gold >= priceOf(o)) || all.find((o) => !o.sold) || all[0];
     fix.sel = sel;
     const syn = F.race === '토끼' ? `속도 +${RABBIT.speed[Math.max(1, n) - 1]}${n >= 3 ? ` · 공격 +${RABBIT.atk}` : ''}` : `보호막 +${SLUG.shield[Math.max(1, n) - 1]}${n >= SLUG.dmgAt ? ` · 피해 +${SLUG.dmg * 100}%` : ''}`;
@@ -2826,6 +2846,7 @@ body { display: grid; place-items: center; }
       + `<div class="fix-sec" style="top:726px">보급품 ${S.held.length}/${SHOP.itemSlots}</div>`
       + `<div class="fix-tins" style="top:756px">${Array.from({ length: SHOP.itemSlots }, (_, i) => { const k = S.held[i]; return k ? `<div><span style="--c:var(--${ITEMS[k].use ? 'accent-2' : 'accent'})"><em>${i + 1}</em>${ico(ITEM_ICO[k])}</span>${ITEMS[k].name}</div>` : `<div><span class="empty"><em>${i + 1}</em></span>비었어요</div>`; }).join('')}</div></div>`;
     h += '<div class="fix-cart" style="left:556px;top:210px;width:900px;height:730px"><div class="fix-cart__cloth"></div><div class="fix-cart__beam"></div><span class="fix-cart__lash" style="left:-14px"></span><span class="fix-cart__lash" style="right:-14px"></span><div class="fix-cart__sign">오토의 떠돌이 수레</div>';
+    { const R = S.fixHeal, RI = itemInfo(R); h += `<button type="button" class="fix-rest${R === sel ? ' on' : ''}${R.sold ? ' sold' : S.gold < RI.pr ? ' poor' : ''}" id="fixRest" style="right:34px;top:-2px">${RI.pt}<div><b>${RI.name} · 체력 +${BAL.fixHeal}</b><small>${R.sold ? '이번 정비엔 다 팔렸어요' : '늘 있어요 · 새로 고침에 안 바뀌어요'}</small></div>${costHtml('coin', RI.pr)}</button>`; }
     const sub = { ally: `공용 풀 · ${F.short} 동료만 와요`, up: `${HEROES[S.hero].name}에게만 · 단계가 있어요`, dev: `판 위에 놓여요 · ${S.devices.length}/6`, item: `1·2·3 깡통 · ${S.held.length}/3` };
     FIX_ROWS.forEach(([r, name], ri) => {
       h += `<div class="fix-row" style="top:${58 + 166 * ri}px"><div class="fix-row__lab"><b>${name}</b><small>${sub[r]}</small></div>`;
@@ -2844,7 +2865,7 @@ body { display: grid; place-items: center; }
     if (sel) h += `<div class="og-sheet fix-detail" style="left:1452px;top:600px;width:440px;height:330px;transform:rotate(1deg);z-index:6"><div class="og-h">${I.name}</div><div class="og-sub" style="margin-top:6px">${I.tg}</div>`
       + `<div class="fix-eff og-sub" style="margin-top:10px;color:var(--ink);font-size:18px">${I.ef}</div><div class="row">${costHtml('coin', I.pr)}<span class="og-sub">엽전 ${S.gold} → ${S.gold - I.pr}</span></div>`
       + `<div class="dest">들어갈 곳 · ${sel.sold ? '이미 샀어요' : full ? `<b>칸이 가득</b> · 사면 하나를 골라 내보내요 (되팔기)` : I.dest}</div>`
-      + `<div class="acts"><button type="button" class="fix-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'}</button><button type="button" class="fix-mini p" id="fixBuy">사기 <span class="key">Enter</span></button></div></div>`;
+      + `<div class="acts">${sel.g === 'heal' ? '' : `<button type="button" class="fix-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'}</button>`}<button type="button" class="fix-mini p" id="fixBuy">사기 <span class="key">Enter</span></button></div></div>`;
     h += `<button type="button" class="fix-reroll" id="fixReroll" style="left:560px;top:950px"><i>${ico('turn')}</i><div>새로 고침<small>찜한 건 남아요 · 다음엔 엽전 ${fix.reroll + 1}</small></div>${costHtml('coin', fix.reroll)}</button>`
       + '<div class="tapekeys" style="left:930px;top:968px;z-index:5"><span><span class="key">Enter</span>사기</span><span><span class="key">F</span>찜</span><span><span class="key">R</span>새로 고침</span><span><span class="key">Esc</span>메뉴</span></div>';
     $('#ovBody').innerHTML = h;
@@ -2863,7 +2884,8 @@ body { display: grid; place-items: center; }
       renderShop();
     });
     if (sel) {
-      $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); });
+      $('#fixRest').addEventListener('click', () => { if (fix.sel === S.fixHeal) return; fix.sel = S.fixHeal; fix.sell = -1; S.fixSay = S.fixHeal.sold ? OTO_SAY.sold : S.gold < PRICE.fixHeal ? OTO_SAY.poor : OTO_SAY.pick('고정 회복', PRICE.fixHeal); renderShop(); });
+      if ($('#fixPin')) $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); });
       $('#fixBuy').addEventListener('click', () => buy(sel));
     }
     // 원본 doReroll: 찜하지 않은 물건이 차례로 접혔다 펴지며 (반쯤 접혔을 때 새 물건으로) 바뀐다. 손잡이가 돌고 오토가 말한다
@@ -2889,12 +2911,13 @@ body { display: grid; place-items: center; }
       S.devices.splice(i, 1); S.gold += FIX.refund.dev; fix.sell = -1; S.fixSay = OTO_SAY.sell; sfx.coin(1);
       renderPanel(); renderShop();
     });
-    S.keys = { Enter: () => sel && buy(sel), f: () => sel && $('#fixPin').click(), r: () => $('#fixReroll').click() };
+    S.keys = { Enter: () => sel && buy(sel), f: () => sel && $('#fixPin') && $('#fixPin').click(), r: () => $('#fixReroll').click() };
     moEnter('fix' + S.node, '');
     syncUI(true);
   }
   // 산 것을 넣는다
   function give(o) {
+    if (o.g === 'heal') { S.main.hp = Math.min(S.main.maxHp, S.main.hp + BAL.fixHeal); return; }
     if (o.g === 'up') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 10; S.main.hp += 10; } }
     else if (o.g === 'ally') { if (!S.levels[o.k]) META.stat.recruits++; S.levels[o.k]++; META.seen.ally[o.k] = 1; }
     else if (o.g === 'main') { S.ally = { kind: o.k, x: -999, y: -999, r: 26, cd: 0, jig: 0 }; META.stat.recruits++; }
@@ -2926,6 +2949,7 @@ body { display: grid; place-items: center; }
     if (o.sold) return;
     const pr = priceOf(o);
     if (S.gold < pr) { fixSay(OTO_SAY.buyPoor); return; }
+    if (o.g === 'heal' && S.main.hp >= S.main.maxHp) { fixSay(OTO_SAY.full); return; }
     const full = fullOf(o);
     if (full) { const I = itemInfo(o); openSwap({ kind: full, name: I.name, tg: I.tg, ef: I.ef, pt: o.k, price: pr, done: () => bought(o, pr, false), cancel: renderShop }); return; }
     bought(o, pr, true);
@@ -2933,7 +2957,7 @@ body { display: grid; place-items: center; }
   // 원본 doBuy: 물건 조각이 수레에서 들어갈 칸으로 포물선을 그리며 날아가 칸이 눌리고, 엽전이 굴러 내려가며 -값이 뜬다
   // fly = false: 교체 창에서 이미 날아 들어갔다
   function bought(o, pr, fly) {
-    const it = $('#ovBody .fix-it.sel'), pt = fly && it && it.querySelector('.pt'), tg = pt && fixSpot(o, false), g0 = S.gold, n0 = S.drawN;
+    const it = $('#ovBody .fix-it.sel, #ovBody .fix-rest.on'), pt = fly && it && it.querySelector('.pt'), tg = pt && fixSpot(o, false), g0 = S.gold, n0 = S.drawN;
     o.info = itemInfo(o);
     S.gold -= pr; give(o); o.sold = true; o.pin = false;
     if (S.levels.santo > 0) META.stat.santoBuys++;
@@ -2947,7 +2971,7 @@ body { display: grid; place-items: center; }
     f.style.left = a[0] + 'px'; f.style.top = a[1] + 'px'; FLY_ROOT().appendChild(f);
     const dx = b[0] - a[0], dy = b[1] - a[1];
     f.animate([{ translate: '0 0', scale: '1' }, { translate: `${dx * 0.5}px ${dy * 0.5 - 180}px`, scale: '1.35', offset: 0.45 }, { translate: `${dx}px ${dy}px`, scale: '.9' }], { duration: RM ? 1 : 720, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).onfinish = () => { f.remove(); if (S.drawN === n0) land(); };
-    it.classList.add('sold'); it.classList.remove('sel');
+    it.classList.add('sold'); it.classList.remove('sel', 'on');
     fixRoll(g0, S.gold); coinPop(pr); fixSay(say);
   }
   // 교체 창 (FixSwap): 정비 화면 위를 덮는 캔버스. 왼쪽 새로 들어올 것, 오른쪽 지금 칸 (모두 같은 크기), 아래 되팔기 계산과 사지 않기 · 교체
