@@ -688,7 +688,7 @@ body { display: grid; place-items: center; }
   const ICONS = {"heart": ["M12 21.2s-7.6-4.7-9.7-9.4C.9 8.5 3 4.6 6.7 4.6c2.2 0 3.7 1.3 5.3 3.1 1.6-1.8 3.1-3.1 5.3-3.1 3.7 0 5.8 3.9 4.4 7.2-2.1 4.7-9.7 9.4-9.7 9.4z", "nonzero"], "sword": ["M20.8 1.8l1.4 1.4-1 4.2-9.4 9.4 1.8 1.8-1.5 1.5-1.9-1.9-3.6 3.6.4 1.8-1.5 1.5-1.6-2.9-2.9-1.6 1.5-1.5 1.8.4 3.6-3.6-1.9-1.9 1.5-1.5 1.8 1.8 9.4-9.4z", "nonzero"], "shield": ["M12 1.8l8.5 3.2v6.3c0 5.4-3.6 9.9-8.5 11.2-4.9-1.3-8.5-5.8-8.5-11.2V5z", "nonzero"], "speed": ["M12.5 3.5l9.5 8.5-9.5 8.5v-5.2H7v-6.6h5.5zM2 8.7h3.4v6.6H2z", "nonzero"], "spirit": ["M12 1.2c1.3 4.1 6.8 6.8 6.8 12.6A6.8 6.8 0 0 1 12 20.8a6.8 6.8 0 0 1-6.8-7c0-3.1 1.7-5.2 3.2-6.5.2 2.1 1.1 3.4 2.6 4C10.5 8.1 10.9 4.6 12 1.2zM12 13.2c.8 1.6 2.6 2.4 2.6 4.4a2.6 2.6 0 0 1-5.2 0c0-2 1.8-2.8 2.6-4.4z", "evenodd"], "coin": ["M2.00 12.00a10 10 0 1 0 20 0a10 10 0 1 0 -20 0zM9 9h6v6H9z", "evenodd"], "carrot": ["M13.4 6.4c1.4-1.2 3.4-1.1 4.6.1s1.3 3.2.1 4.6L4.4 21.2c-.8.7-2.1-.5-1.4-1.4zM16.6 5.6c-.7-1.7-.4-3.6.7-4.9.8.9 1.2 2.1 1.2 3.3.9-.8 2.2-1.2 3.5-1-.2 1.2-.9 2.3-1.9 2.9 1.2.1 2.3.6 2.9 1.5-1.5.8-3.3.8-4.8-.2z", "nonzero"], "bell": ["M4.00 12.50a8 8 0 1 0 16 0a8 8 0 1 0 -16 0zM5.5 11.6h13v1.8h-13zM10.4 .9h3.2v3.2h-3.2zM10.60 16.40a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0 -2.8 0z", "evenodd"], "gear": ["M12.78 4.04L15.05 1.95L16.95 2.74L17.08 5.82L18.18 6.92L21.26 7.05L22.05 8.95L19.96 11.22L19.96 12.78L22.05 15.05L21.26 16.95L18.18 17.08L17.08 18.18L16.95 21.26L15.05 22.05L12.78 19.96L11.22 19.96L8.95 22.05L7.05 21.26L6.92 18.18L5.82 17.08L2.74 16.95L1.95 15.05L4.04 12.78L4.04 11.22L1.95 8.95L2.74 7.05L5.82 6.92L6.92 5.82L7.05 2.74L8.95 1.95L11.22 4.04zM8.60 12.00a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0z", "evenodd"], "book": ["M3 4h7.5c.9 0 1.5.6 1.5 1.5V21c-.5-.7-1.2-1.1-2.1-1.1H3zM21 4h-7.5c-.9 0-1.5.6-1.5 1.5V21c.5-.7 1.2-1.1 2.1-1.1H21z", "nonzero"], "paw": ["M7.40 15.50a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM3.70 10.00a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0 -4.6 0zM7.30 5.80a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0 -4.6 0zM12.10 5.80a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0 -4.6 0zM15.70 10.00a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0 -4.6 0z", "nonzero"], "bag": ["M4.5 8h15l-1.2 13.5H5.7zM8.5 8V6.5a3.5 3.5 0 0 1 7 0V8h-2.2V6.5a1.3 1.3 0 0 0-2.6 0V8z", "nonzero"], "play": ["M6.5 3.5l14 8.5-14 8.5z", "nonzero"], "close": ["M5.3 3.8L12 10.5l6.7-6.7 1.5 1.5-6.7 6.7 6.7 6.7-1.5 1.5-6.7-6.7-6.7 6.7-1.5-1.5 6.7-6.7-6.7-6.7z", "nonzero"], "back": ["M15.4 3l2.1 2.1L10.6 12l6.9 6.9-2.1 2.1L6.4 12z", "nonzero"], "lock": ["M4.5 10h15v11.5h-15zM7 10V7.2a5 5 0 0 1 10 0V10h-2.4V7.2a2.6 2.6 0 0 0-5.2 0V10z", "nonzero"], "star": ["M12.00 1.60L14.70 8.88L22.46 9.20L16.37 14.02L18.47 21.50L12.00 17.20L5.53 21.50L7.63 14.02L1.54 9.20L9.30 8.88z", "nonzero"], "skill": ["M12 .8l2.7 8.5 8.5 2.7-8.5 2.7L12 23.2l-2.7-8.5L.8 12l8.5-2.7z", "nonzero"], "passive": ["M2.00 12.00a10 10 0 1 0 20 0a10 10 0 1 0 -20 0zM6.40 12.00a5.6 5.6 0 1 0 11.2 0a5.6 5.6 0 1 0 -11.2 0zM9.60 12.00a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0z", "evenodd"], "turn": ["M5.5 1.5h13v2.2h-1.3c0 3.6-2.3 5.8-4 8.3 1.7 2.5 4 4.7 4 8.3h1.3v2.2h-13v-2.2h1.3c0-3.6 2.3-5.8 4-8.3-1.7-2.5-4-4.7-4-8.3H5.5zM9 3.7c0 2.4 1.5 4.1 3 6 1.5-1.9 3-3.6 3-6z", "evenodd"], "knot": ["M8.60 6.20a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0zM14.40 12.00a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0zM8.60 17.80a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0zM2.80 12.00a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0zM12 8.2l3.8 3.8-3.8 3.8-3.8-3.8z", "nonzero"], "cloud": ["M6.5 18.5a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.6-1.4 5.2 5.2 0 0 1 .3 10.4z", "nonzero"], "heal": ["M9.4 2.5h5.2v6.9h6.9v5.2h-6.9v6.9H9.4v-6.9H2.5V9.4h6.9z", "nonzero"], "crown": ["M2.5 7.5l5 4.2L12 4l4.5 7.7 5-4.2-2 12.5h-15zM5 21h14v1.8H5z", "nonzero"], "leaf": ["M21 3C9.5 3 3.5 8.5 3.5 15.8c0 1.8.4 3.3 1.1 4.6 1.1-4.3 4.3-7.9 9.4-9.6-4.2 2.4-6.7 5.4-7.7 9.2 1.5.8 3.1 1.3 4.7 1.3C17.2 21.3 21 14.4 21 3z", "nonzero"], "shieldplus": ["M12 1.8l8.5 3.2v6.3c0 5.4-3.6 9.9-8.5 11.2-4.9-1.3-8.5-5.8-8.5-11.2V5zM10.8 7v3.8H7v2.4h3.8V17h2.4v-3.8H17v-2.4h-3.8V7z", "evenodd"], "campfire": ["M12 2.5c.9 2.8 4.6 4.6 4.6 8.6A4.6 4.6 0 0 1 12 15.7a4.6 4.6 0 0 1-4.6-4.7c0-2.1 1.2-3.5 2.2-4.4.1 1.4.8 2.3 1.8 2.7-.5-1.8-.3-4.2.6-6.8zM3 17.2l18 3.6-.5 2.2L2.5 19.4zM21 17.2L3 20.8l.5 2.2 18-3.6z", "nonzero"], "question": ["M1.50 12.00a10.5 10.5 0 1 0 21.0 0a10.5 10.5 0 1 0 -21.0 0zM9 9.2a3 3 0 1 1 4.6 2.5c-.9.6-1.4 1-1.4 2.1v.7h-2.4v-.9c0-1.8.9-2.6 1.9-3.3.5-.3.8-.7.8-1.2a.9.9 0 0 0-1.8.1zM10.8 16.2h2.4v2.4h-2.4z", "evenodd"], "thorn": ["M12 1.5l2.4 6.3 6.6-2.2-3.6 5.9 5.1 4.6-6.8.3L14.3 23 12 16.7 9.7 23l-1.4-6.6-6.8-.3 5.1-4.6L3 5.6l6.6 2.2z", "nonzero"], "pause": ["M6 3.5h4.2v17H6zM13.8 3.5H18v17h-4.2z", "nonzero"], "map": ["M2 5l6.5-2.5 7 2.5L22 2.5v16.5L15.5 21.5l-7-2.5L2 21.5zM9.6 5.4v11.7l4.8 1.7V7.1z", "evenodd"]};
   const ico = (k, cls) => { const d = ICONS[k]; return d ? `<svg class="fu-ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d[0]}" fill-rule="${d[1]}"/></svg>` : ''; };
   const NODE_ICO = { story: 'book', battle: 'leaf', event: 'question', mid: 'thorn', boss: 'crown' };
-  const UP_ICO = { homing: 'speed', combo: 'paw', iai: 'skill', gauge: 'spirit', rate: 'turn', ricochet: 'back', storm: 'cloud', pierce: 'sword', atk: 'sword', hp: 'heart', speed: 'speed', straws: 'passive', suck: 'heal', gulp: 'star', ooze: 'cloud', wide: 'turn', tide: 'skill' };
+  const UP_ICO = { homing: 'speed', combo: 'paw', iai: 'skill', gauge: 'spirit', rate: 'turn', ricochet: 'back', storm: 'cloud', pierce: 'sword', atk: 'sword', hp: 'heart', speed: 'speed', straws: 'passive', suck: 'heal', gulp: 'star', ooze: 'cloud', wide: 'turn', field: 'skill' };
   const ITEM_ICO = { grow: 'passive', fire: 'campfire', crate: 'shield', bomb: 'thorn', heal: 'heal' };
   const DEV_FACE = { plus: ['+1'], mult: ['×2'], bolt: ['ϟ'], roulette: [null, 'star'], spinner: [null, 'turn'], booster: [null, 'play'] };
   const DEV_PIN = { plus: 'on', mult: 'on p', bolt: 'on c', roulette: 'on', spinner: 'on c', booster: 'on p' };
@@ -734,13 +734,19 @@ body { display: grid; place-items: center; }
   // GOO: 판 위 점액. 히프셀 흔적 · 질숭 웅덩이 · 합류한 히프셀이 같은 규칙을 쓴다.
   //   적 하나는 겹친 점액 중 가장 진한 것 하나에만 tick초마다 맞는다 (겹쳐도 쌓이지 않는다). pool 웅덩이 피해 배율 · poolR 웅덩이 반지름
   // SLIME: 히프셀 흔적. step 판 좌표마다 한 방울 · r 반지름 · life 남는 초 · mul 한 번 피해 배율 (공격력 ×) · bonus 범퍼 타격(+n)을 얼마나 얹는가
-  //   skillT 해일 초 · wide 해일 중 굵기 · skillMul 해일 중 피해 · crack 단단한 껍질은 몇 번 맞을 때마다 한 번 깨지는가 · up 정비 강화 한 단계 (지속 초 · 굵기 · 해일 초)
-  // STRAW: 코스모 도리스 빨대. n 한 번에 꽂는 수 · R 적 가장자리가 공 가장자리에서 이만큼 안에 들어오면 꽂는다 · snap 공과 이보다 멀어지면 끊긴다 (순간이동한 적이 멀리 가면)
+  //   crack 단단한 껍질은 몇 번 맞을 때마다 한 번 깨지는가 · up 정비 강화 한 단계 (흔적 초 · 굵기 · 장판 초)
+  //   점액 파문 (스킬, v0.9.1): 쓰는 자리에서 동심원으로 퍼지는 점액 장판. skillT 퍼지는 동안의 스킬 초 · field.R 반지름 · rings 동심원 수 · speed 퍼지는 빠르기 ·
+  //   life 남는 초 (흔적보다 길다. 발 시간으로만 줄고, 발과 발 사이에는 판에 남아 있다. 전투가 끝나면 사라진다) · mul 피해 배율 · shield 파문을 쓰면 받는 보호막
+  // STRAW: 코스모 도리스 빨대. n 한 번에 꽂는 수 · R 촉수 범위: 적 가장자리가 공 가장자리에서 이만큼 안에 들어오면 꽂고, 벗어나면 바로 끊긴다 (v0.9.1)
   //   tick 몇 초마다 빠는가 · mul 한 번 피해 배율 · burst 발 끝 들이켜기 (공격력 ×) · back 빨아들인 피해를 들이켜기에 얼마나 더하는가
-  //   torment 빨대가 꽂힌 적이 받는 피해 + (Figma 코스모 도리스 패시브 '괴롭힘' 20%) · skillT 빨대 잔치 초 · skillN 잔치 때 꽂는 최대 수 · skillRate 잔치 중 빠는 빠르기
+  //   torment 빨대가 꽂힌 적이 받는 피해 + (Figma 코스모 도리스 패시브 '괴롭힘' 20%) · drain 흡혈: 빨대 · 들이켜기 피해의 이만큼 체력을 되찾는다
+  //   고무줄 (v0.9.1): 처음 길이(rest)는 촉수 범위의 rest배 (restMin보다 짧지 않게). 그보다 늘어나면 공을 적 쪽으로 세게 끌어당겨 대롱대롱 매단다.
+  //   k 늘어난 만큼의 당김 (판 좌표/초² per 1) · pull 빨대 하나의 당김 상한 · pullMax 모두 합친 상한 · yank 꽂히는 순간 적 쪽으로 홱 당기는 빠르기 ·
+  //   damp 늘어나는 쪽(적에게서 멀어지는 쪽) 빠르기를 초당 이만큼씩 깎는다 (고무줄 저항) · 팽팽한 동안은 공이 minSpeed까지 느려질 수 있고 초당 recover씩 원래 빠르기로 돌아온다 (늘어나며 느려지고, 끌려오며 빨라진다) · maxSpeed 끌려 빨라진 공의 상한 · twang 이만큼 늘어나면 팽팽 소리
+  //   skillT 촉수 잔치 초 · skillEvery 잔치 동안 몇 번 빨 때마다 발 끝 들이켜기를 한 번 주는가
   const GOO = { tick: 0.25, pool: 0.12, poolR: 56 };
-  const SLIME = { step: 18, r: 32, life: 2.4, mul: 0.7, bonus: 0.5, skillT: 2, wide: 1.6, skillMul: 1.5, crack: 4, up: { life: 0.4, wide: 0.15, tide: 0.5 } };
-  const STRAW = { n: 3, R: 140, snap: 600, tick: 0.3, mul: 0.55, bonus: 0.5, burst: 2, back: 0.5, torment: 0.2, skillT: 2, skillN: 6, skillRate: 2, up: { n: 1, suck: 0.25, gulp: 0.3 } };
+  const SLIME = { step: 18, r: 32, life: 2.4, mul: 0.7, bonus: 0.5, skillT: 1, shield: 15, crack: 4, field: { R: 260, rings: 5, speed: 320, life: 5, mul: 0.7 }, up: { life: 0.4, wide: 0.15, field: 1 } };
+  const STRAW = { n: 3, R: 140, tick: 0.3, mul: 0.25, bonus: 0.5, burst: 2.4, back: 0.5, torment: 0.2, drain: 0.1, rest: 0.55, restMin: 40, k: 200, damp: 8, pull: 18000, pullMax: 24000, yank: 120, minSpeed: 150, recover: 900, maxSpeed: 1600, twang: 45, skillT: 2, skillEvery: 3, up: { n: 1, suck: 0.25, gulp: 0.3 } };
   // 퐁숭 독: 발이 끝날 때 걸고, 그때와 다음 발 끝에 한 번씩 (화상과 같은 때)
   const POISON = { turns: 2, mul: 0.6 };
   // 갯민숭달팽이 시너지 = Figma '작은 해양 생물' (보호막 5/5/10/15/20, 2명 이상 보호막을 가진 아군 피해 +15%, 4명 이상 보호막 획득이 스테이지 시작 → 턴 시작).
@@ -756,8 +762,8 @@ body { display: grid; place-items: center; }
   // 도리스: 가까이 지나간 적에 빨대를 꽂아 지속 피해, 발이 끝나면 꽂힌 적에게 큰 피해. 공은 적에게 튕기되 한 번만 친다
   // 히프셀: 공이 적과 부딪히지 않고 뚫고 지나간다. 지나간 자리에 점액이 남아 n초 동안 그 위 적에게 지속 피해
   Object.assign(HEROES, {
-    doris: { name: '코스모 도리스', fac: 'slug', race: '갯민숭달팽이', hp: 70, atk: 7, def: 2, skill: '빨대 잔치', style: '빨대', desc: `가까이 지나간 적 ${STRAW.n}명에게 빨대를 꽂아 빨고, 발이 끝나면 한꺼번에 들이켠다`, sdesc: `판 위 적 모두에게 빨대 · ${STRAW.skillT}초 동안 두 배로 빤다`, unit: '빨대 · 1초마다 가까운 적을 쪽', gauge: 30, ctl: { shot: 4, dash: 240, moves: 1 } },
-    hipsel: { name: '히프셀', fac: 'slug', race: '갯민숭달팽이', hp: 90, atk: 7, def: 3, skill: '점액 해일', style: '흔적', desc: `적을 뚫고 지나가며 점액을 남긴다. 점액은 ${SLIME.life}초 동안 그 위 적을 녹인다`, sdesc: `${SLIME.skillT}초 동안 점액이 굵고 진해진다 · 판 위 점액이 다시 살아난다`, unit: '점액 · 1.4초마다 가까운 적 발밑에', gauge: 30, ctl: { shot: 4.5, dash: 120, moves: 3 } },
+    doris: { name: '코스모 도리스', fac: 'slug', race: '갯민숭달팽이', hp: 50, atk: 7, def: 2, skill: '촉수 잔치', style: '빨대', desc: `빨대로 적 ${STRAW.n}명을 빨아 먹으며 (피해의 ${STRAW.drain * 100}% 회복) 고무줄처럼 매달린다. 범위를 벗어나면 끊긴다. 발이 끝나면 들이켠다`, sdesc: `판 위 모든 적에게 촉수 · ${STRAW.skillT}초 동안 ${STRAW.skillEvery}번 빨 때마다 들이켜기`, unit: '빨대 · 1초마다 가까운 적을 쪽', gauge: 45, ctl: { shot: 4, dash: 240, moves: 1 } },
+    hipsel: { name: '히프셀', fac: 'slug', race: '갯민숭달팽이', hp: 60, atk: 7, def: 3, skill: '점액 파문', style: '흔적', desc: `적을 뚫고 지나가며 점액을 남긴다. 점액은 ${SLIME.life}초 동안 그 위 적을 녹인다`, sdesc: `제자리에서 동심원으로 퍼지는 점액 장판 (${SLIME.field.life}초, 발과 발 사이에도) · 보호막 +${SLIME.shield}`, unit: '점액 · 1.4초마다 가까운 적 발밑에', gauge: 45, ctl: { shot: 4.5, dash: 120, moves: 3 } },
   });
   // 팩션: 마을 하나 = 메인 2 · 동료 4 · 판 위 장치 몫. 민숭마을은 ×2 범퍼 대신 번개 기둥 (D67 제안: 번개 기둥 → 작은 해양 생물)
   const FACTIONS = {
@@ -870,7 +876,7 @@ body { display: grid; place-items: center; }
     hipsel: [
       { id: 'ooze', name: `점액 +${SLIME.up.life}초`, desc: `점액이 ${SLIME.up.life}초 더 남는다`, max: 3 },
       { id: 'wide', name: `점액 폭 +${SLIME.up.wide * 100}%`, desc: `점액이 ${SLIME.up.wide * 100}% 굵어진다`, max: 3 },
-      { id: 'tide', name: `해일 +${SLIME.up.tide}초`, desc: `점액 해일 +${SLIME.up.tide}초`, max: 3 },
+      { id: 'field', name: `장판 +${SLIME.up.field}초`, desc: `점액 장판이 ${SLIME.up.field}초 더 남는다`, max: 3 },
       { id: 'gauge', name: '투지 충전', desc: `전투 시작 투지 +${BAL.gaugeUp}`, max: 3 },
     ],
     common: [
@@ -1168,6 +1174,7 @@ body { display: grid; place-items: center; }
     place: () => { osc('sine', 150, 70, 0.08, 0.16, 0.1, 0.003); hiss('lowpass', 900, 300, 1, 0.08, 0.06); },
     slurp: () => { osc('sine', vary(520, 0.1), 260, 0.08, 0.08, 0.1, 0.004); hiss('bandpass', 1800, 700, 3, 0.04, 0.06); },
     gulp: () => { osc('sine', 180, 70, 0.12, 0.2, 0.16, 0.004); osc('triangle', 360, 120, 0.1, 0.1, 0.14, 0.004, 0.05); },
+    twang: () => { osc('triangle', vary(240, 0.1), 520, 0.09, 0.08, 0.14, 0.003); osc('sine', 120, 170, 0.06, 0.05, 0.12, 0.003); },
     goo: () => { hiss('lowpass', 700, 200, 1, 0.03, 0.08); osc('sine', vary(140, 0.15), 90, 0.06, 0.04, 0.08, 0.004); },
   };
 
@@ -1177,7 +1184,7 @@ body { display: grid; place-items: center; }
     const h0 = HEROES.hanato;
     S.ctl = null; S.relics = {}; S.inRun = false; S.reviveUsed = false; S.runDodge = 0; S.midDone = false; S.startGold = 0;
     S.main = { hp: h0.hp, maxHp: h0.hp, atk: h0.atk, def: h0.def, shield: 0, flash: 0 };
-    S.levels = Object.fromEntries(ALL_KINDS.map((k) => [k, 0])); S.goo = []; S.straws = [];
+    S.levels = Object.fromEntries(ALL_KINDS.map((k) => [k, 0])); S.goo = []; S.straws = []; S.waves = [];
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
     S.gold = 0; S.devices = []; S.held = []; S.up = {}; S.ally = null; S.trap = 0; S.unlock = 0;
     S.gain = null; S.special = null; S.evDone = []; S.stock = null; S.drag = null; S.bGold = { combo: 0 };
@@ -1338,7 +1345,7 @@ body { display: grid; place-items: center; }
     if (!S.special && S.trap > 0) { for (let i = 0; i < S.trap; i++) placeBoard('spike'); S.trap = 0; }
     for (const e of S.enemies) if (e.trait === 'web') { spinWeb(e); spinWeb(e); }
     S.ball.x = 480; S.ball.y = 540; S.ball.vx = 0; S.ball.vy = 0;
-    S.round = 1; S.shot = blankShot(); S.enemies.forEach((e) => { e.burn = 0; e.burnT = 0; e.poison = 0; e.poisonT = 0; }); S.goo = []; S.straws = []; S.skill = { active: false, t: 0, hits: 0 }; S.trail = []; S.atk = [];
+    S.round = 1; S.shot = blankShot(); S.enemies.forEach((e) => { e.burn = 0; e.burnT = 0; e.poison = 0; e.poisonT = 0; }); S.goo = []; S.straws = []; S.waves = []; S.skill = { active: false, t: 0, hits: 0 }; S.trail = []; S.atk = [];
     if (!S.special && up('gauge') > 0) S.gauge = Math.min(gaugeMax(), S.gauge + BAL.gaugeUp * up('gauge'));
     if (!S.special && S.relics.seedbell) S.gauge = Math.min(gaugeMax(), S.gauge + (S.relics.seedbell > 1 ? 8 : 4));
     if (!S.special && S.relics.woodshield) S.main.shield += S.relics.woodshield > 1 ? 10 : 6;
@@ -2381,7 +2388,7 @@ body { display: grid; place-items: center; }
   const shotLen = () => heroCtl().shot;
   const stormLen = () => BAL.storm.t + BAL.storm.up * up('storm');
   // 스킬 지속 초: 메인마다 (하나토 난무는 시간이 아니라 직선 수)
-  const skillLen = () => (S.hero === 'hipsel' ? SLIME.skillT + SLIME.up.tide * up('tide') : S.hero === 'doris' ? STRAW.skillT : stormLen());
+  const skillLen = () => (S.hero === 'hipsel' ? SLIME.skillT : S.hero === 'doris' ? STRAW.skillT : stormLen());
   function shotSetup() {
     S.reloc = null; S.devDrag = null;
     S.shot = blankShot();
@@ -2392,7 +2399,7 @@ body { display: grid; place-items: center; }
     if (S.hero === 'hanato') sh.extra += up('combo') + (rabbits() >= 5 ? 1 : 0);
     if (S.ally) S.ally.cd = 0.5;
     S.cuts = []; S.straws = []; S.dried = false;
-    S.goo = (S.goo || []).filter((g) => g.src === 'pool');
+    S.goo = (S.goo || []).filter((g) => g.src === 'pool' || g.src === 'field');
   }
   function fire(d) {
     shotSetup();
@@ -2497,8 +2504,8 @@ body { display: grid; place-items: center; }
       const dx = t ? t.x - S.ball.x : 0, dy = t ? t.y - S.ball.y : -1, L = hyp(dx, dy) || 1;
       fire({ x: dx / L, y: dy / L });
     } else S.phase = 'shot';
-    if (S.hero === 'doris') for (const t of nearest(S.ball.x, S.ball.y, STRAW.skillN)) attachStraw(t, true);
-    if (S.hero === 'hipsel') for (const g of S.goo) if (g.src === 'trail') g.life = g.max;
+    if (S.hero === 'doris') { for (const t of targets()) attachStraw(t, true); sfx.slurp(); }
+    if (S.hero === 'hipsel') { const L = SLIME.field.life + SLIME.up.field * up('field'); S.waves.push({ x: S.ball.x, y: S.ball.y, front: 0, ring: -1, life: L, max: L }); S.main.shield += SLIME.shield; float(S.ball.x, S.ball.y - 86, `보호막 +${SLIME.shield}`, T.guard, 22, true); sfx.goo(); sfx.boom(false); }
     float(S.ball.x, S.ball.y - 50, HEROES[S.hero || 'hanato'].skill, T.petal, 30);
     for (let i = 0; i < 40; i++) addPetal(Math.random() * W, -20 - Math.random() * 200);
   }
@@ -2580,22 +2587,22 @@ body { display: grid; place-items: center; }
   }
 
   // ---------- 민숭마을: 점액 · 빨대 ----------
-  const slimeR = () => SLIME.r * (1 + SLIME.up.wide * up('wide')) * (S.skill.active ? SLIME.wide : 1);
+  const slimeR = () => SLIME.r * (1 + SLIME.up.wide * up('wide'));
   const slimeLife = () => SLIME.life + SLIME.up.life * up('ooze');
   const strawN = () => STRAW.n + STRAW.up.n * up('straws');
   const shotPow = () => { const sh = S.shot; return sh.mul * (sh.size > 0 ? 1.5 : 1) * (sh.gateT > 0 ? 1.3 : 1); };
   const comboMul = () => Math.min(2.5, 1 + 0.03 * S.shot.combo);
   const gooOn = (g, e) => hyp(g.x - e.x, g.y - e.y) < g.r + e.r * 0.8;
   const trailOnFoe = () => (S.goo || []).some((g) => g.src === 'trail' && S.enemies.some((e) => e.alive && !e.off && gooOn(g, e)));
-  // 점액 · 빨대로 맞힌 한 번: 콤보 · 투지 · 콤보 골드 (기본 공격 타격과 같은 장부)
-  function scoreHit(e, col) {
+  // 점액 · 빨대로 맞힌 한 번: 콤보 · 투지 · 콤보 골드 (기본 공격 타격과 같은 장부). noGauge: 투지를 채우지 않는다 (점액 장판)
+  function scoreHit(e, col, noGauge) {
     const sh = S.shot, sk = S.skill;
     sh.combo++; sh.hits++; onCombo();
     if (sk.active) sk.hits++;
     if (sh.combo === 20 && S.levels.ryuto > 0 && !sh.trained) { sh.trained = true; trainingStrike(); }
     const ms = [10, 25, 50, 100, 150].indexOf(sh.combo);
     if (ms >= 0) { sfx.milestone(ms); S.fx.flash = 0.22; (S.fx.rings ||= []).push({ x: S.ball.x, y: S.ball.y, R: 90 + ms * 30, life: 0.4, color: ms >= 2 ? T.petal : T.gold }); }
-    if (!sk.active) S.gauge = Math.min(gaugeMax(), S.gauge + 1);
+    if (!sk.active && !noGauge) S.gauge = Math.min(gaugeMax(), S.gauge + 1);
     e.squash = Math.max(e.squash, 0.4);
     S.fx.comboPop = 1; S.fx.comboShow = 1.2;
     burst(e.x + (Math.random() - 0.5) * e.r, e.y + (Math.random() - 0.5) * e.r, col, 3);
@@ -2618,11 +2625,12 @@ body { display: grid; place-items: center; }
     if (sh.gooD < SLIME.step) return;
     sh.gooD = 0;
     const L = slimeLife();
-    S.goo.push({ x: b.x, y: b.y, r: slimeR(), life: L, max: L, mul: SLIME.mul * (S.skill.active ? SLIME.skillMul : 1), src: 'trail' });
+    S.goo.push({ x: b.x, y: b.y, r: slimeR(), life: L, max: L, mul: SLIME.mul, src: 'trail' });
   }
   // 점액: hurt면 시간이 흐르고 (웅덩이는 라운드 내내) 적을 녹인다. 아니면 사라지는 점액만 흐려진다
   let gooSfxT = 0;
   function stepGoo(dt, hurt) {
+    if (hurt && S.waves && S.waves.length) stepWaves(dt);
     if (!S.goo || !S.goo.length) return;
     for (const g of S.goo) { if (g.src === 'fade') g.life -= dt * 3; else if (hurt && g.src !== 'pool') g.life -= dt; }
     S.goo = S.goo.filter((g) => g.life > 0);
@@ -2638,52 +2646,122 @@ body { display: grid; place-items: center; }
       gooHit(e, best);
     }
   }
+  // 점액 파문: 퍼지는 앞머리가 동심원 자리를 지날 때마다 그 원을 따라 점액 장판 방울을 깐다
+  function stepWaves(dt) {
+    const F = SLIME.field, gap = F.R / F.rings;
+    for (const w of S.waves) {
+      w.life -= dt;
+      w.front = Math.min(F.R, w.front + F.speed * dt);
+      while (w.ring < F.rings && (w.ring + 1) * gap <= w.front) {
+        w.ring++;
+        const r = w.ring * gap, n = r ? Math.max(6, Math.round(Math.PI * 2 * r / 28)) : 1;
+        for (let i = 0; i < n; i++) {
+          const a = i / n * Math.PI * 2 + w.ring * 0.3, x = w.x + Math.cos(a) * r, y = w.y + Math.sin(a) * r;
+          if (x < 0 || x > W || y < 0 || y > H) continue;
+          S.goo.push({ x, y, r: SLIME.r + 6, life: w.life, max: w.max, mul: SLIME.field.mul, src: 'field' });
+        }
+      }
+    }
+    S.waves = S.waves.filter((w) => w.life > 0);
+  }
   function gooHit(e, g) {
     const sh = S.shot;
     wear(e);
     if (damage(e, (atkNow() * g.mul * comboMul() + sh.bonus * SLIME.bonus) * shotPow()) === false) return;
-    scoreHit(e, g.src === 'pool' ? T.keep : T.multi);
+    // 장판은 스킬이 만든 것이라 투지를 채우지 않는다 (장판 → 투지 → 다시 장판 고리를 막는다)
+    scoreHit(e, g.src === 'pool' ? T.keep : T.multi, g.src === 'field');
     const now = performance.now(); if (now - gooSfxT > 90) { gooSfxT = now; sfx.goo(); }
   }
-  // 빨대: 가까이 지나가면 꽂는다 (부딪혀도 꽂는다). force는 빨대 잔치 (수 제한 대신 STRAW.skillN)
+  // 빨대: 가까이 지나가면 꽂는다 (부딪혀도 꽂는다). force는 촉수 잔치 (판 위 모든 적, 수 제한 없음)
+  // rest: 고무줄의 처음 길이. 이보다 늘어나면 공을 적 쪽으로 끌어당긴다
   function attachStraw(e, force) {
-    if (!e || !e.alive || e.off || S.straws.some((s) => s.e === e)) return false;
-    if (S.straws.length >= (force ? Math.max(strawN(), STRAW.skillN) : strawN())) return false;
-    S.straws.push({ e, t: 0, sum: 0, pulse: 0 }); e.sucked = true;
-    float(e.x, e.y - e.r - 22, '쪽!', T.guard, 18, true); sfx.slurp();
+    if (!e || !e.alive || e.off) return false;
+    const had = S.straws.find((s) => s.e === e);
+    if (had) { if (force) { had.tent = true; had.grow = 0; } return false; }
+    if (!force && S.straws.length >= strawN()) return false;
+    const b = S.ball, d = hyp(e.x - b.x, e.y - b.y) || 1;
+    const rest = force ? d : clamp(d, e.r + b.r + STRAW.restMin, e.r + b.r + STRAW.R * STRAW.rest);
+    S.straws.push({ e, t: 0, n: 0, sum: 0, pulse: 0, flow: 0, tense: 0, rest, grow: force ? 0 : 1, tent: !!force }); e.sucked = true;
+    if (!force) {
+      b.vx += (e.x - b.x) / d * STRAW.yank; b.vy += (e.y - b.y) / d * STRAW.yank;
+      float(e.x, e.y - e.r - 22, '쪽!', T.guard, 18, true); sfx.slurp();
+    }
     return true;
   }
   function stepStraws(b, sh, dt) {
     if (S.straws.length < strawN()) for (const e of targets()) { if (S.straws.length >= strawN()) break; if (hyp(e.x - b.x, e.y - b.y) < e.r + b.r + STRAW.R) attachStraw(e); }
-    const rate = S.skill.active ? STRAW.skillRate : 1;
+    let ax = 0, ay = 0, pull = 0;
     for (const s of S.straws) {
-      s.pulse = Math.max(0, s.pulse - dt * 4);
-      if (!s.e.alive || hyp(s.e.x - b.x, s.e.y - b.y) > STRAW.snap) {
-        s.dead = true; s.e.sucked = false;
-        if (s.e.alive) { float((b.x + s.e.x) / 2, (b.y + s.e.y) / 2 - 10, '뚝', T.muted, 16); sfx.rip(); }
+      const e = s.e;
+      s.pulse = Math.max(0, s.pulse - dt * 4); s.flow = Math.max(0, s.flow - dt * 2.8); s.grow = Math.min(1, s.grow + dt * 6);
+      const dx = e.x - b.x, dy = e.y - b.y, d = hyp(dx, dy) || 1;
+      // 촉수 범위(공 둘레 점선)를 벗어나면 바로 끊긴다. 촉수 잔치의 촉수만 잔치 동안 판 끝까지 이어진다
+      const out = d > e.r + b.r + STRAW.R + 6 && !(s.tent && S.skill.active);
+      if (!e.alive || out) {
+        s.dead = true; e.sucked = false;
+        if (e.alive) { burst((b.x + e.x) / 2, (b.y + e.y) / 2, s.tent ? T.petal : T.guard, 8); if (!s.tent) { float((b.x + e.x) / 2, (b.y + e.y) / 2 - 10, '뚝', T.muted, 16); sfx.rip(); } }
         continue;
       }
-      s.t += dt * rate;
+      // 고무줄: 늘어난 만큼 공을 적 쪽으로 당긴다. 팽팽해지는 순간 팅 소리와 함께 적이 출렁
+      const st = Math.max(0, d - s.rest); s.tense = st;
+      if (st > 0) {
+        const a = Math.min(STRAW.pull, STRAW.k * st), ux = dx / d, uy = dy / d, vr = b.vx * ux + b.vy * uy;
+        ax += ux * a; ay += uy * a; pull += st;
+        // 고무줄 저항: 멀어지는 쪽 빠르기를 깎아 늘어난 채 출렁이게 한다
+        if (vr < 0) { const cut = -vr * (1 - Math.exp(-STRAW.damp * dt)); b.vx += ux * cut; b.vy += uy * cut; }
+      }
+      if (st > STRAW.twang && !s.taut) { s.taut = true; sfx.twang(); e.squash = Math.max(e.squash, 0.7); }
+      else if (st < STRAW.twang * 0.5) s.taut = false;
+      s.t += dt;
       if (s.t < STRAW.tick) continue;
-      s.t -= STRAW.tick;
-      const got = damage(s.e, (atkNow() * STRAW.mul * (1 + STRAW.up.suck * up('suck')) * comboMul() + sh.bonus * STRAW.bonus) * shotPow());
+      s.t -= STRAW.tick; s.n++;
+      const got = damage(e, (atkNow() * STRAW.mul * (1 + STRAW.up.suck * up('suck')) * comboMul() + sh.bonus * STRAW.bonus) * shotPow());
       if (got === false) continue;
-      s.sum += got || 0; s.pulse = 1; wear(s.e);
-      scoreHit(s.e, T.guard);
+      s.sum += got || 0; s.pulse = 1; wear(e); drain(got);
+      scoreHit(e, s.tent ? T.petal : T.guard);
+      // 촉수 잔치: skillEvery번 빨 때마다 발 끝 들이켜기를 한 번
+      if (S.skill.active && s.n % STRAW.skillEvery === 0) gulpOne(s, true);
+    }
+    const A = hyp(ax, ay);
+    if (A > 0) {
+      const k = A > STRAW.pullMax ? STRAW.pullMax / A : 1;
+      b.vx += ax * k * dt; b.vy += ay * k * dt;
+      const sp = hyp(b.vx, b.vy); if (sp > STRAW.maxSpeed) { b.vx *= STRAW.maxSpeed / sp; b.vy *= STRAW.maxSpeed / sp; }
+      // 끌리는 쪽으로 공이 눌린다
+      b.sq = Math.max(b.sq || 0, Math.min(0.7, pull / 260)); b.nx = -ax / A; b.ny = -ay / A;
     }
     S.straws = S.straws.filter((s) => !s.dead);
+  }
+  // 흡혈: 빨대 · 들이켜기로 준 피해의 drain만큼 체력을 되찾는다 (모아 두었다가 1씩)
+  const tethered = () => S.hero === 'doris' && S.straws && S.straws.some((s) => s.tense > 0);
+  function drain(got) {
+    if (!got || S.hero !== 'doris') return;
+    S.drainAcc = (S.drainAcc || 0) + got * STRAW.drain;
+    const v = Math.min(Math.floor(S.drainAcc), S.main.maxHp - S.main.hp);
+    if (S.drainAcc >= 1) S.drainAcc -= Math.floor(S.drainAcc);
+    if (v > 0) { S.main.hp += v; float(S.ball.x + (Math.random() - 0.5) * 30, S.ball.y - 40, '+' + v, T.keep, 16); }
+  }
+  // 들이켜기 한 번: (공격력 × burst × 콤보 배율 + 빨아들인 피해 × back) × 강화 × 판 배율. 빨아들인 피해는 비운다
+  let gulpSfxT = 0;
+  function gulpOne(s, mid) {
+    const e = s.e;
+    if (!e.alive) return false;
+    const v = (atkNow() * STRAW.burst * comboMul() + s.sum * STRAW.back) * (1 + STRAW.up.gulp * up('gulp')) * shotPow();
+    S.fx.bolts.push({ x1: S.ball.x, y1: S.ball.y, x2: e.x, y2: e.y, life: 0.45, color: s.tent ? T.petal : T.guard });
+    (S.fx.rings ||= []).push({ x: e.x, y: e.y, R: e.r + 26, life: 0.4, color: s.tent ? T.petal : T.guard });
+    drain(damage(e, v, '꿀꺽', true));
+    s.sum = 0; s.flow = 1; e.squash = 1;
+    if (mid) {
+      S.fx.shake = Math.min(18, S.fx.shake + 4);
+      const now = performance.now(); if (now - gulpSfxT > 120) { gulpSfxT = now; sfx.gulp(); }
+    }
+    return true;
   }
   // 발 끝: 꽂힌 빨대마다 한꺼번에 들이켠다 (괴롭힘이 걸린 채로 맞는다)
   function gulpStraws() {
     if (!S.straws || !S.straws.length) return;
     let n = 0;
-    for (const s of S.straws) {
-      if (!s.e.alive) continue;
-      const v = (atkNow() * STRAW.burst * comboMul() + s.sum * STRAW.back) * (1 + STRAW.up.gulp * up('gulp')) * shotPow();
-      S.fx.bolts.push({ x1: S.ball.x, y1: S.ball.y, x2: s.e.x, y2: s.e.y, life: 0.45, color: T.guard });
-      (S.fx.rings ||= []).push({ x: s.e.x, y: s.e.y, R: s.e.r + 26, life: 0.4, color: T.guard });
-      damage(s.e, v, '꿀꺽', true); n++;
-    }
+    for (const s of S.straws) if (gulpOne(s)) n++;
     for (const s of S.straws) s.e.sucked = false;
     S.straws = [];
     if (!n) return;
@@ -2704,7 +2782,7 @@ body { display: grid; place-items: center; }
     // 한 발 시간 동안 같은 빠르기로 튕긴다. 끝나기 직전 FOCUS.brake초 동안만 줄어든다 (스킬 중에는 줄지 않는다)
     const sp = hyp(b.vx, b.vy), brake = sk.active ? 1 : clamp((shotLen() - sh.t) / FOCUS.brake, 0.3, 1);
     const base = sh.base * (sk.active ? 1.35 : 1) * (sh.slowT > 0 ? 0.32 : 1) * brake;
-    const ns = sh.slowT > 0 || brake < 1 ? Math.min(sp, base) : sp > base ? Math.max(base, sp - 520 * dt) : base;
+    const ns = sh.slowT > 0 || brake < 1 ? Math.min(sp, base) : sp > base ? Math.max(base, sp - 520 * dt) : tethered() ? clamp(sp + STRAW.recover * dt, Math.min(base, STRAW.minSpeed), base) : base;
     if (sp > 0) { b.vx *= ns / sp; b.vy *= ns / sp; }
     if (S.hero === 'hanato' && (sk.active || sh.sinceHit > 0.25)) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
     if (S.hero === 'rito') {
@@ -3032,7 +3110,7 @@ body { display: grid; place-items: center; }
       S.ball.vx = 0; S.ball.vy = 0; S.phase = 'dry'; syncUI(true); return;
     }
     gulpStraws();
-    for (const g of S.goo || []) if (g.src !== 'pool') g.src = 'fade';
+    for (const g of S.goo || []) if (g.src === 'trail' || g.src === 'ally') g.src = 'fade';
     S.focus = null; S.dash = null; $('#app').classList.remove('focus');
     if (S.skill.active) S.skill.active = false;
     S.ball.vx = 0; S.ball.vy = 0;
@@ -3998,6 +4076,13 @@ body { display: grid; place-items: center; }
   let gooCv = null, gooCx = null;
   function drawGoo() {
     if (S.phase === 'dry') note(W / 2, 34, '점액이 마르는 중');
+    for (const w of S.waves || []) {
+      const F = SLIME.field, gap = F.R / F.rings, k = clamp(w.life / w.max, 0, 1);
+      ctx.strokeStyle = T.multi; ctx.lineWidth = 3; ctx.globalAlpha = 0.25 + 0.4 * k;
+      for (let i = 1; i <= w.ring; i++) { circle(w.x, w.y, i * gap); ctx.stroke(); }
+      if (w.front < F.R) { ctx.strokeStyle = T.panel; ctx.lineWidth = 5; ctx.globalAlpha = 0.85; circle(w.x, w.y, w.front); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    }
     if (!S.goo || !S.goo.length) return;
     if (!gooCv) { gooCv = document.createElement('canvas'); gooCv.width = W * 2; gooCv.height = H * 2; gooCx = gooCv.getContext('2d'); }
     gooCx.setTransform(1, 0, 0, 1, 0, 0); gooCx.clearRect(0, 0, W * 2, H * 2); gooCx.setTransform(2, 0, 0, 2, 0, 0);
@@ -4014,7 +4099,8 @@ body { display: grid; place-items: center; }
       circle(g.x, g.y, g.r); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
   }
-  // 빨대: 공에서 적까지 처진 관, 적 쪽에서 공 쪽으로 빨려 오는 방울. 조준 · 튕기는 동안 공 둘레에 빨대가 닿는 거리
+  // 빨대 = 고무줄: 느슨하면 아래로 처지고, 늘어나면 곧게 떨리며 가늘어지고 금빛으로 팽팽해진다. 적 쪽에서 공 쪽으로 빨려 오는 방울.
+  // 촉수 잔치의 촉수는 분홍 물결에 빨판, 들이켜기 때 덩이가 적에서 공으로 달려온다. 조준 · 튕기는 동안 공 둘레에 빨대가 닿는 거리
   function drawStraws() {
     const b = S.ball, t = performance.now() / 1000;
     if (S.hero === 'doris' && (S.phase === 'aim' || S.phase === 'shot')) {
@@ -4022,18 +4108,31 @@ body { display: grid; place-items: center; }
       circle(b.x, b.y, b.r + STRAW.R); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
     if (!S.straws || !S.straws.length) return;
-    ctx.lineCap = 'round';
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const N = 18;
     for (const s of S.straws) {
-      const e = s.e, mx = (b.x + e.x) / 2, my = (b.y + e.y) / 2 + Math.min(60, hyp(e.x - b.x, e.y - b.y) * 0.12);
-      ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.quadraticCurveTo(mx, my, e.x, e.y);
-      ctx.strokeStyle = T.mat1; ctx.lineWidth = 9; ctx.globalAlpha = 0.6; ctx.stroke();
-      ctx.strokeStyle = T.guard; ctx.lineWidth = 4 + 2 * (s.pulse || 0); ctx.globalAlpha = 0.95; ctx.stroke();
-      ctx.fillStyle = T.gold;
-      for (let i = 0; i < 3; i++) {
-        const u = 1 - ((t * 1.6 + i / 3) % 1), v = 1 - u;
-        circle(v * v * b.x + 2 * v * u * mx + u * u * e.x, v * v * b.y + 2 * v * u * my + u * u * e.y, 3.5); ctx.fill();
+      const e = s.e, g = s.grow, ex = b.x + (e.x - b.x) * g, ey = b.y + (e.y - b.y) * g;
+      const dx = ex - b.x, dy = ey - b.y, d = hyp(dx, dy) || 1, nx = -dy / d, ny = dx / d;
+      const st = s.tense || 0, slack = Math.max(0, s.rest - hyp(e.x - b.x, e.y - b.y));
+      const thin = clamp(Math.sqrt(s.rest / d), 0.45, 1);
+      const pts = [];
+      for (let i = 0; i <= N; i++) {
+        const u = i / N, bell = Math.sin(u * Math.PI);
+        let off = st > 0 ? Math.sin(t * 60 + u * 9) * Math.min(5, st * 0.05) * bell : 0;
+        if (s.tent) off += Math.sin(u * Math.PI * 3 - t * 9) * 7 * bell * (st > 0 ? 0.5 : 1);
+        pts.push([b.x + dx * u + nx * off, b.y + dy * u + ny * off + slack * 0.45 * bell]);
       }
-      ctx.strokeStyle = T.guard; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.9; ctx.setLineDash([5, 5]); circle(e.x, e.y, e.r + 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (const p of pts) ctx.lineTo(p[0], p[1]);
+      const w = (s.tent ? 9 : 6) * thin;
+      ctx.strokeStyle = T.mat1; ctx.globalAlpha = 0.6; ctx.lineWidth = w + 4; ctx.stroke();
+      ctx.strokeStyle = s.tent ? T.petal : T.guard; ctx.globalAlpha = 0.95; ctx.lineWidth = w + 2 * s.pulse; ctx.stroke();
+      if (st > 0) { ctx.strokeStyle = T.gold; ctx.globalAlpha = clamp(st / 220, 0, 0.85); ctx.lineWidth = Math.max(1.5, w * 0.45); ctx.stroke(); }
+      ctx.globalAlpha = 0.95;
+      if (s.tent) { ctx.fillStyle = T.panel; for (let i = 3; i < N; i += 3) { circle(pts[i][0], pts[i][1], 2.6 * thin + 0.6); ctx.fill(); } }
+      ctx.fillStyle = T.gold;
+      for (let i = 0; i < 3; i++) { const p = pts[Math.round((1 - ((t * 1.6 + i / 3) % 1)) * N)]; circle(p[0], p[1], 3.2 * thin + 1); ctx.fill(); }
+      if (s.flow > 0) { const p = pts[Math.round(clamp(s.flow, 0, 1) * N)]; ctx.fillStyle = T.panel; circle(p[0], p[1], 10); ctx.fill(); ctx.fillStyle = s.tent ? T.petal : T.guard; circle(p[0], p[1], 7); ctx.fill(); }
+      if (g >= 1) { ctx.strokeStyle = s.tent ? T.petal : T.guard; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.9; ctx.setLineDash([5, 5]); circle(e.x, e.y, e.r + 7); ctx.stroke(); ctx.setLineDash([]); }
       ctx.globalAlpha = 1;
     }
   }
