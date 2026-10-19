@@ -734,6 +734,7 @@ body { display: grid; place-items: center; }
   // GOO: 판 위 점액. 히프셀 흔적 · 질숭 웅덩이 · 합류한 히프셀이 같은 규칙을 쓴다.
   //   적 하나는 겹친 점액 중 가장 진한 것 하나에만 tick초마다 맞는다 (겹쳐도 쌓이지 않는다). pool 웅덩이 피해 배율 · poolR 웅덩이 반지름
   // SLIME: 히프셀 흔적. step 판 좌표마다 한 방울 · r 반지름 · life 남는 초 · mul 한 번 피해 배율 (공격력 ×) · bonus 범퍼 타격(+n)을 얼마나 얹는가
+  //   dryRate '점액이 마르는 중' (발이 끝난 뒤 적 위의 흔적 · 장판이 마를 때까지 기다리는 동안) 점액이 마르는 빠르기 배수. 피해는 그대로 tick초마다 (v0.9.2)
   //   crack 단단한 껍질은 몇 번 맞을 때마다 한 번 깨지는가 · up 정비 강화 한 단계 (흔적 초 · 굵기 · 장판 초)
   //   점액 파문 (스킬, v0.9.1): 쓰는 자리에서 동심원으로 퍼지는 점액 장판. skillT 퍼지는 동안의 스킬 초 · field.R 반지름 · rings 동심원 수 · speed 퍼지는 빠르기 ·
   //   life 남는 초 (흔적보다 길다. 발 시간으로만 줄고, 발과 발 사이에는 판에 남아 있다. 전투가 끝나면 사라진다) · mul 피해 배율 · shield 파문을 쓰면 받는 보호막
@@ -745,7 +746,7 @@ body { display: grid; place-items: center; }
   //   damp 늘어나는 쪽(적에게서 멀어지는 쪽) 빠르기를 초당 이만큼씩 깎는다 (고무줄 저항) · 팽팽한 동안은 공이 minSpeed까지 느려질 수 있고 초당 recover씩 원래 빠르기로 돌아온다 (늘어나며 느려지고, 끌려오며 빨라진다) · maxSpeed 끌려 빨라진 공의 상한 · twang 이만큼 늘어나면 팽팽 소리
   //   skillT 촉수 잔치 초 · skillEvery 잔치 동안 몇 번 빨 때마다 발 끝 들이켜기를 한 번 주는가
   const GOO = { tick: 0.25, pool: 0.12, poolR: 56 };
-  const SLIME = { step: 18, r: 32, life: 2.4, mul: 0.7, bonus: 0.5, skillT: 1, shield: 15, crack: 4, field: { R: 260, rings: 5, speed: 320, life: 5, mul: 0.7 }, up: { life: 0.4, wide: 0.15, field: 1 } };
+  const SLIME = { step: 18, r: 32, life: 2.4, mul: 0.7, bonus: 0.5, skillT: 1, shield: 15, dryRate: 2, crack: 4, field: { R: 260, rings: 5, speed: 320, life: 5, mul: 0.7 }, up: { life: 0.4, wide: 0.15, field: 1 } };
   const STRAW = { n: 3, R: 140, tick: 0.3, mul: 0.25, bonus: 0.5, burst: 4, back: 0.6, torment: 0.2, drain: 0.1, rest: 0.55, restMin: 40, k: 200, damp: 8, pull: 18000, pullMax: 24000, yank: 120, minSpeed: 150, recover: 900, maxSpeed: 1600, twang: 45, skillT: 2, skillEvery: 3, up: { n: 1, suck: 0.25, gulp: 0.3 } };
   // 퐁숭 독: 발이 끝날 때 걸고, 그때와 다음 발 끝에 한 번씩 (화상과 같은 때)
   const POISON = { turns: 2, mul: 0.6 };
@@ -2593,7 +2594,8 @@ body { display: grid; place-items: center; }
   const shotPow = () => { const sh = S.shot; return sh.mul * (sh.size > 0 ? 1.5 : 1) * (sh.gateT > 0 ? 1.3 : 1); };
   const comboMul = () => Math.min(2.5, 1 + 0.03 * S.shot.combo);
   const gooOn = (g, e) => hyp(g.x - e.x, g.y - e.y) < g.r + e.r * 0.8;
-  const trailOnFoe = () => (S.goo || []).some((g) => g.src === 'trail' && S.enemies.some((e) => e.alive && !e.off && gooOn(g, e)));
+  // 히프셀이 깐 점액(흔적 · 장판)이 적 위에 남았는가. 남았으면 발이 끝난 뒤 마를 때까지 기다린다
+  const trailOnFoe = () => (S.goo || []).some((g) => (g.src === 'trail' || g.src === 'field') && S.enemies.some((e) => e.alive && !e.off && gooOn(g, e)));
   // 점액 · 빨대로 맞힌 한 번: 콤보 · 투지 · 콤보 골드 (기본 공격 타격과 같은 장부). noGauge: 투지를 채우지 않는다 (점액 장판)
   function scoreHit(e, col, noGauge) {
     const sh = S.shot, sk = S.skill;
@@ -2632,7 +2634,8 @@ body { display: grid; place-items: center; }
   function stepGoo(dt, hurt) {
     if (hurt && S.waves && S.waves.length) stepWaves(dt);
     if (!S.goo || !S.goo.length) return;
-    for (const g of S.goo) { if (g.src === 'fade') g.life -= dt * 3; else if (hurt && g.src !== 'pool') g.life -= dt; }
+    const dry = S.phase === 'dry' ? SLIME.dryRate : 1;
+    for (const g of S.goo) { if (g.src === 'fade') g.life -= dt * 3; else if (hurt && g.src !== 'pool') g.life -= dt * dry; }
     S.goo = S.goo.filter((g) => g.life > 0);
     if (!hurt) return;
     for (const e of S.enemies) {
@@ -2650,7 +2653,7 @@ body { display: grid; place-items: center; }
   function stepWaves(dt) {
     const F = SLIME.field, gap = F.R / F.rings;
     for (const w of S.waves) {
-      w.life -= dt;
+      w.life -= dt * (S.phase === 'dry' ? SLIME.dryRate : 1);
       w.front = Math.min(F.R, w.front + F.speed * dt);
       while (w.ring < F.rings && (w.ring + 1) * gap <= w.front) {
         w.ring++;
