@@ -523,6 +523,62 @@ body { display: grid; place-items: center; }
 /* 끌어 놓는 아이템 (화면 밖 body에 붙는다) */
 .drag-ghost { position: fixed; z-index: 30; pointer-events: none; transform: translate(-50%, -170%) rotate(-3deg); font: 400 20px/1 "Black Han Sans", sans-serif; color: #262a17; background: #f2cf5a; padding: 8px 16px; box-shadow: 0 5px 0 0 rgba(0,0,0,.45); }
 @media (prefers-reduced-motion: reduce) { .K .skill.ready, .K #hero.hero-hurt .hero-art, .K #hero.hero-cut .hero-art { animation: none; } .K .story-hand.go { animation-name: hand-fade; } }
+/* v0.8 아웃게임 (야영지 · 훈련장 · 유물함 · 상점 · 이야기책 · 도감 · 도전과제 · 기록 · 출발): 디자인 시스템 문법으로 새로 만든 화면 */
+.K .fill { width: 100%; height: 100%; object-fit: cover; display: block; }
+.K .money small { color: inherit; }
+.K .money b { font-size: 46px; }
+.K .money.acorn { background: var(--mat-3); box-shadow: inset 0 0 0 8px var(--mat-2); color: var(--cream); }
+.K .row { position: absolute; display: flex; gap: 22px; align-items: center; z-index: 4; }
+.K .row .ticket { position: relative; }
+.K .ticket.sm { font-size: 26px; padding: 12px 26px; gap: 12px; }
+.K .ticket.sel { background: var(--accent); color: #fff; }
+.K .ticket.sel small { color: #fff1e6; }
+.K .spot .ware__obj { width: 140px; height: 140px; }
+.K .spot .ware__obj .fu-ico { width: 70px; height: 70px; }
+.K .spot:not(:disabled):hover .ware__obj { translate: 0 -6px; }
+.K .ware.on .price { background: var(--accent); color: #fff; }
+.K .ware__obj.crop { overflow: hidden; }
+.K .ware__obj.crop img { transform: scale(2.1); transform-origin: 50% 16%; border-radius: 0; }
+.K .rbox .ticket:not(.on):not(.cy) { background: var(--surface-2); }
+.K .ware .lv { position: absolute; left: 34px; top: -10px; padding: 6px 10px; background: var(--surface); color: var(--ink); font: 400 16px/1 var(--font-market-label); transform: rotate(-8deg); }
+.K .pick.locked img { filter: grayscale(1) brightness(.5); }
+.K .pick.locked .burst { background: var(--mat-2) !important; }
+.K .lockstamp { position: absolute; z-index: 4; padding: 18px 30px; background: var(--surface); color: var(--ink); font: 400 46px/1 var(--font-market-display); text-align: center; transform: rotate(-6deg); box-shadow: 0 8px 0 0 var(--mat-1); outline: 3px dashed var(--stitch); outline-offset: -9px; }
+.K .lockstamp small { display: block; margin-top: 10px; font: 400 19px/1.25 var(--font-market-label); color: var(--ink-muted); }
+.K .rbox { position: absolute; z-index: 4; padding: 26px 30px 28px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -9px; box-shadow: 0 10px 0 0 rgba(0,0,0,.4); }
+.K .rbox h3 { margin: 0; font: 400 34px/1.1 var(--font-market-display); color: var(--accent); }
+.K .rbox h4 { margin: 20px 0 0; font: 400 24px/1 var(--font-market-display); color: var(--accent-ink); }
+.K .rbox p { margin: 10px 0 0; font: 400 20px/1.4 var(--font-market-text); }
+.K .rbox p.mut { color: var(--ink-muted); font-size: 18px; }
+.K .rbox .row { position: static; margin-top: 18px; flex-wrap: wrap; gap: 14px; }
+.K .rbox .ticket { font-size: 26px; padding: 12px 24px; }
+.K .grow { display: flex; align-items: center; gap: 14px; margin-top: 12px; font: 400 26px/1.15 var(--font-market-display); }
+.K .grow small { display: block; font: 400 17px/1.3 var(--font-market-label); color: var(--ink-muted); }
+.K .grow .dot { flex: none; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--c, var(--spirit)); color: var(--ink); }
+.K .grow .dot .fu-ico { width: 30px; height: 30px; }
+.K .slotc { position: absolute; z-index: 3; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-2); box-shadow: inset 0 0 0 6px var(--mat-3); color: var(--cream); font: 400 22px/1 var(--font-market-label); }
+.K .slotc.full { background: var(--accent); box-shadow: 0 0 0 6px var(--cream), 0 10px 0 0 rgba(0,0,0,.4); color: var(--ink); }
+.K .slotc .fu-ico { width: 72px; height: 72px; }
+.K .slotlab { position: absolute; width: 230px; text-align: center; font: 400 20px/1.25 var(--font-market-label); color: var(--on-dark); }
+.K .achv { position: absolute; width: 780px; min-height: 112px; padding: 16px 150px 16px 124px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -8px; box-shadow: 0 6px 0 0 rgba(0,0,0,.35); }
+.K .achv .dot { position: absolute; left: 20px; top: 14px; width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--ink-muted); }
+.K .achv .dot .fu-ico { width: 44px; height: 44px; }
+.K .achv.done .dot { background: var(--spirit); color: var(--ink); }
+.K .achv b { font: 400 28px/1 var(--font-market-display); color: var(--accent); }
+.K .achv p { margin: 8px 0 0; font: 400 18px/1.3 var(--font-market-text); }
+.K .achv .rw { position: absolute; right: 22px; top: 16px; width: 140px; text-align: right; font: 400 17px/1.3 var(--font-market-label); color: var(--accent-ink); }
+.K .achv .st { position: absolute; right: 22px; bottom: 14px; font: 400 26px/1 var(--font-market-display); color: var(--ink-muted); }
+.K .achv.done .st { color: var(--accent); }
+.K .led.big .led__row span { font-size: 24px; }
+.K .led.big .led__row b { font-size: 46px; }
+.K .led.dim { opacity: .55; }
+.K .led.camp .led__row + .led__row { margin-top: 4px; }
+.K .led.camp .led__row b { font-size: 34px; }
+.K .campfire { position: absolute; width: 230px; height: 230px; display: grid; place-items: center; }
+.K .campfire .burst { inset: 0; background: var(--accent); }
+.K .campfire i { position: absolute; inset: 44px; border-radius: 50%; background: var(--cream); display: grid; place-items: center; color: var(--accent-ink); }
+.K .campfire .fu-ico { width: 84px; height: 84px; }
+.K .logpile { position: absolute; height: 26px; background: var(--mat-3); box-shadow: inset 0 -8px 0 0 var(--mat-2), 0 8px 0 0 rgba(0,0,0,.4); }
 /* v0.7 멈춤: 판 밖 화면도 어둡게 (판은 캔버스가 직접 덮는다) */
 .K .focus-dim { position: absolute; inset: 0; z-index: 8; pointer-events: none; background: var(--mat-1); opacity: 0; transition: opacity .12s; }
 .K.focus .focus-dim { opacity: .62; }
@@ -607,7 +663,7 @@ body { display: grid; place-items: center; }
       <label class="tog"><input type="checkbox" id="optSound" checked> 소리</label>
       <section id="meSec" hidden><h3>플레이어</h3><div class="me" id="me"></div></section>
       <div class="menu-row">
-        <button class="ticket" id="restart" type="button">처음부터</button>
+        <button class="ticket" id="restart" type="button">원정 그만두기</button>
         <button class="ticket cy" id="redoPersona" type="button">페르소나 다시 만들기</button>
         <button class="ticket on" id="menuClose" type="button">닫기<small>Esc</small></button>
       </div>
@@ -832,6 +888,88 @@ body { display: grid; place-items: center; }
 
   const S = { opts: { cutin: true, sound: true }, uiT: 0, persona: null };
   let T = {};
+
+  // ---------- 아웃게임 데이터 (v0.8, 수치는 모두 임시) ----------
+  // 재화 두 가지: 도토리 = 일반 (훈련 · 시작 구매), 별조각 = 희귀 (유물 구매 · 강화). 런 안의 골드와는 다른 재화다
+  const MONEY = { acorn: { name: '도토리', ico: 'leaf' }, star: { name: '별조각', ico: 'star' } };
+  // 원정이 끝날 때: 끝낸 칸마다 도토리, 중간 보스 · 보스를 쓰러뜨리면 덤. 별조각은 보스에서만 (보상 구간 3단계, Q46)
+  const REWARD = { perNode: 3, mid: 15, boss: 30, midStar: 1, bossStar: 2 };
+  // 훈련장: 메인마다 따로 남는다 (세션 밖 강화). cost는 단계마다 드는 도토리. 정비의 '메인 강화'(런 안)와 헷갈리지 않게 '훈련'이라 부른다
+  const TRAIN = {
+    main: [
+      { id: 'hp', name: '체력', ico: 'heart', step: 5, cost: [15, 25, 40, 60, 85] },
+      { id: 'atk', name: '공격', ico: 'sword', step: 1, cost: [20, 30, 45, 65, 90] },
+      { id: 'def', name: '방어', ico: 'shield', step: 1, cost: [25, 45, 70] },
+    ],
+    ctl: [
+      { id: 'shot', name: '한 발 시간', ico: 'turn', step: 0.25, unit: '초', cost: [20, 35, 55] },
+      { id: 'dash', name: '대쉬 거리', ico: 'speed', step: 20, cost: [15, 25, 40] },
+      { id: 'moves', name: '장치 옮기기', ico: 'gear', step: 1, unit: '개', cost: [30, 60] },
+      { id: 'think', name: '멈춤 고르기 시간', ico: 'pause', step: 0.5, unit: '초', cost: [15, 30] },
+    ],
+  };
+  // 유물: 계정 공용, 장착 2칸, 2단계까지. from 유물은 그 메인으로 그 보스를 처음 쓰러뜨리면 얻는다 (메인 × 보스마다 다르다).
+  // shop 유물은 상점에서 별조각으로 산다
+  const RELIC = { slots: 2, maxLv: 2, up: 3, shopN: 3 };
+  const RELICS = {
+    thornknot: { name: '꺾인 가시 매듭', from: ['hanato', 'thistle'], ico: 'thorn', desc: (L) => `대쉬가 끝난 자리 둘레 적에게 충격 (공격력 × ${L > 1 ? 3 : 2})` },
+    blossom: { name: '벚꽃 덩굴끈', from: ['hanato', 'ivy'], ico: 'leaf', desc: (L) => `스킬을 쓰면 체력 +${L > 1 ? 8 : 5}` },
+    thorncharm: { name: '가시 부적', from: ['rito', 'thistle'], ico: 'skill', desc: (L) => `발이 시작될 때 가까운 적 ${L > 1 ? 5 : 3}명에게 부적 (공격력 × 0.6)` },
+    seedbell: { name: '씨앗 방울', from: ['rito', 'ivy'], ico: 'bell', desc: (L) => `전투 시작 투지 +${L > 1 ? 8 : 4}` },
+    clover: { name: '토끼풀 부적', shop: 4, ico: 'heart', desc: (L) => `원정마다 한 번, 쓰러지면 체력 ${L > 1 ? 50 : 30}%로 일어난다` },
+    luckycoin: { name: '행운 엽전', shop: 4, ico: 'coin', desc: (L) => `전투 승리 골드 +${L > 1 ? 2 : 1}` },
+    combobell: { name: '콤보 방울', shop: 4, ico: 'paw', desc: (L) => `콤보 25마다 체력 +${L > 1 ? 5 : 3}` },
+    toolbox: { name: '장치 상자', shop: 4, ico: 'gear', desc: (L) => `원정을 장치 ${L > 1 ? 2 : 1}개 들고 시작` },
+    pouch: { name: '도토리 주머니', shop: 4, ico: 'bag', desc: (L) => `원정이 끝날 때 도토리 +${L > 1 ? 40 : 20}%` },
+    woodshield: { name: '나무 방패 조각', shop: 4, ico: 'shield', desc: (L) => `전투마다 첫 라운드 보호막 +${L > 1 ? 10 : 6}` },
+  };
+  const RELIC_ORDER = Object.keys(RELICS);
+  const relicOf = (k, boss) => RELIC_ORDER.find((id) => RELICS[id].from && RELICS[id].from[0] === k && RELICS[id].from[1] === boss);
+  // 시작 구매: 출발 준비에서 원정마다 한 번씩. 같은 종족 동료는 Figma "세션 시작 시 같은 종족 동료 구매 가능"
+  const START_BUY = [
+    { id: 'ally', name: '동료 한 명', ico: 'paw', desc: (k) => `무작위 ${HEROES[k].race} 동료 1단계로 출발`, cost: 20 },
+    { id: 'dev', name: '장치 하나', ico: 'gear', desc: () => '무작위 장치 하나를 들고 출발', cost: 15 },
+    { id: 'heal', name: '회복', ico: 'heal', desc: () => '보급품 칸에 회복 하나', cost: 10 },
+    { id: 'gold', name: '골드 주머니', ico: 'coin', desc: () => '시작 골드 +5', cost: 10 },
+  ];
+  // 메인마다 전용 챕터 6개 (Q27). 지금은 1장만 내용이 있다. 이름은 가제 (Q35)
+  const CH_N = 6, CH_NAME = ['교역로'];
+  // 도전과제: 원정이 끝날 때 본다. 보상은 그때 바로 들어온다
+  const ACH = [
+    { id: 'first', name: '첫 원정', desc: '원정을 한 번 마친다', reward: { acorn: 10 }, test: () => true },
+    { id: 'mid', name: '첫 고비', desc: '시슬라를 쓰러뜨린다', reward: { star: 1 }, test: (r) => r.mid },
+    { id: 'clear', name: '교역로 완주', desc: '1장을 깬다', reward: { acorn: 20, star: 1 }, test: (r) => r.win },
+    { id: 'combo50', name: '콤보 50', desc: '한 발에 콤보 50을 낸다', reward: { acorn: 15 }, test: (r) => r.bestCombo >= 50 },
+    { id: 'combo100', name: '콤보 100', desc: '한 발에 콤보 100을 낸다', reward: { star: 1 }, test: (r) => r.bestCombo >= 100 },
+    { id: 'dodge', name: '피하기 달인', desc: '멈춤 · 대쉬로 피하는 자리에 10번 선다 (모든 원정)', reward: { acorn: 15 }, test: () => META.stat.dodge >= 10, prog: () => `${Math.min(10, META.stat.dodge)}/10` },
+    { id: 'devices', name: '장치 장인', desc: '한 원정에서 장치 6칸을 모두 채운다', reward: { acorn: 10 }, test: (r) => r.devFull },
+    { id: 'party', name: '모두 함께', desc: '한 원정에서 동료 4칸을 모두 채운다', reward: { acorn: 15 }, test: (r) => r.partyFull },
+    { id: 'both', name: '두 원정대', desc: '하나토와 리토로 1장을 깬다', reward: { star: 2 }, test: () => META.rec.hanato.clears > 0 && META.rec.rito.clears > 0 },
+    { id: 'relic4', name: '유물 수집가', desc: '유물 4개를 모은다', reward: { acorn: 20 }, test: () => Object.keys(META.relics).length >= 4, prog: () => `${Math.min(4, Object.keys(META.relics).length)}/4` },
+  ];
+  const UNLOCK = { rito: { by: 'hanato', boss: 'thistle', text: '하나토로 시슬라를 쓰러뜨리면 합류' } };
+  const FOE_BOOK = ['ghost', 'shaman', 'willow', 'shroom', 'spider', 'knot', 'sprout', 'thistle', 'ivy'];
+  const FOE_NOTE = { ghost: '맞으면 다른 자리로 순간이동한다', shaman: '둘레 몬스터에게 방어를 나눠 준다', willow: '새싹을 불러낸다', shroom: '쓰러지면 포자가 터져 둘레를 친다', spider: '거미줄을 쳐서 공을 느리게 한다', knot: '껍질이 깨지기 전에는 피해를 덜 받는다', sprout: '버드나무 난쟁이가 불러내는 작은 몬스터', thistle: '1장 중간 보스. 꽃봉오리를 다 깨야 갑옷이 열린다', ivy: '1장 보스. 씨앗 폭탄으로 덩굴 마디를 친다' };
+  // 저장 (이 브라우저에만). 런 도중 저장은 없다
+  const META_KEY = 'furryup-meta';
+  const blankRec = () => ({ runs: 0, clears: 0, best: 0, bestCombo: 0, dealt: 0 });
+  const blankMeta = () => ({ v: 1, acorn: 0, star: 0, pick: 'hanato', unlocked: { hanato: true, rito: false }, train: { hanato: {}, rito: {} }, relics: {}, equip: [], shop: null, ach: {}, seen: { main: {}, ally: {}, foe: {}, cg: {}, story: { hanato: [], rito: [] } }, rec: { hanato: blankRec(), rito: blankRec() }, stat: { runs: 0, dodge: 0 } });
+  let META = blankMeta();
+  function mergeMeta(base, m) {
+    for (const k of Object.keys(m || {})) {
+      if (base[k] && typeof base[k] === 'object' && !Array.isArray(base[k]) && m[k] && typeof m[k] === 'object' && !Array.isArray(m[k])) mergeMeta(base[k], m[k]);
+      else base[k] = m[k];
+    }
+    return base;
+  }
+  function loadMeta() { try { const m = JSON.parse(localStorage.getItem(META_KEY) || 'null'); if (m && m.v === 1) META = mergeMeta(blankMeta(), m); } catch (e) { /* 없어도 된다 */ } }
+  function saveMeta() { try { localStorage.setItem(META_KEY, JSON.stringify(META)); } catch (e) { /* 이번 창에서만 기억 */ } }
+  const unlocked = (k) => !!META.unlocked[k];
+  // 훈련을 반영한 메인 값
+  function trained(k) {
+    const h = HEROES[k], t = META.train[k] || {}, add = (g, id) => (t[id] || 0) * TRAIN[g].find((x) => x.id === id).step;
+    return { hp: h.hp + add('main', 'hp'), atk: h.atk + add('main', 'atk'), def: h.def + add('main', 'def'), shot: h.ctl.shot + add('ctl', 'shot'), dash: h.ctl.dash + add('ctl', 'dash'), moves: h.ctl.moves + add('ctl', 'moves'), think: FOCUS.max + add('ctl', 'think') };
+  }
   // 캔버스는 짙은 숲 바닥 위에 그리므로 --cv-* 색을 쓴다
   const TOKENS = ['ink', 'muted', 'line', 'accent', 'accent-ink', 'chip-ink', 'danger', 'gold', 'dash', 'guard', 'spark', 'finale', 'multi', 'keep', 'petal', 'board', 'board-line', 'foe', 'foe-fill', 'panel', 'bg', 'enemy', 'bubble', 'mat1', 'mat2', 'mat3', 'dot', 'ink-dark'];
   function readTokens() {
@@ -978,8 +1116,9 @@ body { display: grid; place-items: center; }
 
   // ---------- 챕터 흐름 ----------
   // cyoa === true 이면 저장된 페르소나가 있어도 설문부터 (설정 · 다시 만들기)
-  function newRun(cyoa) {
+  function resetRun() {
     const h0 = HEROES.hanato;
+    S.ctl = null; S.relics = {}; S.inRun = false; S.reviveUsed = false; S.runDodge = 0; S.midDone = false; S.startGold = 0;
     S.main = { hp: h0.hp, maxHp: h0.hp, atk: h0.atk, def: h0.def, shield: 0, flash: 0 };
     S.levels = { ryuto: 0, sato: 0, oto: 0, santo: 0 };
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
@@ -994,8 +1133,30 @@ body { display: grid; place-items: center; }
     S.storyBg = null; $('#menu').hidden = true; $('#handClip').hidden = true;
     S.focus = null; S.dash = null; S.reloc = null; S.devDrag = null; S.mouse = null;
     renderPanel(); renderSlots();
-    // 첫 게임 시작 (저장된 페르소나가 없을 때)에만 CYOA 설문
-    if (cyoa === true || !S.persona) startCyoa(chooseHero); else chooseHero();
+  }
+  // 출발: 시작 구매 값을 치르고 런을 연다. free = 시험 고리용
+  function beginRun(k, buys, free) {
+    if (!free) for (const id of buys) META.acorn -= START_BUY.find((b) => b.id === id).cost;
+    META.pick = k; saveMeta();
+    resetRun();
+    S.inRun = true;
+    setHero(k, buys);
+  }
+  // 훈련 · 유물 · 시작 구매를 런에 얹는다
+  function applyMeta(k, buys) {
+    const t = trained(k);
+    Object.assign(S.main, { hp: t.hp, maxHp: t.hp, atk: t.atk, def: t.def });
+    S.ctl = { shot: t.shot, dash: t.dash, moves: t.moves, think: t.think };
+    S.relics = {};
+    for (const id of META.equip) if (META.relics[id]) S.relics[id] = META.relics[id];
+    for (const id of buys) {
+      if (id === 'ally') { const free = KIND_ORDER.filter((n) => S.levels[n] === 0 && KINDS[n].race === HEROES[k].race); if (free.length) { const n = pickOne(free); S.levels[n] = 1; META.seen.ally[n] = 1; } }
+      else if (id === 'dev') S.devices.push(pickOne(DEVICES));
+      else if (id === 'heal') S.held.push('heal');
+      else if (id === 'gold') S.startGold += 5;
+    }
+    for (let i = 0; i < (S.relics.toolbox || 0); i++) if (S.devices.length < SHOP.deviceMax) S.devices.push(pickOne(DEVICES));
+    META.seen.main[k] = 1; saveMeta();
   }
   const heroSrc = (k) => ((k || S.hero) === 'rito' ? ART_SRC.rito : $('#portrait').dataset.hanato);
   // 메인 선택 (CampSelect): 터지는 별 위 큰 패치 두 장
@@ -1008,24 +1169,27 @@ body { display: grid; place-items: center; }
     showOverlay('', 'select');
     const box = document.createElement('div'); box.className = 'picks';
     Object.entries(HEROES).forEach(([k, h], i) => {
-      const p = PICK[k];
+      const p = PICK[k], t = trained(k), lock = !unlocked(k);
       const html = `<span class="burst" style="left:${p.burst[0]}px;top:${p.burst[1]}px;width:${p.burst[2]}px;height:${p.burst[2]}px;background:${p.burst[3]}"></span>`
         + `<img class="abs sticker" alt="${h.name}" src="${heroSrc(k)}" style="left:${p.art[0]}px;top:${p.art[1]}px;height:${p.art[2]}px;transform:rotate(${p.art[3]}deg)">`
         + `<span class="shout" style="left:${p.name[0]}px;top:${p.name[1]}px;font-size:${p.name[2]}px;transform:rotate(${p.name[3]}deg)">${h.name}</span>`
-        + `<span class="mate sticker-s" style="left:${p.info[0]}px;top:${p.info[1]}px;transform:rotate(${p.info[2]}deg)"><b>${h.style}</b><p>${h.desc}</p><p>체력 ${h.hp} · 공격 ${h.atk} · 방어 ${h.def}</p><p>한 발 ${h.ctl.shot}초 · 대쉬 ${h.ctl.dash} · 장치 옮기기 ${h.ctl.moves}개</p><p><span class="sk">${h.skill}</span> ${h.sdesc}</p></span>`;
-      const b = button(html, 'pick', 'hero' + i, () => setHero(k));
+        + `<span class="mate sticker-s" style="left:${p.info[0]}px;top:${p.info[1]}px;transform:rotate(${p.info[2]}deg)"><b>${h.style}</b><p>${h.desc}</p><p>체력 ${t.hp} · 공격 ${t.atk} · 방어 ${t.def}</p><p>한 발 ${t.shot}초 · 대쉬 ${t.dash} · 장치 옮기기 ${t.moves}개</p><p><span class="sk">${h.skill}</span> ${h.sdesc}</p></span>`;
+      const b = button(html + (lock ? `<span class="lockstamp" style="left:${p.info[0] - 120}px;top:${p.box[3] / 2 - 60}px">잠김<small>${UNLOCK[k].text}</small></span>` : ''), 'pick' + (lock ? ' locked' : ''), 'hero' + i, () => { if (!lock) showChapters(k); });
+      b.disabled = lock;
       b.style.cssText = `left:${p.box[0]}px;top:${p.box[1]}px;width:${p.box[2]}px;height:${p.box[3]}px`;
       b.setAttribute('aria-label', `${h.name} · ${h.style}`);
       box.append(b);
     });
     $('#ovBody').append(box);
     $('#ovBody').insertAdjacentHTML('beforeend', '<div class="sec" style="left:80px;top:56px;font-size:34px">메인 캐릭터 고르기</div><div class="tapekeys" style="left:760px;top:1010px"><span><span class="key">클릭</span>이 친구로!</span></div>');
+    $('#ovActions').append(button('야영지로<small>돌아가기</small>', 'ticket', 'selBack', showCamp));
     syncUI(true);
   }
-  function setHero(k) {
+  function setHero(k, buys) {
     S.hero = k;
     const h = HEROES[k];
     Object.assign(S.main, { hp: h.hp, maxHp: h.hp, atk: h.atk, def: h.def });
+    applyMeta(k, buys || []);
     $('#portrait').src = k === 'hanato' ? $('#portrait').dataset.hanato : ART_SRC.rito;
     $('#portrait').alt = h.name; $('#hero').setAttribute('aria-label', h.name);
     $('#heroNameTxt').textContent = h.name; $('#talkWho').textContent = h.name; $('#skillName').innerHTML = h.skill.replace(' ', '<br>') + '!';
@@ -1112,6 +1276,9 @@ body { display: grid; place-items: center; }
     S.ball.x = 480; S.ball.y = 540; S.ball.vx = 0; S.ball.vy = 0;
     S.round = 1; S.shot = blankShot(); S.enemies.forEach((e) => { e.burn = 0; e.burnT = 0; }); S.skill = { active: false, t: 0, hits: 0 }; S.trail = []; S.atk = [];
     if (!S.special && up('gauge') > 0) S.gauge = Math.min(gaugeMax(), S.gauge + BAL.gaugeUp * up('gauge'));
+    if (!S.special && S.relics.seedbell) S.gauge = Math.min(gaugeMax(), S.gauge + (S.relics.seedbell > 1 ? 8 : 4));
+    if (!S.special && S.relics.woodshield) S.main.shield += S.relics.woodshield > 1 ? 10 : 6;
+    for (const e of S.enemies) if (FOE_BOOK.includes(e.key)) META.seen.foe[e.key] = 1;
     S.focus = null; S.dash = null; S.devDrag = null; $('#app').classList.remove('focus');
     S.reloc = S.board.some((it) => it.dev) ? { n: heroCtl().moves, moved: new Set() } : null;
     prepRound();
@@ -1457,18 +1624,20 @@ body { display: grid; place-items: center; }
     A: '<rect width="1190" height="560" fill="#e3ecd2"/><path fill="#bfd3a0" d="M0 250 Q80 170 170 220 Q250 150 340 210 Q430 140 520 205 Q610 150 700 210 Q800 140 900 200 Q990 150 1080 205 Q1140 180 1190 200 V330 H0Z"/><path fill="#a9c389" d="M0 300 Q120 250 240 290 T520 285 T820 280 T1190 290 V360 H0Z"/><path fill="#cfdca6" d="M0 400 H1190 V560 H0Z"/><path fill="#e6d7ab" d="M300 560 Q420 470 640 440 T1190 420 V450 Q900 470 700 500 T430 560Z"/>',
     B: '<rect width="1190" height="560" fill="#ecdcb8"/><rect y="380" width="1190" height="180" fill="#b98552"/><rect y="372" width="1190" height="14" fill="#8a5c3a"/><rect x="120" y="90" width="300" height="210" fill="#8a5c3a"/><rect x="134" y="104" width="272" height="182" fill="#cfe3d8"/><rect x="267" y="104" width="6" height="182" fill="#8a5c3a"/><rect x="560" y="120" width="420" height="40" fill="#a8794e"/><rect x="560" y="210" width="420" height="40" fill="#a8794e"/><rect x="600" y="70" width="60" height="50" fill="#6f9a52"/><rect x="700" y="80" width="50" height="40" fill="#c9a24a"/><rect x="800" y="160" width="60" height="50" fill="#9a7ab0"/>',
   };
-  function showStory() {
+  function showStory(replay) {
     S.phase = 'story';
     clearField();
-    const name = HEROES[S.hero].name, no = ++S.stories, lines = storyLines(no, name), st = $('#story');
+    const hero = replay ? replay.hero : S.hero, name = HEROES[hero].name, no = replay ? replay.no : ++S.stories, lines = storyLines(no, name), st = $('#story');
+    if (!replay) { const seen = META.seen.story[hero] || (META.seen.story[hero] = []); if (!seen.includes(no)) { seen.push(no); saveMeta(); } }
     const other = (lines.find((l) => l.who !== name) || { who: '상대' }).who;
     let i = 0;
     hideOverlay();
-    $('#storyHero').src = heroSrc();
+    $('#storyHero').src = heroSrc(hero);
+    $('#talkWho').textContent = name;
     const show = () => {
       const l = lines[i], main = l.who === name;
       $('#talkTag').textContent = `배경 ${l.bg} · 자리표시`;
-      $('#storyPlace').textContent = `스토리 ${no} · ${S.node + 1}/16 · 표정 ${l.face}${l.hand && S.persona ? ` · 손 연출 (${RACES[S.persona.race].name} 손)` : ''}`;
+      $('#storyPlace').textContent = `${replay ? '다시 보기 · ' : ''}스토리 ${no}${replay ? '' : ` · ${S.node + 1}/16`} · 표정 ${l.face}${l.hand && S.persona ? ` · 손 연출 (${RACES[S.persona.race].name} 손)` : ''}`;
       $('#talkWho').textContent = l.who;
       $('#say').textContent = l.say;
       $('#storyBgArt').innerHTML = STORY_BG[l.bg] || STORY_BG.A;
@@ -1484,7 +1653,8 @@ body { display: grid; place-items: center; }
       i++;
       if (i < lines.length) { show(); return; }
       $('#handClip').hidden = true; S.storyBg = null;
-      if (no === 1) gainGold([['시작', GOLD.start]]);
+      if (replay) { replay.back(); return; }
+      if (no === 1) gainGold([['시작', GOLD.start], ...(S.startGold ? [['주머니', S.startGold]] : [])]);
       stageDone();
     };
     $('#storyNext').focus({ preventScroll: true });
@@ -1580,7 +1750,9 @@ body { display: grid; place-items: center; }
   function afterBattle() {
     const t = CHAPTER[S.node];
     if (t === 'boss') { showEnding(); return; }
+    if (t === 'mid') S.midDone = true;
     const parts = [['승리', t === 'mid' ? GOLD.mid : GOLD.battle]];
+    if (S.relics.luckycoin) parts.push(['엽전', S.relics.luckycoin]);
     if (S.bGold.combo) parts.push(['콤보', S.bGold.combo]);
     if (S.levels.santo) parts.push(['산토', 2 * S.levels.santo]);
     gainGold(parts);
@@ -1595,20 +1767,54 @@ body { display: grid; place-items: center; }
     if (S.hero) sfx.win();
     syncUI(true);
   }
-  // 결과 (CampResult): 외침 글자, 원정 일지 칠판, 함께한 동료 와펜
+  // 원정이 끝날 때 아웃게임 보상을 정산한다 (승패 상관없이 도달 구간별, Q46)
+  function settleRun(win, wasShop) {
+    const k = S.hero, done = Math.min(CHAPTER.length, S.node + (win || wasShop ? 1 : 0));
+    const r = { win, mid: S.midDone, done, bestCombo: S.run.bestCombo, devFull: S.devices.length >= SHOP.deviceMax, partyFull: partySize() >= SHOP.partyMax, relics: [], ach: [], unlock: [] };
+    const parts = [['지난 칸', REWARD.perNode * done]];
+    if (S.midDone) parts.push(['시슬라', REWARD.mid]);
+    if (win) parts.push(['아이비른', REWARD.boss]);
+    let acorn = parts.reduce((a, [, v]) => a + v, 0);
+    if (S.relics.pouch) { const add = Math.round(acorn * (S.relics.pouch > 1 ? 0.4 : 0.2)); parts.push(['주머니', add]); acorn += add; }
+    const star = (S.midDone ? REWARD.midStar : 0) + (win ? REWARD.bossStar : 0);
+    // 메인 × 보스 유물: 그 메인으로 그 보스를 처음 쓰러뜨리면
+    for (const [boss, ok] of [['thistle', S.midDone], ['ivy', win]]) {
+      const id = ok && relicOf(k, boss);
+      if (id && !META.relics[id]) { META.relics[id] = 1; r.relics.push(id); if (META.equip.length < RELIC.slots) META.equip.push(id); }
+    }
+    for (const [m, u] of Object.entries(UNLOCK)) if (!META.unlocked[m] && k === u.by && ((u.boss === 'thistle' && S.midDone) || (u.boss === 'ivy' && win))) { META.unlocked[m] = true; r.unlock.push(m); }
+    const rec = META.rec[k];
+    rec.runs++; if (win) rec.clears++; rec.best = Math.max(rec.best, done); rec.bestCombo = Math.max(rec.bestCombo, S.run.bestCombo); rec.dealt += S.run.dealt;
+    META.stat.runs++; META.stat.dodge += S.runDodge;
+    if (win) META.seen.cg[k] = 1;
+    META.acorn += acorn; META.star += star;
+    for (const a of ACH) if (!META.ach[a.id] && a.test(r)) { META.ach[a.id] = 1; r.ach.push(a); META.acorn += a.reward.acorn || 0; META.star += a.reward.star || 0; }
+    META.shop = null; // 상점 진열은 원정이 끝날 때마다 바뀐다
+    saveMeta();
+    return { ...r, acorn, star, parts };
+  }
+  const rewardText = (rw) => [rw.acorn ? `도토리 +${rw.acorn}` : '', rw.star ? `별조각 +${rw.star}` : ''].filter(Boolean).join(' · ');
+  // 결과 (CampResult): 외침 글자, 원정 일지 칠판, 얻은 것 쪽지, 메인 그림
   function finishRun(win) {
-    S.phase = win ? 'clear' : 'lose';
+    const R = settleRun(win, S.phase === 'shop');
+    S.phase = win ? 'clear' : 'lose'; S.inRun = false;
     showOverlay('', 'result');
-    const done = CHAPTER.slice(0, S.node + (win ? 1 : 0)).length;
-    const rows = [['진행', `${done}/${CHAPTER.length}`], ['최고 콤보', S.run.bestCombo], ['총 타격', S.run.totalHits], ['준 피해', S.run.dealt], ['번 골드', S.run.gold], ['스킬', S.run.skillUses]];
+    const rows = [['진행', `${R.done}/${CHAPTER.length}`], ['최고 콤보', S.run.bestCombo], ['총 타격', S.run.totalHits], ['준 피해', S.run.dealt], ['번 골드', S.run.gold], ['스킬', S.run.skillUses]];
     const crew = [...KIND_ORDER.filter((k) => S.levels[k] > 0), ...(S.ally ? [S.ally.kind] : [])];
-    const spots = [[1700, 170, -6], [1730, 390, 6], [1710, 610, -4], [1480, 120, 5], [1300, 90, -3]];
-    $('#ovBody').innerHTML = `<div class="shout" style="left:170px;top:110px;font-size:150px;transform:rotate(-5deg)">${win ? '챕터 클리어!' : '원정 실패…'}</div>`
-      + `<div class="led res" style="left:260px;top:390px;width:820px">${rows.map(([k, v]) => `<div class="led__row" style="margin-top:12px"><span>${k}</span><b data-g="${'8'.repeat(String(v).length)}">${v}</b></div>`).join('')}</div>`
-      + `<img class="abs sticker" alt="" src="${heroSrc()}" style="left:1150px;top:300px;height:520px;transform:rotate(-4deg)">`
-      + crew.map((k, i) => { const sp = spots[i % spots.length]; return `<span class="abs sticker" style="left:${sp[0]}px;top:${sp[1]}px;width:170px;height:170px;border-radius:50%;overflow:hidden;background:var(--char-${k});transform:rotate(${sp[2]}deg)">${faceImg(k)}</span>`; }).join('');
-    $('#ovBody').querySelectorAll('.sticker img').forEach((im) => { im.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block'; });
-    $('#ovActions').append(button('한 판 더!<small>클릭</small>', 'ticket on', 'again', newRun));
+    let gain = `<h3>얻은 것</h3><div class="grow"><span class="dot" style="--c:var(--mat-3)">${ico('leaf')}</span><div>도토리 +${R.acorn}<small>${R.parts.map(([n, v]) => `${n} ${v}`).join(' · ')}</small></div></div>`
+      + `<div class="grow"><span class="dot">${ico('star')}</span><div>별조각 +${R.star}<small>${R.star ? '중간 보스 · 보스에서' : '중간 보스를 넘기면 얻는다'}</small></div></div>`;
+    if (R.relics.length) gain += '<h4>새 유물!</h4>' + R.relics.map((id) => `<div class="grow"><span class="dot" style="--c:var(--accent)">${ico(RELICS[id].ico)}</span><div>${RELICS[id].name}<small>${RELICS[id].desc(1)}</small></div></div>`).join('');
+    if (R.unlock.length) gain += '<h4>합류!</h4>' + R.unlock.map((m) => `<div class="grow"><span class="dot" style="--c:var(--char-${m})">${faceImg(m, 'fill')}</span><div>${HEROES[m].name}<small>이제 출발할 때 고를 수 있다</small></div></div>`).join('');
+    // 도전과제가 많으면 한 줄로 모은다 (쪽지가 화면 밖으로 넘치지 않게)
+    const achSum = R.ach.reduce((o, a) => ({ acorn: o.acorn + (a.reward.acorn || 0), star: o.star + (a.reward.star || 0) }), { acorn: 0, star: 0 });
+    if (R.ach.length > 3) gain += `<h4>도전과제 ${R.ach.length}개</h4><div class="grow"><span class="dot" style="--c:var(--accent-2)">${ico('crown')}</span><div>${R.ach.map((a) => a.name).join(' · ')}<small>${rewardText(achSum)}</small></div></div>`;
+    else if (R.ach.length) gain += '<h4>도전과제</h4>' + R.ach.map((a) => `<div class="grow"><span class="dot" style="--c:var(--accent-2)">${ico('crown')}</span><div>${a.name}<small>${rewardText(a.reward)}</small></div></div>`).join('');
+    $('#ovBody').innerHTML = `<div class="shout" style="left:120px;top:80px;font-size:130px;transform:rotate(-5deg)">${win ? '챕터 클리어!' : '원정 실패…'}</div>`
+      + `<div class="led res" style="left:150px;top:300px;width:660px">${rows.map(([k, v]) => `<div class="led__row" style="margin-top:12px"><span>${k}</span><b data-g="${'8'.repeat(String(v).length)}">${v}</b></div>`).join('')}</div>`
+      + `<div class="rbox" style="left:870px;top:150px;width:560px;transform:rotate(1deg)">${gain}</div>`
+      + `<img class="abs sticker" alt="" src="${heroSrc()}" style="left:1480px;top:250px;height:560px;transform:rotate(-4deg)">`
+      + crew.map((k, i) => `<span class="abs sticker" style="left:${150 + 130 * i}px;top:900px;width:110px;height:110px;border-radius:50%;overflow:hidden;background:var(--char-${k});transform:rotate(${i % 2 ? 5 : -5}deg)">${faceImg(k, 'fill')}</span>`).join('');
+    $('#ovActions').append(button('야영지로!<small>보상 받기</small>', 'ticket on', 'again', showCamp));
     renderTrack();
     syncUI(true);
   }
@@ -1674,7 +1880,7 @@ body { display: grid; place-items: center; }
     S.phase = 'shop';
     showOverlay('', 'shop');
     const body = $('#ovBody'), g = S.gain;
-    body.innerHTML = '<div class="abs" style="left:400px;top:120px;width:1140px;height:920px;background:var(--mat-2);transform:rotate(-1deg);box-shadow:inset 0 0 0 16px var(--mat-3)"></div><div class="beam" style="left:380px;right:auto;width:1180px;top:96px"></div><div class="boardsign" style="left:780px;top:50px">보급 천막!</div>'
+    body.innerHTML = '<div class="abs" style="left:400px;top:120px;width:1140px;height:920px;background:var(--mat-2);transform:rotate(-1deg);box-shadow:inset 0 0 0 16px var(--mat-3)"></div><div class="beam" style="left:380px;right:auto;width:1180px;top:96px"></div><div class="boardsign" style="left:780px;top:50px">정비 천막!</div>'
       + `<img class="abs sticker" alt="" src="${heroSrc()}" style="left:-40px;top:560px;height:430px;transform:rotate(-5deg)">`
       + `<div class="purse"><div class="gold sticker-s"><small>골드</small><b id="purse">${S.gold}</b></div>${g && g.sum ? `<div class="gain"><b>${g.sum > 0 ? '+' : ''}${g.sum}</b>${g.parts.map(([n, v]) => `${n} ${v > 0 ? '+' : ''}${v}`).join('<br>')}</div>` : ''}</div>`;
     const rows = [['메인 강화 · 동료', S.stock.a, 'A', 150, 400], [`장치 ${S.devices.length}/${SHOP.deviceMax}`, S.stock.dev, 'D', 440, 690], [`보급품 ${S.held.length}/${SHOP.itemSlots}`, S.stock.items, 'I', 730, 980]];
@@ -1689,7 +1895,7 @@ body { display: grid; place-items: center; }
         body.append(b);
       });
     });
-    $('#ovActions').append(button('다음 칸으로!<small>상점 닫기</small>', 'ticket on', 'shopNext', () => { S.gain = null; S.stock = null; nextNode(); }));
+    $('#ovActions').append(button('다음 칸으로!<small>정비 닫기</small>', 'ticket on', 'shopNext', () => { S.gain = null; S.stock = null; nextNode(); }));
     renderTrack();
     syncUI(true);
   }
@@ -1698,7 +1904,7 @@ body { display: grid; place-items: center; }
     if (o.g === 'dev' && S.devices.length >= SHOP.deviceMax) { openSwap(o.k, () => { S.gold -= priceOf(o); o.sold = true; sfx.buy(); renderShop(); }, renderShop); return; }
     S.gold -= priceOf(o);
     if (o.g === 'up') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 10; S.main.hp += 10; } }
-    else if (o.g === 'ally') S.levels[o.k]++;
+    else if (o.g === 'ally') { S.levels[o.k]++; META.seen.ally[o.k] = 1; }
     else if (o.g === 'main') S.ally = { kind: o.k, x: -999, y: -999, r: 26, cd: 0, jig: 0 };
     else if (o.g === 'dev') S.devices.push(o.k);
     else S.held.push(o.k);
@@ -1754,6 +1960,270 @@ body { display: grid; place-items: center; }
     const d = S.devDrag; S.devDrag = null;
     if (d.ok && S.reloc && hyp(d.it.x - d.x0, d.it.y - d.y0) > 4) { S.reloc.moved.add(d.it); d.it.bx = d.it.x; d.it.pop = 1; burst(d.it.x, d.it.y, T.gold, 8); sfx.place(); }
     else { d.it.x = d.x0; d.it.y = d.y0; if (!d.ok) sfx.dud(); }
+  }
+
+  // ---------- 아웃게임 화면 ----------
+  const money = (k, v, x, y) => `<div class="gold sticker-s money ${k}" style="left:${x}px;top:${y}px;width:130px;height:130px"><small>${MONEY[k].name}</small><b>${v}</b></div>`;
+  const purse = () => money('acorn', META.acorn, 1390, 26) + money('star', META.star, 1540, 40);
+  const refreshPurse = () => { const p = $('#purseOut'); if (p) p.innerHTML = purse(); };
+  // 야영지 화면 틀: 간판 · 재화 · 돌아가기
+  function campFrame(phase, title, back) {
+    S.phase = phase; S.inRun = false;
+    showOverlay('', 'camp');
+    $('#ovBody').innerHTML = `<div class="boardsign" style="left:90px;top:56px">${title}</div><div id="purseOut">${purse()}</div>`;
+    if (back !== false) $('#ovActions').append(button('돌아가기', 'ticket', 'campBack', back || showCamp));
+  }
+  const add = (html) => $('#ovBody').insertAdjacentHTML('beforeend', html);
+  function spot(id, x, y, icon, name, text, kind, col, fn, dis) {
+    const b = button(`<span class="ware__obj sticker-s">${ico(icon)}</span><b>${name}</b><span>${text}</span>${kind ? `<span class="kind">${kind}</span>` : ''}`, 'ware spot', id, fn);
+    b.style.cssText = `left:${x}px;top:${y}px;--c:${col}`; b.disabled = !!dis;
+    $('#ovBody').append(b);
+    return b;
+  }
+  // 타이틀 (CampTitle): 랜턴 두른 나무 간판, 이름표 메뉴, 겹쳐 붙인 와펜 형제
+  function showTitle() {
+    S.phase = 'title'; S.inRun = false;
+    showOverlay('', 'title');
+    const light = (x, y, i) => `<span class="abs" style="left:${x}px;top:${y}px;width:18px;height:18px;border-radius:50%;background:var(${i % 2 ? '--spirit' : '--surface'})"></span>`;
+    let sign = '<div class="abs" style="left:110px;top:110px;width:900px;height:380px;background:var(--sign);transform:rotate(-3deg);box-shadow:inset 0 0 0 40px var(--mat-2),inset 0 0 0 46px var(--mat-3),0 14px 0 0 var(--mat-1)">';
+    for (let i = 0; i < 16; i++) sign += light(14 + 58 * i, 14, i) + light(14 + 58 * i, 348, i + 1);
+    for (let i = 0; i < 5; i++) sign += light(14, 72 + 56 * i, i + 1) + light(866, 72 + 56 * i, i);
+    const face = (k, x, y, s, r) => `<span class="abs sticker" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;border-radius:50%;overflow:hidden;background:var(--char-${k});transform:rotate(${r}deg)">${faceImg(k, 'fill')}</span>`;
+    add(sign + '</div><div class="shout" style="left:170px;top:180px;font-size:200px;transform:rotate(-5deg)">퍼리업!</div>'
+      + '<div class="abs lab" style="left:220px;top:400px;font-size:28px;color:var(--spirit);transform:rotate(-5deg);letter-spacing:.3em">토끼 마을 원정대 · 튕김 난타</div>'
+      + face('santo', 1500, 230, 230, 6) + face('oto', 1110, 250, 210, -6) + face('sato', 1640, 760, 190, 8) + face('ryuto', 1700, 500, 180, -4)
+      + `<img class="abs sticker" alt="리토" src="${heroSrc('rito')}" style="left:1290px;top:470px;height:460px;transform:rotate(4deg)">`
+      + `<img class="abs sticker" alt="하나토" src="${heroSrc('hanato')}" style="left:860px;top:420px;height:560px;transform:rotate(-3deg)">`
+      + '<div class="tapekeys" style="left:150px;top:960px"><span><span class="key">클릭</span>고르기</span><span><span class="key">Esc</span>메뉴</span></div>');
+    const items = [
+      ['titleGo', `출발!<small>${S.persona ? '원정대 야영지로' : '처음이면 플레이어부터 만든다'}</small>`, 'ticket on', 150, 560, -3, () => (S.persona ? showCamp() : startCyoa(showCamp))],
+      ['titleBook', '도감', 'ticket', 170, 700, 2, () => showCodex('main', showTitle)],
+      ['titleTent', '설정', 'ticket', 420, 712, -4, () => showTent(showTitle)],
+    ];
+    for (const [id, label, cls, x, y, r, fn] of items) { const b = button(label, cls, id, fn); b.style.cssText = `left:${x}px;top:${y}px;transform:rotate(${r}deg)`; $('#ovBody').append(b); }
+    $('#titleGo').focus({ preventScroll: true });
+    syncUI(true);
+  }
+  // 야영지 (허브): 모닥불 옆 메인, 둘레에 갈 곳, 원정 기록 칠판, 출발 이름표
+  function showCamp() {
+    campFrame('camp', '원정대 야영지!', false);
+    if (!unlocked(META.pick)) META.pick = 'hanato';
+    const k = META.pick, h = HEROES[k], rec = META.rec[k], other = Object.keys(HEROES).find((m) => m !== k);
+    const relicN = Object.keys(META.relics).length, storyN = Object.values(META.seen.story).reduce((a, s) => a + s.length, 0) + Object.keys(META.seen.cg).length;
+    const bookN = Object.keys(HEROES).filter(unlocked).length + Object.keys(META.seen.ally).length + Object.keys(META.seen.foe).length + Object.keys(META.seen.cg).length;
+    const bookAll = Object.keys(HEROES).length + KIND_ORDER.length + FOE_BOOK.length + Object.keys(HEROES).length;
+    const achN = ACH.filter((a) => META.ach[a.id]).length, shopLeft = RELIC_ORDER.filter((id) => RELICS[id].shop && !META.relics[id]).length;
+    add(`<span class="logpile" style="left:880px;top:850px;width:320px;transform:rotate(-4deg)"></span><span class="logpile" style="left:900px;top:870px;width:300px;transform:rotate(5deg)"></span>`
+      + `<div class="campfire" style="left:930px;top:640px"><span class="burst"></span><i>${ico('campfire')}</i></div>`
+      + `<img class="abs sticker" alt="${h.name}" src="${heroSrc(k)}" style="left:560px;top:250px;height:600px;transform:rotate(-3deg)">`
+      + `<button class="led camp" id="campRec" type="button" style="left:1230px;top:672px;width:420px">`
+      + `<div class="led__row"><span>${h.name} 원정</span><b data-g="88">${rec.runs}</b></div><div class="led__row"><span>클리어</span><b data-g="88">${rec.clears}</b></div>`
+      + `<div class="led__row"><span>가장 멀리</span><b data-g="88">${rec.best}</b></div><div class="led__row"><span>최고 콤보</span><b data-g="888">${rec.bestCombo}</b></div></button>`);
+    $('#campRec').addEventListener('click', showRecords);
+    spot('goTrain', 90, 220, 'sword', '훈련장', '메인 훈련 · 조작 훈련', '도토리로 영구히', 'var(--accent)', () => showTrain(k));
+    spot('goRelic', 90, 480, 'star', '유물함', `장착 ${META.equip.length}/${RELIC.slots}`, `모은 유물 ${relicN}/${RELIC_ORDER.length}`, 'var(--spirit)', () => showRelics());
+    spot('goBook', 90, 740, 'book', '이야기책', '본 이야기 다시 보기', `${storyN}편`, 'var(--accent-2)', showBook);
+    spot('goShop', 1220, 200, 'bag', '상점', '유물을 별조각으로', shopLeft ? `원정마다 진열이 바뀐다` : '다 샀다', 'var(--accent)', showShopOut);
+    spot('goCodex', 1520, 200, 'paw', '도감', '만난 친구와 몬스터', `${bookN}/${bookAll}`, 'var(--accent-2)', () => showCodex('main'));
+    spot('goAch', 1220, 440, 'crown', '도전과제', '조건을 채우면 보상', `${achN}/${ACH.length}`, 'var(--spirit)', showAch);
+    spot('goTent', 1520, 440, 'gear', '내 천막', '플레이어 · 설정', '', 'var(--surface-2)', () => showTent());
+    const sw = button(unlocked(other) ? `${h.name} · ${h.race}<small>눌러서 ${HEROES[other].name}로 바꾸기</small>` : `${h.name} · ${h.race}<small>${HEROES[other].name}: ${UNLOCK[other].text}</small>`, 'ticket sm', 'campSwap', () => { META.pick = other; saveMeta(); showCamp(); });
+    sw.disabled = !unlocked(other); sw.style.cssText = 'left:520px;top:880px;transform:rotate(-2deg)';
+    $('#ovBody').append(sw);
+    add('<div class="tapekeys" style="left:90px;top:1010px"><span><span class="key">클릭</span>들어가기</span><span><span class="key">Esc</span>메뉴</span></div>');
+    $('#ovActions').append(button(`원정 출발!<small>${CH_NAME[0]} · ${h.name}</small>`, 'ticket on', 'campGo', showDepart));
+    $('#campGo').focus({ preventScroll: true });
+    syncUI(true);
+  }
+  // 훈련장: 메인마다 따로. 메인 훈련(체력 · 공격 · 방어) · 조작 훈련(한 발 · 대쉬 · 장치 옮기기 · 멈춤 고르기)
+  function showTrain(k) {
+    if (!unlocked(k)) k = 'hanato';
+    campFrame('train', '훈련장!');
+    const t = trained(k), lv = (id) => (META.train[k] || {})[id] || 0;
+    add('<div class="abs" style="left:400px;top:150px;width:1140px;height:860px;background:var(--mat-2);transform:rotate(-1deg);box-shadow:inset 0 0 0 16px var(--mat-3)"></div>'
+      + `<img class="abs sticker" alt="" src="${heroSrc(k)}" style="left:-40px;top:560px;height:430px;transform:rotate(-5deg)">`);
+    const tabs = document.createElement('div'); tabs.className = 'row'; tabs.style.cssText = 'left:90px;top:200px;flex-direction:column;align-items:flex-start';
+    for (const m of Object.keys(HEROES)) { const b = button(unlocked(m) ? HEROES[m].name : `${HEROES[m].name}<small>잠김</small>`, 'ticket sm' + (m === k ? ' sel' : ''), 'trainTab' + m, () => showTrain(m)); b.disabled = !unlocked(m); tabs.append(b); }
+    $('#ovBody').append(tabs);
+    const fmt = (it, v) => (it.unit === '초' ? `${+v.toFixed(2)}초` : it.unit === '개' ? `${v}개` : `${v}`);
+    [['main', '메인 훈련', 190, 430], ['ctl', '조작 훈련', 520, 760]].forEach(([g, title, top, shelf], r) => {
+      add(`<div class="shelf" style="left:430px;top:${shelf}px;width:1080px;transform:rotate(${r ? -0.6 : 0.6}deg)"></div><div class="sec" style="left:420px;top:${shelf - 20}px">${title}</div>`);
+      const list = TRAIN[g], xs = list.length === 3 ? [500, 840, 1180] : [450, 710, 970, 1230];
+      list.forEach((it, i) => {
+        const L = lv(it.id), max = it.cost.length, cost = it.cost[L], cur = t[it.id], why = L >= max ? '끝' : META.acorn < cost ? '도토리 부족' : '';
+        const b = button(`<span class="ware__obj sticker-s">${ico(it.ico)}</span><b>${it.name}</b><span>${L >= max ? `${fmt(it, cur)} · 끝까지 올렸다` : `${fmt(it, cur)} → ${fmt(it, cur + it.step)}`}</span><span class="kind">${L}/${max}단계 · 도토리</span><span class="price burst${why && why !== '도토리 부족' ? ' why' : ''}">${why === '끝' ? '끝' : cost}</span>`, 'ware' + (why ? ' dim' : ''), `train_${it.id}`, () => {
+          if (why) return;
+          META.acorn -= cost; (META.train[k] ||= {})[it.id] = L + 1; saveMeta(); sfx.buy(); showTrain(k);
+        });
+        b.disabled = !!why; b.style.cssText = `left:${xs[i]}px;top:${top}px;--c:var(${g === 'main' ? '--accent-2' : '--spirit'})`;
+        $('#ovBody').append(b);
+      });
+    });
+    add(`<div class="say big" style="left:470px;top:860px;font-size:22px;width:1000px"><b>${HEROES[k].name}</b> 체력 ${t.hp} · 공격 ${t.atk} · 방어 ${t.def} · 한 발 ${t.shot}초 · 대쉬 ${t.dash} · 장치 옮기기 ${t.moves}개 · 멈춤 고르기 ${t.think}초</div>`);
+    syncUI(true);
+  }
+  // 유물함: 장착 2칸, 모은 유물, 고른 유물 쪽지 (장착 · 빼기 · 강화)
+  function showRelics(back, sel) {
+    campFrame('relics', '유물함!', back);
+    const pickId = sel && RELICS[sel] ? sel : META.equip[0] || RELIC_ORDER.find((id) => META.relics[id]) || RELIC_ORDER[0];
+    for (let i = 0; i < RELIC.slots; i++) {
+      const id = META.equip[i];
+      add(`<div class="slotc${id ? ' full' : ''}" style="left:${560 + 270 * i}px;top:120px">${id ? ico(RELICS[id].ico) : '빈 칸'}</div><div class="slotlab" style="left:${520 + 270 * i}px;top:285px">장착 ${i + 1}${id ? ` · ${RELICS[id].name}` : ''}</div>`);
+    }
+    const src = (id) => { const r = RELICS[id]; return r.from ? `${HEROES[r.from[0]].name}로 ${FOES[r.from[1]].name}를 처음 쓰러뜨리면` : `상점에서 별조각 ${r.shop}`; };
+    RELIC_ORDER.forEach((id, i) => {
+      const r = RELICS[id], L = META.relics[id] || 0, eq = META.equip.includes(id);
+      const b = button(`<span class="ware__obj sticker-s">${L ? ico(r.ico) : '<span class="glyph">?</span>'}</span>${L ? `<span class="lv">Lv ${L}</span>` : ''}<b>${L ? r.name : '???'}</b><span>${L ? r.desc(L) : src(id)}</span><span class="kind">${r.from ? '메인 × 보스 유물' : '상점 유물'}${eq ? ' · 장착 중' : ''}</span>`, 'ware' + (L ? '' : ' dim') + (id === pickId ? ' on' : ''), 'relic_' + id, () => showRelics(back, id));
+      b.style.cssText = `left:${110 + 262 * (i % 5)}px;top:${i < 5 ? 380 : 680}px;--c:var(${r.from ? '--accent' : '--accent-2'})`;
+      $('#ovBody').append(b);
+    });
+    const r = RELICS[pickId], L = META.relics[pickId] || 0, eq = META.equip.includes(pickId), full = META.equip.length >= RELIC.slots;
+    add(`<div class="rbox" id="relicBox" style="left:1450px;top:330px;width:390px"><h3>${L ? r.name : '아직 없는 유물'}</h3><p>${L ? `Lv ${L} · ${r.desc(L)}` : '얻는 곳: ' + src(pickId)}</p>${L && L < RELIC.maxLv ? `<p class="mut">강화하면: ${r.desc(L + 1)}</p>` : ''}<p class="mut">유물은 모든 메인이 같이 쓴다. 출발할 때 장착한 것만 가지고 간다</p><div class="row" id="relicActs"></div></div>`);
+    const acts = $('#relicActs');
+    if (L) {
+      const e = button(eq ? '빼기' : full ? '칸이 가득' : '장착', 'ticket' + (eq ? '' : ' on'), 'relicEquip', () => { if (eq) META.equip = META.equip.filter((x) => x !== pickId); else if (!full) META.equip.push(pickId); saveMeta(); sfx.place(); showRelics(back, pickId); });
+      e.disabled = !eq && full; acts.append(e);
+      const u = button(L >= RELIC.maxLv ? '강화 끝' : `강화<small>별조각 ${RELIC.up}</small>`, 'ticket', 'relicUp', () => { META.star -= RELIC.up; META.relics[pickId] = L + 1; saveMeta(); sfx.buy(); showRelics(back, pickId); });
+      u.disabled = L >= RELIC.maxLv || META.star < RELIC.up; acts.append(u);
+    }
+    syncUI(true);
+  }
+  // 상점 (아웃게임): 별조각으로 상점 유물을 산다. 진열 3칸, 원정이 끝날 때마다 바뀐다
+  function showShopOut() {
+    campFrame('shopout', '상점!');
+    if (!META.shop) { META.shop = shuffle(RELIC_ORDER.filter((id) => RELICS[id].shop && !META.relics[id])).slice(0, RELIC.shopN); saveMeta(); }
+    add('<div class="abs" style="left:400px;top:150px;width:1140px;height:560px;background:var(--mat-2);transform:rotate(-1deg);box-shadow:inset 0 0 0 16px var(--mat-3)"></div><div class="beam" style="left:380px;right:auto;width:1180px;top:126px"></div>'
+      + '<div class="shelf" style="left:430px;top:600px;width:1080px;transform:rotate(0.6deg)"></div><div class="sec" style="left:420px;top:580px">유물 · 별조각</div>'
+      + `<span class="abs sticker" style="left:90px;top:520px;width:260px;height:260px;border-radius:50%;overflow:hidden;background:var(--char-santo);transform:rotate(-6deg)">${faceImg('santo', 'fill')}</span>`
+      + '<div class="scene-note" style="left:430px;top:760px">행상 천막 · 진열은 원정이 끝날 때마다 바뀐다 · 산 유물은 바로 유물함에 들어간다</div>');
+    const xs = WARE_X[META.shop.length] || WARE_X[3];
+    if (!META.shop.length) add('<div class="say big" style="left:640px;top:330px;font-size:30px">지금은 팔 유물이 없다</div>');
+    META.shop.forEach((id, i) => {
+      const r = RELICS[id], sold = !!META.relics[id], why = sold ? '산 것' : META.star < r.shop ? '별조각 부족' : '';
+      const b = button(`<span class="ware__obj sticker-s">${ico(r.ico)}</span><b>${r.name}</b><span>${r.desc(1)}</span><span class="kind">상점 유물 · 계정 공용</span><span class="price burst${sold ? ' why' : ''}">${sold ? '산 것' : r.shop}</span>`, 'ware' + (sold ? ' sold' : why ? ' dim' : ''), 'shopOut' + i, () => {
+        if (why) return;
+        META.star -= r.shop; META.relics[id] = 1; if (META.equip.length < RELIC.slots) META.equip.push(id); saveMeta(); sfx.buy(); showShopOut();
+      });
+      b.disabled = !!why; b.style.cssText = `left:${xs[i]}px;top:320px;--c:var(--accent-2)`;
+      $('#ovBody').append(b);
+    });
+    syncUI(true);
+  }
+  // 이야기책: 본 스토리 칸과 엔딩 CG를 다시 본다
+  function showBook() {
+    campFrame('book', '이야기책!');
+    const stories = CHAPTER.filter((t) => t === 'story').length;
+    Object.keys(HEROES).forEach((k, r) => {
+      const seen = META.seen.story[k] || [], y = 260 + 330 * r;
+      add(`<span class="abs sticker" style="left:120px;top:${y}px;width:170px;height:170px;border-radius:50%;overflow:hidden;background:var(--char-${k});transform:rotate(${r ? 5 : -5}deg)">${faceImg(k, 'fill')}</span><div class="sec" style="left:330px;top:${y - 10}px">${HEROES[k].name} · ${CH_NAME[0]}${unlocked(k) ? '' : ' · 잠김'}</div>`);
+      const row = document.createElement('div'); row.className = 'row'; row.style.cssText = `left:330px;top:${y + 50}px;flex-wrap:wrap;width:1450px`;
+      for (let n = 1; n <= stories; n++) { const ok = seen.includes(n); const b = button(ok ? `스토리 ${n}<small>다시 보기</small>` : `스토리 ${n}<small>아직 못 봤다</small>`, 'ticket sm' + (ok ? '' : ''), `book_${k}_${n}`, () => showStory({ hero: k, no: n, back: showBook })); b.disabled = !ok; row.append(b); }
+      const cg = !!META.seen.cg[k], e = button(cg ? '엔딩 CG<small>다시 보기</small>' : '엔딩 CG<small>1장을 깨면</small>', 'ticket sm cy', `book_${k}_cg`, () => { S.phase = 'book'; showOverlay('', 'ending'); $('#ovBody').innerHTML = '<div class="cg"><div>엔딩 CG 자리</div></div>'; $('#ovActions').append(button('닫기', 'ticket on', 'cgBack', showBook)); });
+      e.disabled = !cg; row.append(e);
+      $('#ovBody').append(row);
+    });
+    add('<div class="scene-note" style="left:330px;top:900px">스토리 글은 시나리오 담당이 쓴다. 지금은 형식 시험용 테스트 대사뿐이다</div>');
+    syncUI(true);
+  }
+  // 도감: 메인 · 동료 · 몬스터 · 엔딩. 못 본 것은 ?로
+  function showCodex(tab, back) {
+    tab = tab || 'main';
+    campFrame('codex', '도감!', back);
+    const tabs = [['main', '메인'], ['ally', '동료'], ['foe', '몬스터'], ['cg', '엔딩']];
+    const list = { main: Object.keys(HEROES), ally: KIND_ORDER, foe: FOE_BOOK, cg: Object.keys(HEROES) };
+    const seenOf = (g, k) => (g === 'main' ? unlocked(k) : g === 'ally' ? !!META.seen.ally[k] : g === 'foe' ? !!META.seen.foe[k] : !!META.seen.cg[k]);
+    const row = document.createElement('div'); row.className = 'row'; row.style.cssText = 'left:560px;top:80px';
+    for (const [g, name] of tabs) row.append(button(`${name}<small>${list[g].filter((k) => seenOf(g, k)).length}/${list[g].length}</small>`, 'ticket sm' + (g === tab ? ' sel' : ''), 'codex_' + g, () => showCodex(g, back)));
+    $('#ovBody').append(row);
+    list[tab].forEach((k, i) => {
+      const ok = seenOf(tab, k);
+      let obj = '<span class="glyph">?</span>', name = '???', text = tab === 'foe' ? '아직 못 만났다' : tab === 'cg' ? '1장을 깨면 열린다' : '아직 만나지 못했다', kind = '', col = 'var(--surface-2)';
+      if (ok && tab === 'main') { obj = `<img alt="" src="${heroSrc(k)}">`; name = HEROES[k].name; text = `${HEROES[k].style} · ${HEROES[k].desc}`; kind = `${HEROES[k].race} · 메인`; col = `var(--char-${k})`; }
+      if (ok && tab === 'ally') { obj = faceImg(k, 'face'); name = `${KINDS[k].name} · ${KINDS[k].role}`; text = SHORT[k](1); kind = `${KINDS[k].race} · 동료`; col = `var(--char-${k})`; }
+      if (ok && tab === 'foe') { const src = ART_SRC[k]; obj = src && src.startsWith('data:') ? `<img alt="" src="${src}">` : ico('leaf'); name = FOES[k].name; text = FOE_NOTE[k]; kind = FOES[k].boss ? '보스' : TRAITS[FOES[k].trait] || '몬스터'; col = 'var(--foe-fill, var(--mat-3))'; }
+      if (tab === 'cg') { obj = ok ? ico('star') : obj; name = `${HEROES[k].name} · 1장 엔딩`; text = ok ? '이야기책에서 다시 볼 수 있다' : text; col = 'var(--accent)'; }
+      const b = button(`<span class="ware__obj sticker-s${ok && (tab === 'main' || tab === 'foe') ? ' crop' : ''}">${obj}</span><b>${name}</b><span>${text}</span>${kind ? `<span class="kind">${kind}</span>` : ''}`, 'ware' + (ok ? '' : ' dim'), `book_${tab}_${k}`, () => {});
+      b.disabled = true; b.style.cssText = `left:${150 + 330 * (i % 5)}px;top:${i < 5 ? 300 : 620}px;--c:${col};opacity:1`;
+      $('#ovBody').append(b);
+    });
+    syncUI(true);
+  }
+  // 도전과제: 원정이 끝날 때 조건을 본다. 보상은 그때 들어온다
+  function showAch() {
+    campFrame('ach', '도전과제!');
+    ACH.forEach((a, i) => {
+      const done = !!META.ach[a.id];
+      add(`<div class="achv${done ? ' done' : ''}" style="left:${i % 2 ? 990 : 150}px;top:${190 + 136 * Math.floor(i / 2)}px"><span class="dot">${ico(done ? 'crown' : 'lock')}</span><b>${a.name}</b><p>${a.desc}</p><span class="rw">${rewardText(a.reward)}</span><span class="st">${done ? '달성!' : a.prog ? a.prog() : '아직'}</span></div>`);
+    });
+    syncUI(true);
+  }
+  // 원정 기록: 메인마다 칠판
+  function showRecords() {
+    campFrame('records', '원정 기록!');
+    Object.keys(HEROES).forEach((k, i) => {
+      const r = META.rec[k], x = 150 + 860 * i;
+      add(`<div class="sec" style="left:${x}px;top:220px">${HEROES[k].name}${unlocked(k) ? '' : ' · 잠김'}</div><div class="led res big${unlocked(k) ? '' : ' dim'}" style="left:${x}px;top:270px;width:720px">`
+        + [['원정', r.runs], ['클리어', r.clears], ['가장 멀리', `${r.best}/${CHAPTER.length}`], ['최고 콤보', r.bestCombo], ['준 피해', r.dealt]].map(([n, v]) => `<div class="led__row" style="margin-top:12px"><span>${n}</span><b data-g="${'8'.repeat(String(v).length)}">${v}</b></div>`).join('') + '</div>');
+    });
+    add(`<div class="say big" style="left:150px;top:790px;font-size:24px">모든 원정 ${META.stat.runs}번 · 멈춤 · 대쉬로 피한 자리 ${META.stat.dodge}번 · 모은 유물 ${Object.keys(META.relics).length}개</div>`);
+    syncUI(true);
+  }
+  // 내 천막: 플레이어 프로필 · 설정 · 시험용 도구
+  function showTent(back) {
+    campFrame('tent', '내 천막!', back);
+    const p = S.persona;
+    let prof = '<h3>플레이어</h3><p>아직 플레이어를 만들지 않았다. 출발하면 처음에 만든다</p>';
+    if (p) { const r = RACES[p.race], c = r.colors[p.color], hd = handArt(p.race, p.color); prof = `<h3>${esc(p.name)}</h3><div class="grow">${hd ? `<span class="dot" style="--c:var(--surface-2);width:110px;height:110px"><img alt="" src="${hd.url}" style="width:100px"></span>` : ''}<div>${r.name} · ${c[0]} · ${p.size}<small>설문 결과 ${RACES[p.suggested].name}${p.custom ? ' · 직접 골랐다' : ''}</small></div></div>`; }
+    add(`<div class="rbox" style="left:150px;top:220px;width:700px">${prof}<div class="row" id="tentA"></div></div>`
+      + `<div class="rbox" style="left:960px;top:220px;width:800px"><h3>설정 · 시험용</h3><p class="mut">저장은 이 브라우저에만 남는다. 원정 도중에는 저장하지 않는다</p><div class="row" id="tentB"></div></div>`);
+    $('#tentA').append(button('페르소나 다시 만들기', 'ticket cy', 'tentPersona', () => { resetRun(); startCyoa(showCamp); }));
+    $('#tentB').append(button('컷씬 · 소리<small>Esc 메뉴</small>', 'ticket', 'tentMenu', () => setMenu(true)),
+      button('시험용 선물<small>리토 합류 · 도토리 +200 · 별조각 +10</small>', 'ticket', 'tentGift', () => { META.unlocked.rito = true; META.acorn += 200; META.star += 10; saveMeta(); sfx.coin(2); refreshPurse(); }));
+    const wipe = button('기록 지우기<small>재화 · 훈련 · 유물 · 수집 전부</small>', 'ticket', 'tentWipe', () => {
+      if (wipe.dataset.sure !== '1') { wipe.dataset.sure = '1'; wipe.innerHTML = '정말 지운다<small>한 번 더 누르면 지운다</small>'; return; }
+      META = blankMeta(); saveMeta(); showTitle();
+    });
+    $('#tentB').append(wipe);
+    syncUI(true);
+  }
+  // 출발: 메인 고르기 → 챕터 고르기 → 출발 준비 (유물 확인 · 시작 구매)
+  function showDepart() { chooseHero(); }
+  function showChapters(k) {
+    campFrame('chapter', `${HEROES[k].name}의 원정!`, showDepart);
+    const rec = META.rec[k];
+    add(`<span class="abs sticker" style="left:90px;top:200px;width:200px;height:200px;border-radius:50%;overflow:hidden;background:var(--char-${k});transform:rotate(-5deg)">${faceImg(k, 'fill')}</span><div class="scene-note" style="left:90px;top:430px;width:280px">메인마다 전용 챕터 6개. 깨면 그 메인의 다음 장이 열린다</div>`);
+    for (let n = 1; n <= CH_N; n++) {
+      const open = n === 1, x = 420 + 470 * ((n - 1) % 3), y = n <= 3 ? 220 : 590;
+      const text = open ? (rec.runs ? `가장 멀리 ${rec.best}/${CHAPTER.length} · 클리어 ${rec.clears}번` : '아직 가 보지 않았다') : n === 2 && rec.clears ? '열렸다 · 준비 중' : '앞 장을 깨면 열린다 · 준비 중';
+      const b = button(`<span class="ware__obj sticker-s"><span class="glyph">${n}</span></span><b>${n}장 · ${CH_NAME[n - 1] || '???'}</b><span>${text}</span><span class="kind">${open ? '중간 보스 시슬라 · 보스 아이비른' : '내용 없음'}</span>`, 'ware' + (open ? '' : ' dim'), 'chap' + n, () => { if (open) showPrep(k); });
+      b.disabled = !open; b.style.cssText = `left:${x}px;top:${y}px;--c:var(${open ? '--accent' : '--surface-2'})`;
+      $('#ovBody').append(b);
+    }
+    syncUI(true);
+  }
+  function showPrep(k, buys) {
+    buys = buys || [];
+    campFrame('prep', '출발 준비!', () => showChapters(k));
+    const t = trained(k), spend = buys.reduce((a, id) => a + START_BUY.find((b) => b.id === id).cost, 0);
+    add(`<img class="abs sticker" alt="" src="${heroSrc(k)}" style="left:-40px;top:500px;height:480px;transform:rotate(-5deg)">`
+      + '<div class="sec" style="left:440px;top:200px">가지고 갈 유물</div>');
+    for (let i = 0; i < RELIC.slots; i++) {
+      const id = META.equip[i];
+      add(`<div class="slotc${id ? ' full' : ''}" style="left:${470 + 300 * i}px;top:250px">${id ? ico(RELICS[id].ico) : '빈 칸'}</div><div class="slotlab" style="left:${430 + 300 * i}px;top:415px">${id ? `${RELICS[id].name} · Lv ${META.relics[id]}` : '장착 안 함'}</div>`);
+    }
+    const ch = button('유물함에서 바꾸기', 'ticket sm', 'prepRelic', () => showRelics(() => showPrep(k, buys)));
+    ch.style.cssText = 'left:1080px;top:300px;transform:rotate(2deg)'; $('#ovBody').append(ch);
+    add(`<div class="say big" style="left:440px;top:470px;font-size:21px;width:1060px"><b>훈련</b> 체력 ${t.hp} · 공격 ${t.atk} · 방어 ${t.def} · 한 발 ${t.shot}초 · 대쉬 ${t.dash} · 장치 옮기기 ${t.moves}개 · 멈춤 고르기 ${t.think}초</div>`
+      + '<div class="shelf" style="left:430px;top:830px;width:1080px;transform:rotate(-0.6deg)"></div><div class="sec" style="left:420px;top:810px">시작 구매 · 도토리 (원정마다 한 번씩)</div>');
+    START_BUY.forEach((it, i) => {
+      const on = buys.includes(it.id), why = !on && META.acorn - spend < it.cost ? '도토리 부족' : '';
+      const b = button(`<span class="ware__obj sticker-s">${ico(it.ico)}</span><b>${it.name}</b><span>${it.desc(k)}</span><span class="kind">${on ? '고름 · 다시 누르면 뺀다' : '누르면 고른다'}</span><span class="price burst">${it.cost}</span>`, 'ware' + (on ? ' on' : why ? ' dim' : ''), 'buy_' + it.id, () => showPrep(k, on ? buys.filter((x) => x !== it.id) : [...buys, it.id]));
+      b.disabled = !!why; b.style.cssText = `left:${450 + 260 * i}px;top:590px;--c:var(--accent-2)`;
+      $('#ovBody').append(b);
+    });
+    $('#ovActions').append(button(`출발!<small>${spend ? `도토리 −${spend}` : '시작 구매 없이'}</small>`, 'ticket on', 'prepGo', () => beginRun(k, buys)));
+    $('#prepGo').focus({ preventScroll: true });
+    syncUI(true);
   }
 
   // ---------- 아이템 슬롯 (조준 중에만) ----------
@@ -1831,7 +2301,13 @@ body { display: grid; place-items: center; }
     if (L < 4) return null;
     return { d: { x: dx / L, y: dy / L }, L };
   }
-  const heroCtl = () => HEROES[S.hero || 'hanato'].ctl;
+  const heroCtl = () => S.ctl || HEROES[S.hero || 'hanato'].ctl;
+  const thinkLen = () => (S.ctl && S.ctl.think) || FOCUS.max;
+  // 발이 시작될 때: 오토 부적, 가시 부적 (유물)
+  function launchExtras() {
+    if (S.levels.oto > 0) charms(S.ball, S.levels.oto, 5 + 2 * S.levels.oto);
+    if (S.relics.thorncharm) charms(S.ball, S.relics.thorncharm > 1 ? 5 : 3, Math.max(1, Math.round(atkNow() * 0.6)));
+  }
   const gaugeMax = () => HEROES[S.hero || 'hanato'].gauge;
   const shotLen = () => heroCtl().shot;
   const stormLen = () => BAL.storm.t + BAL.storm.up * up('storm');
@@ -1852,7 +2328,7 @@ body { display: grid; place-items: center; }
     S.ball.vx = d.x * S.shot.base; S.ball.vy = d.y * S.shot.base;
     S.mine = [];
     S.phase = 'shot'; S.trail = []; S.acc = 0;
-    if (S.levels.oto > 0) charms(S.ball, S.levels.oto, 5 + 2 * S.levels.oto);
+    launchExtras();
     sfx.launch();
     renderSlots();
     syncUI(true);
@@ -1860,6 +2336,7 @@ body { display: grid; place-items: center; }
   function trySkill() {
     if (S.gauge < gaugeMax() || S.skill.active || S.focus || S.dash || !(S.phase === 'aim' || S.phase === 'shot')) return;
     S.gauge = 0; S.run.skillUses++;
+    if (S.relics.blossom) { const v = Math.min(S.relics.blossom > 1 ? 8 : 5, S.main.maxHp - S.main.hp); S.main.hp += v; if (v) float(S.ball.x, S.ball.y - 64, '+' + v, T.keep, 24, true); }
     if (S.opts.cutin) { S.cutin = { t: 0, dur: reduceMotion ? 0.9 : 1.6, from: S.phase, lines: Array.from({ length: 34 }, () => ({ y: Math.random(), x: Math.random(), w: 60 + Math.random() * 220, s: 0.8 + Math.random() * 1.6 })) }; S.phase = 'cutin'; sfx.skill(); const h = $('#hero'); h.classList.remove('hero-cut'); void h.offsetWidth; h.classList.add('hero-cut'); setTimeout(() => h.classList.remove('hero-cut'), S.cutin.dur * 1000 + 200); }
     else startSkill(S.phase);
     syncUI(true);
@@ -1920,7 +2397,7 @@ body { display: grid; place-items: center; }
     S.run.bestCombo = Math.max(S.run.bestCombo, S.shot.combo);
     if (foes().length === 0) { S.phase = 'shot'; endShot(); return; }
     // 조준 중에 썼으면 여기서 발이 시작된다 (난무 → 발사). 튕기던 중이면 남은 시간만큼 이어 간다
-    if (z.from === 'aim') { S.mine = []; S.trail = []; S.acc = 0; if (S.levels.oto > 0) charms(S.ball, S.levels.oto, 5 + 2 * S.levels.oto); sfx.launch(); }
+    if (z.from === 'aim') { S.mine = []; S.trail = []; S.acc = 0; launchExtras(); sfx.launch(); }
     const dx = last.x2 - last.x1, dy = last.y2 - last.y1, L = hyp(dx, dy) || 1;
     S.ball.vx = dx / L * S.shot.base; S.ball.vy = dy / L * S.shot.base; S.phase = 'shot';
   }
@@ -1998,6 +2475,12 @@ body { display: grid; place-items: center; }
     if (d.t < FOCUS.dashT) return;
     if (hyp(d.x1 - d.x0, d.y1 - d.y0) > 1) burst(b.x, b.y, T.panel, 10);
     float(b.x, b.y - 52, '멈춤', T.ink, 20, true);
+    if (!threatsAt(b.x, b.y).length && alive().some((e) => e.intent && ['area', 'shot', 'fan', 'rain'].includes(e.intent.t) || (e.intent && e.intent.t === 'charge' && e.intent.n <= 1))) S.runDodge++;
+    if (S.relics.thornknot) {
+      const R = 100, v = Math.round(atkNow() * (S.relics.thornknot > 1 ? 3 : 2));
+      (S.fx.rings ||= []).push({ x: b.x, y: b.y, R, life: 0.4, color: T.petal }); sfx.crack(); S.fx.shake = Math.min(18, S.fx.shake + 6);
+      for (const e of targets().filter((o) => hyp(o.x - b.x, o.y - b.y) < R + o.r)) damage(e, v, '충격');
+    }
     endShot();
   }
   // 적이 다음 차례에 하는 공격이 이 자리에 닿는가 (범위 · 씨앗 비 · 막히지 않은 투사체)
@@ -2241,6 +2724,11 @@ body { display: grid; place-items: center; }
   // 콤보 구간마다 골드 (결과에서 합친다)
   function onCombo() {
     const sh = S.shot;
+    if (S.relics.combobell && sh.combo > 0 && sh.combo % 25 === 0 && !sh.coins.has('h' + sh.combo)) {
+      sh.coins.add('h' + sh.combo);
+      const v = Math.min(S.relics.combobell > 1 ? 5 : 3, S.main.maxHp - S.main.hp); S.main.hp += v;
+      if (v) float(S.ball.x - 50, S.ball.y - 70, '+' + v, T.keep, 20, true);
+    }
     if (S.special || !GOLD.combo.includes(sh.combo) || sh.coins.has(sh.combo)) return;
     sh.coins.add(sh.combo); S.bGold.combo++;
     sfx.coin(GOLD.combo.indexOf(sh.combo));
@@ -2396,7 +2884,7 @@ body { display: grid; place-items: center; }
     const it = e.intent; e.act = 0.35;
     if (e.trait === 'sprout' && S.enemies.filter((o) => o.alive && o.key === 'sprout').length < 3) {
       const at = freeSpot(22, e.x, e.y, e.r + 50, e.r + 220);
-      if (at) { const sp = makeFoe('sprout', at.x, at.y, S.mul.hp, S.mul.atk); sp.id = S.enemies.length; sp.fadeIn = 0.35; S.enemies.push(sp); burst(at.x, at.y, T.keep, 12); sfx.pop(); }
+      if (at) { META.seen.foe.sprout = 1; const sp = makeFoe('sprout', at.x, at.y, S.mul.hp, S.mul.atk); sp.id = S.enemies.length; sp.fadeIn = 0.35; S.enemies.push(sp); burst(at.x, at.y, T.keep, 12); sfx.pop(); }
     }
     if (e.trait === 'web') spinWeb(e);
     if (it.t === 'shield' && it.aura) {
@@ -2481,6 +2969,10 @@ body { display: grid; place-items: center; }
     S.fx.shake = Math.min(20, S.fx.shake + (heavy ? 14 : 6));
     float(S.ball.x, S.ball.y - 48, `-${a}`, T.danger, heavy ? 30 : 22);
     sfx.hurt();
+    if (S.main.hp <= 0 && S.relics.clover && !S.reviveUsed) {
+      S.reviveUsed = true; S.main.hp = Math.max(1, Math.round(S.main.maxHp * (S.relics.clover > 1 ? 0.5 : 0.3)));
+      float(S.ball.x, S.ball.y - 84, '토끼풀 부적!', T.keep, 28, true); sfx.pickup('heart'); for (let j = 0; j < 12; j++) addPetal(S.ball.x, S.ball.y, true);
+    }
     if (S.main.hp <= 0) { S.phase = 'wait'; S.enemyQueue = []; S.atk = []; S.pending = { t: 0.8, fn: () => finishRun(false) }; }
   }
   function endRound() {
@@ -2519,7 +3011,7 @@ body { display: grid; place-items: center; }
   function update(dt) {
     const fx = S.fx;
     // 멈춘 동안에는 게임이 완전히 멈춘다 (멈춤 시간만 흐른다)
-    if (S.focus) { S.focus.t += dt; if (S.focus.t >= FOCUS.max || S.phase !== 'shot') releaseFocus(); else return; }
+    if (S.focus) { S.focus.t += dt; if (S.focus.t >= thinkLen() || S.phase !== 'shot') releaseFocus(); else return; }
     S.main.flash = Math.max(0, S.main.flash - dt);
     fx.shake = Math.max(0, fx.shake - dt * 60);
     fx.comboPop = Math.max(0, fx.comboPop - dt * 5);
@@ -2692,7 +3184,7 @@ body { display: grid; place-items: center; }
     ctx.strokeStyle = T.panel; ctx.globalAlpha = 0.8; ctx.lineWidth = 2; circle(b.x, b.y, b.r + 9); ctx.stroke(); ctx.globalAlpha = 1;
     ctx.font = `700 16px ${FONT_BODY}`; ctx.fillStyle = col; strokeFill(hit ? '맞는 자리' : '피하는 자리', p.x, p.y + b.r + 24);
     // 위 쪽지 + 남은 멈춤 시간
-    const k = clamp(1 - f.t / FOCUS.max, 0, 1);
+    const k = clamp(1 - f.t / thinkLen(), 0, 1);
     note(W / 2, 34, f.src === 'key' ? '멈춤! 방향을 고르고 Shift를 뗀다' : '멈춤! 방향을 고르고 손을 뗀다');
     ctx.fillStyle = T.mat1; ctx.fillRect(W / 2 - 120, 56, 240, 6); ctx.fillStyle = T.gold; ctx.fillRect(W / 2 - 120, 56, 240 * k, 6);
   }
@@ -3484,7 +3976,7 @@ body { display: grid; place-items: center; }
     el.style.opacity = String(clamp(S.fx.comboShow * 2, 0, 1));
   }
   const menuOpen = () => !$('#menu').hidden;
-  function setMenu(open) { $('#menu').hidden = !open; if (open) { renderMe(); $('#menuClose').focus({ preventScroll: true }); } }
+  function setMenu(open) { $('#menu').hidden = !open; if (open) { renderMe(); $('#restart').hidden = !S.inRun; $('#menuClose').focus({ preventScroll: true }); } }
   $('#menuBtn').addEventListener('click', () => setMenu(true));
   $('#menuClose').addEventListener('click', () => setMenu(false));
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); setMenu(!menuOpen()); } });
@@ -3521,8 +4013,9 @@ body { display: grid; place-items: center; }
   });
   $('#skillBtn').addEventListener('click', () => { audio(); trySkill(); });
   document.addEventListener('click', (ev) => { if (ev.target.closest && ev.target.closest('.ticket, .ware, .pick, .menu-btn')) sfx.ui(); });
-  $('#restart').addEventListener('click', () => { setMenu(false); hideOverlay(); newRun(); });
-  $('#redoPersona').addEventListener('click', () => { setMenu(false); hideOverlay(); newRun(true); });
+  // 원정 그만두기 = 그 자리에서 패배와 같이 정산 (Q56)
+  $('#restart').addEventListener('click', () => { setMenu(false); if (S.inRun) finishRun(false); });
+  $('#redoPersona').addEventListener('click', () => { setMenu(false); resetRun(); startCyoa(showCamp); });
   for (const [id, key] of [['optCutin', 'cutin'], ['optSound', 'sound']]) {
     $('#' + id).addEventListener('change', (ev) => { S.opts[key] = ev.target.checked; savePrefs(); });
   }
@@ -3570,7 +4063,7 @@ body { display: grid; place-items: center; }
     }
     if (S.ally) rows.push([`--c:var(--char-${S.ally.kind})`, 'sticker-s', `${faceImg(S.ally.kind)}<div><b>${HEROES[S.ally.kind].name}</b><small>합류한 메인</small><p>${HEROES[S.ally.kind].unit}</p></div>`]);
     const cap = SHOP.partyMax - 1, filled = rows.length;
-    while (rows.length < cap) rows.push(['', 'empty', `<span>+</span><div><b>빈 자리 ${rows.length + 1}</b><p>상점 · 이벤트에서 데려온다</p></div>`]);
+    while (rows.length < cap) rows.push(['', 'empty', `<span>+</span><div><b>빈 자리 ${rows.length + 1}</b><p>정비 · 이벤트에서 데려온다</p></div>`]);
     $('#team').innerHTML = rows.map(([st, cls, inner], i) => `<div class="m4 ${cls}" style="top:${236 + 90 * i}px;transform:rotate(${i % 2 ? -1.5 : 1.5}deg);${st}">${inner}</div>`).join('');
     $('#teamHead').textContent = `동료 ${filled}/${cap}`;
     const n = Math.max(1, rabbits());
@@ -3637,7 +4130,7 @@ body { display: grid; place-items: center; }
     $('#portrait').dataset.hanato = ART_SRC.hanato.startsWith('data:') ? ART_SRC.hanato : MAIN_SRC;
     $('#portrait').src = $('#portrait').dataset.hanato;
     fit();
-    newRun();
+    loadMeta(); resetRun(); showTitle();
     requestAnimationFrame(frame);
   }
   const hot = window.claude && window.claude.hot;
@@ -3649,6 +4142,9 @@ body { display: grid; place-items: center; }
     shoot(deg) { if (S.phase !== 'aim') return false; const a = deg * Math.PI / 180; fire({ x: Math.cos(a), y: -Math.sin(a) }); return true; },
     fillGauge() { S.gauge = gaugeMax(); syncUI(true); },
     get gaugeMax() { return gaugeMax(); },
+    meta: () => META,
+    quick(h, buys) { beginRun(['hanato', 'rito'][h || 0], buys || [], true); return S.phase; },
+    screen(name, a) { ({ title: showTitle, camp: showCamp, train: showTrain, relics: showRelics, shop: showShopOut, book: showBook, codex: showCodex, ach: showAch, records: showRecords, tent: showTent, depart: showDepart, chapters: showChapters, prep: showPrep })[name](a); return S.phase; },
     get ctl() { return heroCtl(); },
     threats(x, y) { return threatsAt(x, y).length; },
     aimDash(x, y) { S.mouse = { x, y }; const p = dashPlan(); return { x: p.x, y: p.y, n: threatsAt(p.x, p.y).length }; },
