@@ -523,6 +523,10 @@ body { display: grid; place-items: center; }
 /* 끌어 놓는 아이템 (화면 밖 body에 붙는다) */
 .drag-ghost { position: fixed; z-index: 30; pointer-events: none; transform: translate(-50%, -170%) rotate(-3deg); font: 400 20px/1 "Black Han Sans", sans-serif; color: #262a17; background: #f2cf5a; padding: 8px 16px; box-shadow: 0 5px 0 0 rgba(0,0,0,.45); }
 @media (prefers-reduced-motion: reduce) { .K .skill.ready, .K #hero.hero-hurt .hero-art, .K #hero.hero-cut .hero-art { animation: none; } .K .story-hand.go { animation-name: hand-fade; } }
+/* v0.7 멈춤: 판 밖 화면도 어둡게 (판은 캔버스가 직접 덮는다) */
+.K .focus-dim { position: absolute; inset: 0; z-index: 8; pointer-events: none; background: var(--mat-1); opacity: 0; transition: opacity .12s; }
+.K.focus .focus-dim { opacity: .62; }
+.K.focus #stageWrap { z-index: 9; }
 </style>
 </head>
 <body>
@@ -574,7 +578,8 @@ body { display: grid; place-items: center; }
       <div class="pow bp-dmg" id="bossDmg"></div>
     </section>
 
-    <div class="tapekeys" id="keys"><span><span class="key">드래그</span>당겨서 쏘기</span><span><span class="key">Space</span>스킬</span><span><span class="key">보급품</span>조준 중에 끌어다 놓기</span><span><span class="key">Esc</span>메뉴</span></div>
+    <div class="focus-dim" aria-hidden="true"></div>
+    <div class="tapekeys" id="keys"><span><span class="key">드래그</span>당겨서 쏘기</span><span><span class="key">Shift</span>멈추고 대쉬</span><span><span class="key">Space</span>스킬</span><span><span class="key">끌기</span>보급품 놓기 · 첫 발 전 장치 옮기기</span><span><span class="key">Esc</span>메뉴</span></div>
   </div>
 
   <div id="story" hidden data-speaker="main">
@@ -616,7 +621,9 @@ body { display: grid; place-items: center; }
   const canvas = $('#stage');
   const ctx = canvas.getContext('2d');
   const W = 960, H = 600, DT = 1 / 240;
-  const BOUNCE_T = 3.6, DECEL = 1100, BASE_SPEED = 1150, KICK = 240, SKILL_T = 4.5, GAUGE_MAX = 45;
+  const BASE_SPEED = 1150;
+  // 멈추기 · 대쉬: slow 누르는 동안 게임 빠르기 · max 누르고 있을 수 있는 최대 시간 (실제 초) · brake 발이 끝나기 직전 감속 구간 · dashT 대쉬에 걸리는 시간
+  const FOCUS = { slow: 0.12, max: 1.6, brake: 0.3, dashT: 0.15 };
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const FONT_BODY = '"Do Hyeon", "Black Han Sans", sans-serif';
   const FONT_DISPLAY = '"Bagel Fat One", "Black Han Sans", sans-serif';
@@ -626,7 +633,7 @@ body { display: grid; place-items: center; }
   const ico = (k, cls) => { const d = ICONS[k]; return d ? `<svg class="fu-ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d[0]}" fill-rule="${d[1]}"/></svg>` : ''; };
   const NODE_ICO = { story: 'book', battle: 'leaf', event: 'question', mid: 'thorn', boss: 'crown' };
   const UP_ICO = { homing: 'speed', combo: 'paw', iai: 'skill', gauge: 'spirit', rate: 'turn', ricochet: 'back', storm: 'cloud', pierce: 'sword', atk: 'sword', hp: 'heart', speed: 'speed' };
-  const ITEM_ICO = { sword: 'sword', shuriken: 'skill', hammer: 'knot', grow: 'passive', fire: 'campfire', crate: 'shield', bomb: 'thorn', heal: 'heal' };
+  const ITEM_ICO = { grow: 'passive', fire: 'campfire', crate: 'shield', bomb: 'thorn', heal: 'heal' };
   const DEV_FACE = { plus: ['+1'], mult: ['×2'], bolt: ['ϟ'], roulette: [null, 'star'], spinner: [null, 'turn'], booster: [null, 'play'] };
   const DEV_PIN = { plus: 'on', mult: 'on p', bolt: 'on c', roulette: 'on', spinner: 'on c', booster: 'on p' };
   const devFace = (k) => { const f = DEV_FACE[k] || ['?']; return f[0] ? `<span class="glyph">${f[0]}</span>` : ico(f[1]); };
@@ -658,9 +665,11 @@ body { display: grid; place-items: center; }
   };
   const KIND_ORDER = ['ryuto', 'sato', 'oto', 'santo'];
   const kcol = (k) => T[KINDS[k].col];
+  // gauge: 스킬에 드는 투지 (리토는 부적 타격이 많아 더 든다)
+  // ctl (조작 묶음): shot 한 발 시간 (초) · dash 대쉬 거리 (판 좌표) · moves 첫 발 전에 옮길 수 있는 장치 수. 메인마다 다르다 (임시)
   const HEROES = {
-    hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 5연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기' },
-    rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '4초 동안 0.5초마다 사방으로 부적 6장 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장' },
+    hanato: { name: '하나토', race: '토끼', hp: 80, atk: 8, def: 2, skill: '벚꽃 난무', style: '공격 유도', desc: '공이 적 쪽으로 휘어 들어간다', sdesc: '직선 발도 3연격 · 납도하는 순간 한꺼번에 베인다', unit: '발도 · 1.4초마다 직선 베기', gauge: 20, ctl: { shot: 4, dash: 210, moves: 2 } },
+    rito: { name: '리토', race: '토끼', hp: 60, atk: 6, def: 1, skill: '부적 폭풍', style: '투사체', desc: '튕기는 동안 0.3초마다 부적을 던진다', sdesc: '2초 동안 0.5초마다 사방으로 부적 6장 · 벽에 두 번까지 튕긴다', unit: '부적 · 0.6초마다 한 장', gauge: 30, ctl: { shot: 4.5, dash: 150, moves: 3 } },
   };
   const P = (t, v, o) => ({ t, v, ...o });
   const FOES = {
@@ -717,9 +726,6 @@ body { display: grid; place-items: center; }
     booster: { name: '가속 패드', type: 'gate', r: 22, desc: '가까운 적 쪽으로 쏘아 보낸다' },
     grow: { name: '거대화 버섯', type: 'gate', r: 24, desc: '공이 커진다 · ×1.5' },
     fire: { name: '불꽃 고리', type: 'gate', r: 24, desc: '3턴 화상' },
-    sword: { name: '칼 필드', type: 'field', w: 84, h: 54, r: 48, short: '칼', weapon: true, desc: '칼 변신 · 피해 ×1.5' },
-    shuriken: { name: '표창 필드', type: 'field', w: 84, h: 54, r: 48, short: '표창', weapon: true, desc: '표창 변신 · 연타 +1 · 방어 무시' },
-    hammer: { name: '망치 필드', type: 'field', w: 90, h: 50, r: 50, short: '망치', weapon: true, desc: '망치 변신 · 방어 · 껍질을 부순다' },
     bomb: { name: '폭탄', type: 'bomb', r: 22, desc: '닿으면 터진다' },
     patrol: { name: '순찰 가시', type: 'bump', r: 17, bad: true, amp: 90 },
     spike: { name: '가시 범퍼', type: 'bump', r: 17, bad: true },
@@ -728,16 +734,19 @@ body { display: grid; place-items: center; }
   // ---------- 상점 ----------
   // 진열: 메인 강화 + 동료 3 · 장치 2 · 아이템 3. 수치는 모두 임시
   // 난이도: 적 공격 배율 · 회복량 (임시)
-  // storm: 부적 폭풍 (몇 초마다 · 한 번에 몇 장 · 한 장 피해 배율 · 폭풍 중 공이 닿을 때 연타 +n · 피해 배율)
-  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: 5, storm: { every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.25 } };
+  // iai: 벚꽃 난무 (처음 직선 수 · 강화 한 단계에 늘어나는 수 · 한 선 피해 배율)
+  // storm: 부적 폭풍 (지속 초 · 강화 한 단계에 늘어나는 초 · 몇 초마다 · 한 번에 몇 장 · 한 장 피해 배율 · 폭풍 중 공이 닿을 때 연타 +n · 피해 배율)
+  // gaugeUp: 투지 충전 강화 한 단계에 전투 시작 투지
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: { n: 3, up: 2, mul: 1.2 }, gaugeUp: 4, storm: { t: 2, up: 0.5, every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.1 } };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
   const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
-  const DEVICES = ['plus', 'mult', 'roulette', 'bolt', 'spinner', 'booster'];
+  // 판 위 도구는 종족마다 나눠 줄 예정이다. 지금은 토끼 몫만 상점 · 이벤트에 나온다.
+  // HOLD는 다른 종족 몫으로 보관 (배정 미정). 정의(BOARD · ITEMS)와 동작은 남겨 둔다
+  const DEVICES = ['plus', 'mult', 'spinner', 'booster'];
+  const ITEM_POOL = ['crate', 'bomb', 'heal'];
+  const HOLD = { dev: ['roulette', 'bolt'], item: ['grow', 'fire'] };
   const ITEMS = {
-    sword: { name: '칼 필드', board: 'sword' },
-    shuriken: { name: '표창 필드', board: 'shuriken' },
-    hammer: { name: '망치 필드', board: 'hammer' },
     grow: { name: '거대화 버섯', board: 'grow' },
     fire: { name: '불꽃 고리', board: 'fire' },
     crate: { name: '상자', desc: '투사체를 막는다 · 깨지면 타격 +3' },
@@ -749,13 +758,13 @@ body { display: grid; place-items: center; }
     hanato: [
       { id: 'homing', name: '유도 강화', desc: '유도 +30%', max: 3 },
       { id: 'combo', name: '연타 +1', desc: '닿을 때 연타 +1', max: 3 },
-      { id: 'iai', name: '난무 +5', desc: '벚꽃 난무 직선 +5', max: 3 },
-      { id: 'gauge', name: '투지 충전', desc: '전투 시작 투지 +10', max: 3 },
+      { id: 'iai', name: `난무 +${BAL.iai.up}`, desc: `벚꽃 난무 직선 +${BAL.iai.up}`, max: 3 },
+      { id: 'gauge', name: '투지 충전', desc: `전투 시작 투지 +${BAL.gaugeUp}`, max: 3 },
     ],
     rito: [
       { id: 'rate', name: '부적 간격', desc: '부적 간격 −20%', max: 3 },
       { id: 'ricochet', name: '부적 튕김 +1', desc: '기본 부적 벽 튕김 +1', max: 3 },
-      { id: 'storm', name: '폭풍 +1초', desc: '부적 폭풍 +1초', max: 3 },
+      { id: 'storm', name: `폭풍 +${BAL.storm.up}초`, desc: `부적 폭풍 +${BAL.storm.up}초`, max: 3 },
       { id: 'pierce', name: '부적 관통', desc: '부적이 적 하나를 더 뚫는다', max: 3 },
     ],
     common: [
@@ -948,7 +957,8 @@ body { display: grid; place-items: center; }
     neg: () => osc('sawtooth', 230, 110, 0.2, 0.045, 0.2),
     drop: () => { osc('square', 700, 350, 0.06, 0.05, 0.06); hiss('bandpass', 1500, 0, 2, 0.06, 0.02); },
     spin: (n) => { for (let i = 0; i < Math.min(n, 10); i++) { osc('square', 1300 - i * 40, 0, 0, 0.03, 0.025, 0.001, i * 0.035); hiss('bandpass', 4200, 0, 3, 0.03, 0.006, 0.001, i * 0.035); } },
-    weapon: () => { osc('triangle', 520, 1300, 0.18, 0.08, 0.18); hiss('highpass', 3000, 0, 0.7, 0.04, 0.1, 0.01); },
+    focus: () => { osc('sine', 520, 140, 0.25, 0.08, 0.28); hiss('lowpass', 2400, 300, 0.8, 0.06, 0.3); },
+    dash: () => { hiss('bandpass', 900, 4200, 1.6, 0.13, 0.12, 0.002, 0, 0.1); osc('triangle', 240, 620, 0.08, 0.1, 0.1); },
     flame: () => { hiss('bandpass', 1200, 400, 0.8, 0.14, 0.3, 0.02); osc('sawtooth', 300, 600, 0.25, 0.03, 0.25); },
     grow: () => osc('triangle', 200, 700, 0.35, 0.1, 0.35),
     shrink: () => osc('triangle', 900, 250, 0.3, 0.07, 0.3),
@@ -982,6 +992,7 @@ body { display: grid; place-items: center; }
     S.trail = []; S.aim = null; S.round = 1; S.shot = blankShot(); S.atk = [];
     S.mine = []; S.cuts = []; S.walls = []; S.pads = []; S.crates = []; S.portals = [];
     S.storyBg = null; $('#menu').hidden = true; $('#handClip').hidden = true;
+    S.focus = null; S.dash = null; S.reloc = null; S.devDrag = null; S.mouse = null;
     renderPanel(); renderSlots();
     // 첫 게임 시작 (저장된 페르소나가 없을 때)에만 CYOA 설문
     if (cyoa === true || !S.persona) startCyoa(chooseHero); else chooseHero();
@@ -1001,7 +1012,7 @@ body { display: grid; place-items: center; }
       const html = `<span class="burst" style="left:${p.burst[0]}px;top:${p.burst[1]}px;width:${p.burst[2]}px;height:${p.burst[2]}px;background:${p.burst[3]}"></span>`
         + `<img class="abs sticker" alt="${h.name}" src="${heroSrc(k)}" style="left:${p.art[0]}px;top:${p.art[1]}px;height:${p.art[2]}px;transform:rotate(${p.art[3]}deg)">`
         + `<span class="shout" style="left:${p.name[0]}px;top:${p.name[1]}px;font-size:${p.name[2]}px;transform:rotate(${p.name[3]}deg)">${h.name}</span>`
-        + `<span class="mate sticker-s" style="left:${p.info[0]}px;top:${p.info[1]}px;transform:rotate(${p.info[2]}deg)"><b>${h.style}</b><p>${h.desc}</p><p>체력 ${h.hp} · 공격 ${h.atk} · 방어 ${h.def}</p><p><span class="sk">${h.skill}</span> ${h.sdesc}</p></span>`;
+        + `<span class="mate sticker-s" style="left:${p.info[0]}px;top:${p.info[1]}px;transform:rotate(${p.info[2]}deg)"><b>${h.style}</b><p>${h.desc}</p><p>체력 ${h.hp} · 공격 ${h.atk} · 방어 ${h.def}</p><p>한 발 ${h.ctl.shot}초 · 대쉬 ${h.ctl.dash} · 장치 옮기기 ${h.ctl.moves}개</p><p><span class="sk">${h.skill}</span> ${h.sdesc}</p></span>`;
       const b = button(html, 'pick', 'hero' + i, () => setHero(k));
       b.style.cssText = `left:${p.box[0]}px;top:${p.box[1]}px;width:${p.box[2]}px;height:${p.box[3]}px`;
       b.setAttribute('aria-label', `${h.name} · ${h.style}`);
@@ -1045,7 +1056,7 @@ body { display: grid; place-items: center; }
   function clearField() {
     S.enemies = []; S.board = []; S.walls = []; S.pads = []; S.crates = []; S.portals = []; S.webs = []; S.gates = []; S.clouds = []; S.mine = []; S.cuts = []; S.atk = [];
   }
-  function blankShot() { return { gated: new Set(), gateT: 0, t: 0, combo: 0, hits: 0, dealt: 0, sinceHit: 0, base: BASE_SPEED, extra: 0, bonusT: 0, bonus: 0, mul: 1, plusN: 0, weapon: null, fire: false, size: 0, used: new Set(), inside: new Set(), coins: new Set() }; }
+  function blankShot() { return { gated: new Set(), gateT: 0, t: 0, combo: 0, hits: 0, dealt: 0, sinceHit: 0, base: BASE_SPEED, extra: 0, bonus: 0, mul: 1, plusN: 0, fire: false, size: 0, used: new Set(), inside: new Set(), coins: new Set() }; }
   function makeFoe(key, x, y, hpMul, atkMul) {
     const f = FOES[key];
     const pattern = f.p.map((it) => ({ ...it, v: it.t === 'shield' ? it.v : Math.round(it.v * atkMul * BAL.foeAtk) }));
@@ -1095,12 +1106,14 @@ body { display: grid; place-items: center; }
     S.enemies.forEach((e, i) => { e.id = i; });
     S.webs = [];
     placeAlly();
-    for (const k of S.devices) placeBoard(k);
+    for (const k of S.devices) { const it = placeBoard(k); if (it) it.dev = true; }
     if (!S.special && S.trap > 0) { for (let i = 0; i < S.trap; i++) placeBoard('spike'); S.trap = 0; }
     for (const e of S.enemies) if (e.trait === 'web') { spinWeb(e); spinWeb(e); }
     S.ball.x = 480; S.ball.y = 540; S.ball.vx = 0; S.ball.vy = 0;
     S.round = 1; S.shot = blankShot(); S.enemies.forEach((e) => { e.burn = 0; e.burnT = 0; }); S.skill = { active: false, t: 0, hits: 0 }; S.trail = []; S.atk = [];
-    if (!S.special && up('gauge') > 0) S.gauge = Math.min(GAUGE_MAX, S.gauge + 10 * up('gauge'));
+    if (!S.special && up('gauge') > 0) S.gauge = Math.min(gaugeMax(), S.gauge + BAL.gaugeUp * up('gauge'));
+    S.focus = null; S.dash = null; S.devDrag = null; $('#app').classList.remove('focus');
+    S.reloc = S.board.some((it) => it.dev) ? { n: heroCtl().moves, moved: new Set() } : null;
     prepRound();
     S.phase = 'aim';
     renderSlots();
@@ -1222,7 +1235,7 @@ body { display: grid; place-items: center; }
       const n = clamp(Math.round(hyp(b.vx, b.vy) / 260), 1, 8);
       sh.bonus += n; it.spin += n * 7;
       float(it.x, ty, `+${n} 회전`, T.gold, 18 + n, n >= 5); sfx.spin(n); if (n >= 5) react('spark');
-    } else if (d.weapon) { if (sh.weapon !== k) { sh.weapon = k; float(it.x, ty, d.short + ' 변신', T.finale, 21, true); burst(b.x, b.y, T.finale, 12); sfx.weapon(); react('excl'); } }
+    }
   }
   function boardStep(it, b, sh, dt) {
     const d = it.d;
@@ -1235,7 +1248,7 @@ body { display: grid; place-items: center; }
       return;
     }
     if (d.type === 'bomb') { if (hyp(b.x - it.x, b.y - it.y) < d.r + b.r) explode(it); return; }
-    const inside = d.type === 'field' || d.type === 'spin'
+    const inside = d.type === 'spin'
       ? Math.abs(b.x - it.x) < d.w / 2 + b.r * 0.3 && Math.abs(b.y - it.y) < d.h / 2 + b.r * 0.3
       : hyp(b.x - it.x, b.y - it.y) < d.r + b.r * 0.4;
     const was = sh.inside.has(it);
@@ -1541,7 +1554,7 @@ body { display: grid; place-items: center; }
     if (sp.id === 'targets') { line = `과녁 ${got} / ${sp.total} · +${got} 골드`; if (got) after = (end) => { gainGold([['과녁', got]]); end(); }; }
     else if (sp.id === 'chest') {
       if (left) line = '놓쳤다';
-      else if (S.held.length < SHOP.itemSlots) { const k = pickOne(Object.keys(ITEMS)); S.held.push(k); renderSlots(); line = `잡았다 · ${ITEMS[k].name}`; }
+      else if (S.held.length < SHOP.itemSlots) { const k = pickOne(ITEM_POOL); S.held.push(k); renderSlots(); line = `잡았다 · ${ITEMS[k].name}`; }
       else { line = '잡았다 · 슬롯 가득 · +5 골드'; after = (end) => { gainGold([['상자', 5]]); end(); }; }
     } else if (left) line = `버섯 ${got} / ${sp.total}`;
     else { const k = pickOne(DEVICES); line = `다 터뜨렸다 · ${BOARD[k].name}`; after = (end) => giveDevice(k, end); }
@@ -1622,7 +1635,7 @@ body { display: grid; place-items: center; }
   }
   // 아이템 진열: 무작위, 회복만 두 배로 잘 뜬다 (BAL.healWeight)
   function pickItems(n) {
-    const bag = Object.keys(ITEMS).flatMap((k) => Array(k === 'heal' ? BAL.healWeight : 1).fill(k)), got = [];
+    const bag = ITEM_POOL.flatMap((k) => Array(k === 'heal' ? BAL.healWeight : 1).fill(k)), got = [];
     while (got.length < n && bag.length) { const k = bag[Math.floor(Math.random() * bag.length)]; got.push(k); for (let i = bag.length - 1; i >= 0; i--) if (bag[i] === k) bag.splice(i, 1); }
     return got;
   }
@@ -1710,6 +1723,39 @@ body { display: grid; place-items: center; }
     syncUI(true);
   }
 
+  // ---------- 장치 옮기기 (전투마다 첫 발 전에) ----------
+  // 메인마다 옮길 수 있는 장치 수가 다르다 (ctl.moves). 이미 옮긴 장치는 다시 옮겨도 개수가 줄지 않는다
+  function devOk(it, x, y) {
+    const r = solidR(it), b = S.ball;
+    if (x < r + 16 || x > W - r - 16 || y < r + 16 || y > H - r - 16) return false;
+    if (hyp(b.x - x, b.y - y) < b.r + r + 24) return false;
+    if (S.walls.some((w) => segDist(x, y, w) < r + w.t + 8)) return false;
+    if ([...onField(), ...(S.ally ? [S.ally] : [])].some((e) => hyp(e.x - x, e.y - y) < e.r + r + 10)) return false;
+    if ([...S.pads, ...S.crates.filter((c) => !c.dead)].some((o) => hyp(o.x - x, o.y - y) < o.r + r + 8)) return false;
+    if (S.portals.some((g) => hyp(g.a.x - x, g.a.y - y) < g.r + r + 8 || hyp(g.b.x - x, g.b.y - y) < g.r + r + 8)) return false;
+    return S.board.every((o) => o === it || o.dead || hyp(o.x - x, o.y - y) >= solidR(o) + r + 8 + (o.d.amp || 0));
+  }
+  const devAt = (p) => S.board.find((it) => it.dev && !it.dead && (it.d.type === 'spin' ? Math.abs(p.x - it.x) < it.d.w / 2 + 12 && Math.abs(p.y - it.y) < 30 : hyp(p.x - it.x, p.y - it.y) < it.d.r + 14));
+  const relocLeft = () => (S.reloc ? S.reloc.n - S.reloc.moved.size : 0);
+  function grabDevice(p) {
+    const rl = S.reloc, it = rl && devAt(p);
+    if (!it) return false;
+    if (!rl.moved.has(it) && relocLeft() <= 0) { float(it.x, it.y - solidR(it) - 22, '옮기기 끝', T.muted, 16); return false; }
+    S.devDrag = { it, x0: it.x, y0: it.y, ox: it.x - p.x, oy: it.y - p.y, ok: true };
+    it.pop = 1; sfx.grab();
+    return true;
+  }
+  function moveDevice(p) {
+    const d = S.devDrag;
+    d.it.x = clamp(p.x + d.ox, 0, W); d.it.y = clamp(p.y + d.oy, 0, H);
+    d.ok = devOk(d.it, d.it.x, d.it.y);
+  }
+  function dropDevice() {
+    const d = S.devDrag; S.devDrag = null;
+    if (d.ok && S.reloc && hyp(d.it.x - d.x0, d.it.y - d.y0) > 4) { S.reloc.moved.add(d.it); d.it.bx = d.it.x; d.it.pop = 1; burst(d.it.x, d.it.y, T.gold, 8); sfx.place(); }
+    else { d.it.x = d.x0; d.it.y = d.y0; if (!d.ok) sfx.dud(); }
+  }
+
   // ---------- 아이템 슬롯 (조준 중에만) ----------
   function renderSlots() {
     const box = $('#slots'); if (!box) return;
@@ -1785,7 +1831,12 @@ body { display: grid; place-items: center; }
     if (L < 4) return null;
     return { d: { x: dx / L, y: dy / L }, L };
   }
+  const heroCtl = () => HEROES[S.hero || 'hanato'].ctl;
+  const gaugeMax = () => HEROES[S.hero || 'hanato'].gauge;
+  const shotLen = () => heroCtl().shot;
+  const stormLen = () => BAL.storm.t + BAL.storm.up * up('storm');
   function shotSetup() {
+    S.reloc = null; S.devDrag = null;
     S.shot = blankShot();
     const sh = S.shot;
     S.enemies.forEach((e) => { e.burnShot = false; });
@@ -1807,7 +1858,7 @@ body { display: grid; place-items: center; }
     syncUI(true);
   }
   function trySkill() {
-    if (S.gauge < GAUGE_MAX || S.skill.active || !(S.phase === 'aim' || S.phase === 'shot')) return;
+    if (S.gauge < gaugeMax() || S.skill.active || S.focus || S.dash || !(S.phase === 'aim' || S.phase === 'shot')) return;
     S.gauge = 0; S.run.skillUses++;
     if (S.opts.cutin) { S.cutin = { t: 0, dur: reduceMotion ? 0.9 : 1.6, from: S.phase, lines: Array.from({ length: 34 }, () => ({ y: Math.random(), x: Math.random(), w: 60 + Math.random() * 220, s: 0.8 + Math.random() * 1.6 })) }; S.phase = 'cutin'; sfx.skill(); const h = $('#hero'); h.classList.remove('hero-cut'); void h.offsetWidth; h.classList.add('hero-cut'); setTimeout(() => h.classList.remove('hero-cut'), S.cutin.dur * 1000 + 200); }
     else startSkill(S.phase);
@@ -1817,7 +1868,7 @@ body { display: grid; place-items: center; }
     S.skill = { active: true, t: 0, hits: 0 };
     if (from === 'aim') shotSetup();
     const segs = []; let x = S.ball.x, y = S.ball.y, last = null;
-    for (let i = 0; i < BAL.iai + 5 * up('iai'); i++) {
+    for (let i = 0; i < BAL.iai.n + BAL.iai.up * up('iai'); i++) {
       const pool = targets().filter((e) => e !== last), t = pool.length ? pickOne(pool) : last;
       let a = Math.random() * Math.PI * 2, L = 320;
       if (t) { a = Math.atan2(t.y - y, t.x - x) + (Math.random() - 0.5) * 0.3; L = hyp(t.x - x, t.y - y) + 90 + Math.random() * 140; last = t; }
@@ -1855,8 +1906,8 @@ body { display: grid; place-items: center; }
     for (let i = 0; i < 5; i++) { const k = Math.random(); addPetal(sg.x1 + (sg.x2 - sg.x1) * k, sg.y1 + (sg.y2 - sg.y1) * k, true); }
     const sh = S.shot, w = { x1: sg.x1, y1: sg.y1, x2: sg.x2, y2: sg.y2 };
     for (const e of S.enemies.filter((o) => o.alive && !o.off && segDist(o.x, o.y, w) < o.r + 10)) {
-      const pw = sh.mul * (sh.weapon === 'sword' ? 1.5 : 1) * (sh.size > 0 ? 1.5 : 1);
-      if (damage(e, (atkNow() * 1.7 * Math.min(2.5, 1 + 0.03 * sh.combo) + sh.bonus) * pw) === false) continue;
+      const pw = sh.mul * (sh.size > 0 ? 1.5 : 1);
+      if (damage(e, (atkNow() * BAL.iai.mul * Math.min(2.5, 1 + 0.03 * sh.combo) + sh.bonus) * pw) === false) continue;
       sh.combo++; sh.hits++; S.skill.hits++; onCombo();
       e.squash = 1; e.flash = Math.max(e.flash, 0.12);
       sfx.hit(sh.combo);
@@ -1867,9 +1918,11 @@ body { display: grid; place-items: center; }
     const z = S.iai, last = z.segs[z.segs.length - 1];
     S.iai = null; S.skill.active = false;
     S.run.bestCombo = Math.max(S.run.bestCombo, S.shot.combo);
-    if (z.from === 'aim') { S.phase = 'shot'; endShot(); return; }
+    if (foes().length === 0) { S.phase = 'shot'; endShot(); return; }
+    // 조준 중에 썼으면 여기서 발이 시작된다 (난무 → 발사). 튕기던 중이면 남은 시간만큼 이어 간다
+    if (z.from === 'aim') { S.mine = []; S.trail = []; S.acc = 0; if (S.levels.oto > 0) charms(S.ball, S.levels.oto, 5 + 2 * S.levels.oto); sfx.launch(); }
     const dx = last.x2 - last.x1, dy = last.y2 - last.y1, L = hyp(dx, dy) || 1;
-    S.ball.vx = dx / L * BASE_SPEED; S.ball.vy = dy / L * BASE_SPEED; S.phase = 'shot';
+    S.ball.vx = dx / L * S.shot.base; S.ball.vy = dy / L * S.shot.base; S.phase = 'shot';
   }
   function drawIai() {
     const z = S.iai; if (!z) return;
@@ -1898,6 +1951,71 @@ body { display: grid; place-items: center; }
     float(S.ball.x, S.ball.y - 50, HEROES[S.hero || 'hanato'].skill, T.petal, 30);
     for (let i = 0; i < 40; i++) addPetal(Math.random() * W, -20 - Math.random() * 200);
   }
+  // ---------- 멈추기 · 대쉬 ----------
+  // 튕기는 중 Shift (또는 판을 누르고 있기): 강한 슬로우, 화면이 어두워지고 공과 적의 공격 범위만 보인다. 공에서 커서까지 화살표.
+  // 떼면 그 방향으로 짧게 대쉬하고 멈춘다. 남은 초와 상관없이 그 발은 끝난다. 대쉬는 자리만 옮긴다 (때리지 않는다).
+  // 누르고 있을 수 있는 시간은 FOCUS.max초. 넘기면 그때 방향으로 대쉬한다
+  const canFocus = () => S.phase === 'shot' && !S.focus && !S.dash && !menuOpen();
+  function startFocus(src) {
+    if (!canFocus()) return;
+    S.focus = { t: 0, src };
+    sfx.focus();
+    $('#app').classList.add('focus');
+  }
+  const solidR = (o) => (o.d ? (o.d.type === 'spin' ? o.d.w / 2 : o.d.r) : o.r);
+  function dashFree(x, y) {
+    const r = S.ball.r;
+    if (x < r || x > W - r || y < r || y > H - r) return false;
+    if (S.walls.some((w) => segDist(x, y, w) < r + w.t)) return false;
+    const solid = [...onField(), ...(S.ally ? [S.ally] : []), ...S.pads, ...S.crates.filter((c) => !c.dead), ...S.board.filter((it) => !it.dead && (it.d.type === 'bump' || it.d.type === 'bomb'))];
+    return solid.every((o) => hyp(o.x - x, o.y - y) >= solidR(o) + r);
+  }
+  // 대쉬가 닿는 자리: 커서 방향으로 대쉬 거리까지, 막히면 그 앞에서 멈춘다
+  function dashPlan() {
+    const b = S.ball, m = S.mouse || { x: b.x, y: b.y };
+    const L = hyp(m.x - b.x, m.y - b.y);
+    if (L < 6) return { x: b.x, y: b.y, d: 0, L: 0, ux: 0, uy: 0, mx: m.x, my: m.y };
+    const ux = (m.x - b.x) / L, uy = (m.y - b.y) / L, max = Math.min(L, heroCtl().dash);
+    let d = 0;
+    for (let s = 4; s <= max; s += 4) { if (!dashFree(b.x + ux * s, b.y + uy * s)) break; d = s; }
+    return { x: b.x + ux * d, y: b.y + uy * d, d, L, ux, uy, mx: m.x, my: m.y };
+  }
+  function releaseFocus() {
+    if (!S.focus) return;
+    S.focus = null; $('#app').classList.remove('focus');
+    if (S.phase !== 'shot') return;
+    const p = dashPlan(), b = S.ball;
+    S.dash = { x0: b.x, y0: b.y, x1: p.x, y1: p.y, t: 0 };
+    b.vx = 0; b.vy = 0;
+    if (p.d > 0) { b.nx = -p.ux; b.ny = -p.uy; b.sq = 1; sfx.dash(); }
+  }
+  function stepDash(dt) {
+    const d = S.dash, b = S.ball;
+    d.t += dt;
+    const k = easeOut(d.t / FOCUS.dashT);
+    b.x = d.x0 + (d.x1 - d.x0) * k; b.y = d.y0 + (d.y1 - d.y0) * k;
+    S.trail.push({ x: b.x, y: b.y }); if (S.trail.length > 18) S.trail.shift();
+    if (d.t < FOCUS.dashT) return;
+    if (hyp(d.x1 - d.x0, d.y1 - d.y0) > 1) burst(b.x, b.y, T.panel, 10);
+    float(b.x, b.y - 52, '멈춤', T.ink, 20, true);
+    endShot();
+  }
+  // 적이 다음 차례에 하는 공격이 이 자리에 닿는가 (범위 · 씨앗 비 · 막히지 않은 투사체)
+  function threatsAt(x, y) {
+    const r = S.ball.r, out = [];
+    for (const e of alive()) {
+      const it = e.intent; if (!it) continue;
+      for (const s of sourcesOf(e, it)) {
+        if ((it.t === 'area' || (it.t === 'charge' && it.n <= 1)) && hyp(x - s.x, y - s.y) < it.R + r * 0.5) out.push(s);
+        if (it.t === 'shot' || it.t === 'fan') {
+          const a = Math.atan2(y - s.y, x - s.x), x0 = s.x + Math.cos(a) * (s.r + 8), y0 = s.y + Math.sin(a) * (s.r + 8);
+          if (rayBlock(x0, y0, a, Math.max(0, hyp(x - x0, y - y0) - r)) < 0) out.push(s);
+        }
+      }
+      if (it.t === 'rain') for (const m of e.marks || []) if (hyp(x - m.x, y - m.y) < it.R + r * 0.5) out.push(m);
+    }
+    return out;
+  }
   function endSkill() {
     S.skill.active = false;
     S.fx.shake = Math.min(20, S.fx.shake + 8);
@@ -1907,20 +2025,21 @@ body { display: grid; place-items: center; }
   // ---------- 물리 ----------
   function physStep(dt) {
     const b = S.ball, sh = S.shot, sk = S.skill;
-    sh.t += dt; sh.sinceHit += dt;
+    if (!S.focus) sh.t += dt;
+    sh.sinceHit += dt;
     for (const e of S.enemies) {
       e.cd = Math.max(0, e.cd - dt);
       if (e.strikes > 0) { e.strikeT -= dt; if (e.strikeT <= 0) { e.strikes--; e.strikeT = 0.045; strike(e, false); } }
       else if (e.tpPend && e.alive) { e.tpPend = false; teleport(e); }
     }
-    if (sk.active) { sk.t += dt; if (sk.t >= (S.hero === 'rito' ? 4 + up('storm') : SKILL_T)) endSkill(); }
-    const keep = sh.t < BOUNCE_T + sh.bonusT || sk.active;
-    const sp = hyp(b.vx, b.vy);
-    const base = sh.base * (sk.active ? 1.35 : 1) * (sh.slowT > 0 ? 0.32 : 1);
-    const ns = keep ? (sh.slowT > 0 ? Math.min(sp, base) : sp > base ? Math.max(base, sp - 520 * dt) : base) : Math.max(0, sp - DECEL * dt);
+    if (sk.active) { sk.t += dt; if (sk.t >= stormLen()) endSkill(); }
+    // 한 발 시간 동안 같은 빠르기로 튕긴다. 끝나기 직전 FOCUS.brake초 동안만 줄어든다 (스킬 중에는 줄지 않는다)
+    const sp = hyp(b.vx, b.vy), brake = sk.active ? 1 : clamp((shotLen() - sh.t) / FOCUS.brake, 0.3, 1);
+    const base = sh.base * (sk.active ? 1.35 : 1) * (sh.slowT > 0 ? 0.32 : 1) * brake;
+    const ns = sh.slowT > 0 || brake < 1 ? Math.min(sp, base) : sp > base ? Math.max(base, sp - 520 * dt) : base;
     if (sp > 0) { b.vx *= ns / sp; b.vy *= ns / sp; }
-    if (keep && S.hero !== 'rito' && (sk.active || sh.sinceHit > 0.25)) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
-    if (keep && S.hero === 'rito') {
+    if (S.hero !== 'rito' && (sk.active || sh.sinceHit > 0.25)) steer(b, sk.active ? 6 : 3.8 * (1 + 0.3 * up('homing')), dt);
+    if (S.hero === 'rito') {
       sh.fireT = (sh.fireT || 0) - dt;
       if (sh.fireT <= 0) { if (sk.active) { sh.fireT = BAL.storm.every; ritoVolley(); } else { sh.fireT = 0.3 * Math.pow(0.8, up('rate')); ritoShot(); } }
     }
@@ -1977,7 +2096,7 @@ body { display: grid; place-items: center; }
     S.trailT = (S.trailT || 0) + dt;
     if (S.trailT > 0.018) { S.trailT = 0; S.trail.push({ x: b.x, y: b.y }); if (S.trail.length > 18) S.trail.shift(); if (sk.active && Math.random() < 0.6) addPetal(b.x, b.y, true); if (sh.fire) S.fx.particles.push({ x: b.x + (Math.random() - 0.5) * b.r, y: b.y + (Math.random() - 0.5) * b.r, vx: (Math.random() - 0.5) * 60, vy: -80 - Math.random() * 80, life: 0.4, color: T.dash, r: 3 + Math.random() * 3 }); }
     if (foes().length === 0) { endShot(); return; }
-    if ((!keep && ns < 20) || sh.t > 16) endShot();
+    if (!sk.active && !S.focus && sh.t >= shotLen()) endShot();
   }
   function wallHit(nx, ny) { const b = S.ball; b.sq = 1; b.nx = nx; b.ny = ny; sfx.wall(); }
   function charmShot(a, sp, bounces, skill, from) {
@@ -2048,13 +2167,13 @@ body { display: grid; place-items: center; }
   function charmHit(e, m) {
     const sh = S.shot, sk = S.skill;
     let mul = (m.skill ? BAL.storm.dmg : m.ally ? 0.45 : 0.6) * Math.min(2.5, 1 + 0.03 * sh.combo) * m.mul; if (m.skill) sk.hits++;
-    const pw = sh.mul * (sh.weapon === 'sword' ? 1.5 : 1) * (sh.size > 0 ? 1.5 : sh.size < 0 ? 0.7 : 1) * (sh.gateT > 0 ? 1.3 : 1);
+    const pw = sh.mul * (sh.size > 0 ? 1.5 : 1) * (sh.gateT > 0 ? 1.3 : 1);
     if (damage(e, (atkNow() * mul + sh.bonus) * pw) === false) return;
     sh.combo++; sh.hits++; sh.sinceHit = 0; onCombo();
     if (sh.combo === 20 && S.levels.ryuto > 0 && !sh.trained) { sh.trained = true; trainingStrike(); }
     const ms = [10, 25, 50, 100, 150].indexOf(sh.combo);
     if (ms >= 0) { sfx.milestone(ms); S.fx.flash = 0.22; (S.fx.rings ||= []).push({ x: S.ball.x, y: S.ball.y, R: 90 + ms * 30, life: 0.4, color: ms >= 2 ? T.petal : T.gold }); }
-    if (!sk.active) S.gauge = Math.min(GAUGE_MAX, S.gauge + 1);
+    if (!sk.active) S.gauge = Math.min(gaugeMax(), S.gauge + 1);
     e.squash = Math.max(e.squash, 0.6);
     S.fx.comboPop = 1; S.fx.comboShow = 1.2; S.fx.hitstop = Math.min(0.05, S.fx.hitstop + 0.012);
     burst(m.x, m.y, T.danger, 6); sfx.hit(sh.combo);
@@ -2090,11 +2209,6 @@ body { display: grid; place-items: center; }
       else sfx.crack();
     }
     if (e.trait === 'blink' && !(e.tpCD > 0)) e.tpPend = true;
-    if (sh.weapon === 'shuriken') k += 1;
-    if (sh.weapon === 'hammer' && !e.gimmick) {
-      if (e.shield > 0) { e.shield = 0; float(e.x, e.y - e.r - 40, '방어 파괴', T.guard, 20, true); sfx.shatter(); }
-      if (e.trait === 'bark' && e.cracks < 3) { e.cracks = 3; sfx.shatter(); burst(e.x, e.y, T.foe, 26); float(e.x, e.y - e.r - 60, '껍질 깨짐', T.gold, 24, true); }
-    }
     sfx.squish();
     const ang = Math.atan2(S.ball.y - e.y, S.ball.x - e.x);
     (S.fx.rings ||= []).push({ x: e.x + Math.cos(ang) * e.r, y: e.y + Math.sin(ang) * e.r, R: 22, life: 0.25, color: T.gold });
@@ -2109,14 +2223,14 @@ body { display: grid; place-items: center; }
     const sh = S.shot, sk = S.skill;
     let mul = 0.5 * Math.min(2.5, 1 + 0.03 * sh.combo) * e.strikeMul;
     if (sk.active) { mul *= BAL.storm.mul; sk.hits++; for (let i = 0; i < 3; i++) addPetal(e.x, e.y, true); }
-    const pw = sh.mul * (sh.weapon === 'sword' ? 1.5 : 1) * (sh.size > 0 ? 1.5 : sh.size < 0 ? 0.7 : 1) * (sh.gateT > 0 ? 1.3 : 1);
+    const pw = sh.mul * (sh.size > 0 ? 1.5 : 1) * (sh.gateT > 0 ? 1.3 : 1);
     if (damage(e, (atkNow() * mul + sh.bonus) * pw) === false) { e.strikes = 0; return; }
     if (sh.fire && !e.gimmick && !e.off && !e.burnShot) { e.burnShot = true; e.burn = Math.max(e.burn || 0, 4 + Math.floor(sh.combo / 10)); e.burnT = 3; float(e.x + e.r, e.y - e.r, '화상', T.dash, 16); }
     sh.combo++; sh.hits++; onCombo();
     if (sh.combo === 20 && S.levels.ryuto > 0 && !sh.trained) { sh.trained = true; trainingStrike(); }
     const ms = [10, 25, 50, 100, 150].indexOf(sh.combo);
     if (ms >= 0) { sfx.milestone(ms); S.fx.flash = 0.22; (S.fx.rings ||= []).push({ x: S.ball.x, y: S.ball.y, R: 90 + ms * 30, life: 0.4, color: ms >= 2 ? T.petal : T.gold }); }
-    if (!sk.active) S.gauge = Math.min(GAUGE_MAX, S.gauge + 1);
+    if (!sk.active) S.gauge = Math.min(gaugeMax(), S.gauge + 1);
     e.squash = Math.max(e.squash, 0.7);
     S.fx.hitstop = Math.min(0.07, S.fx.hitstop + (first ? 0.03 : 0.012));
     S.fx.comboPop = 1; S.fx.comboShow = 1.2;
@@ -2198,7 +2312,7 @@ body { display: grid; place-items: center; }
     if (e.sealed) amount *= 1 + e.sealed;
     const amt = Math.max(1, Math.round(amount));
     let rest = amt;
-    if (e.shield > 0 && !(S.phase === 'shot' && S.shot.weapon === 'shuriken')) { const s = Math.min(e.shield, rest); e.shield -= s; rest -= s; }
+    if (e.shield > 0) { const s = Math.min(e.shield, rest); e.shield -= s; rest -= s; }
     e.hp = Math.max(0, e.hp - rest);
     e.ghostT = 0.3; e.flash = 0.12;
     S.shot.dealt += amt; S.run.dealt += amt;
@@ -2225,6 +2339,7 @@ body { display: grid; place-items: center; }
   }
   function endShot() {
     const sh = S.shot;
+    S.focus = null; S.dash = null; $('#app').classList.remove('focus');
     if (S.skill.active) S.skill.active = false;
     S.ball.vx = 0; S.ball.vy = 0;
     S.ball.x = clamp(S.ball.x, 40, W - 40); S.ball.y = clamp(S.ball.y, 40, H - 40);
@@ -2403,6 +2518,7 @@ body { display: grid; place-items: center; }
   // ---------- 매 프레임 ----------
   function update(dt) {
     const fx = S.fx;
+    if (S.focus) { S.focus.t += dt; if (S.focus.t >= FOCUS.max || S.phase !== 'shot') releaseFocus(); else dt *= FOCUS.slow; }
     S.main.flash = Math.max(0, S.main.flash - dt);
     fx.shake = Math.max(0, fx.shake - dt * 60);
     fx.comboPop = Math.max(0, fx.comboPop - dt * 5);
@@ -2452,6 +2568,7 @@ body { display: grid; place-items: center; }
     }
     if (S.phase === 'iai') { stepIai(dt); return; }
     if (S.phase === 'shot') {
+      if (S.dash) { stepDash(dt); return; }
       if (fx.hitstop > 0) { fx.hitstop -= dt; return; }
       S.acc = (S.acc || 0) + dt;
       while (S.acc >= DT && S.phase === 'shot') { physStep(DT); S.acc -= DT; }
@@ -2484,7 +2601,7 @@ body { display: grid; place-items: center; }
       drawPaw();
       S.enemies.forEach(drawFoeUI);
       drawAttacks();
-      drawGates(); drawIai(); drawCuts(); drawTrail(); drawMine(); drawBallPulled(); drawEmote(); drawAim(); drawDrag(); drawFx(); drawPower();
+      drawGates(); drawIai(); drawCuts(); drawTrail(); drawMine(); drawBallPulled(); drawEmote(); drawReloc(); drawAim(); drawDrag(); drawFx(); drawPower(); drawFocus();
     } else { if (S.phase === 'story') drawStoryBg(); drawFx(); }
     if (fx.flash > 0 && !reduceMotion) { ctx.fillStyle = T.panel; ctx.globalAlpha = fx.flash * 1.4; ctx.fillRect(-30, -30, W + 60, H + 60); ctx.globalAlpha = 1; }
     drawBanner();
@@ -2494,9 +2611,89 @@ body { display: grid; place-items: center; }
   function drawTimer() {
     if (S.phase !== 'shot') return;
     const sk = S.skill, sh = S.shot;
-    const k = sk.active ? clamp(1 - sk.t / (S.hero === 'rito' ? 4 + up('storm') : SKILL_T), 0, 1) : clamp(1 - sh.t / (BOUNCE_T + sh.bonusT), 0, 1);
+    const k = sk.active ? clamp(1 - sk.t / stormLen(), 0, 1) : clamp(1 - sh.t / shotLen(), 0, 1);
     ctx.fillStyle = T.mat1; ctx.globalAlpha = 0.6; ctx.fillRect(0, 0, W, 8);
     ctx.globalAlpha = 1; ctx.fillStyle = sk.active ? T.petal : T.gold; ctx.fillRect(0, 0, W * k, 8);
+    // 남은 초: 띠 끝에 붙는 숫자
+    const left = sk.active ? stormLen() - sk.t : shotLen() - sh.t;
+    ctx.font = `20px ${FONT_NUM}`; ctx.fillStyle = sk.active ? T.petal : T.gold;
+    strokeFill(`${Math.max(0, left).toFixed(1)}초`, clamp(W * k, 34, W - 34), 24);
+  }
+  // 판 위 쪽지: 크림 종이 + 납작한 그림자
+  function note(x, y, text, col) {
+    ctx.font = `700 17px ${FONT_BODY}`;
+    const w = ctx.measureText(text).width + 32, h = 34;
+    ctx.fillStyle = T.mat1; ctx.fillRect(x - w / 2 + 4, y - h / 2 + 4, w, h);
+    ctx.fillStyle = col || T.bubble; ctx.fillRect(x - w / 2, y - h / 2, w, h);
+    ctx.fillStyle = T['ink-dark']; ctx.fillText(text, x, y + 1);
+  }
+  // 첫 발 전: 옮길 수 있는 장치에 점선 고리, 끄는 동안 놓을 수 있는지 색으로
+  function drawReloc() {
+    const rl = S.reloc; if (!rl || S.phase !== 'aim') return;
+    const t = performance.now() / 1000, open = relocLeft() > 0;
+    for (const it of S.board) {
+      if (!it.dev || it.dead || !(open || rl.moved.has(it))) continue;
+      ctx.strokeStyle = rl.moved.has(it) ? T.keep : T.gold; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.9;
+      ctx.setLineDash([6, 6]); ctx.lineDashOffset = -t * 16; circle(it.x, it.y, solidR(it) + 11 + Math.sin(t * 4) * 2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+    const d = S.devDrag;
+    if (d) {
+      const r = solidR(d.it) + 8, col = d.ok ? T.gold : T.danger;
+      ctx.strokeStyle = T.muted; ctx.globalAlpha = 0.6; ctx.lineWidth = 2; ctx.setLineDash([3, 6]); circle(d.x0, d.y0, r); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = col; ctx.globalAlpha = 0.18; circle(d.it.x, d.it.y, r); ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 3; circle(d.it.x, d.it.y, r); ctx.stroke();
+    }
+    note(W / 2, 30, `장치 옮기기 ${relocLeft()}/${rl.n} · 첫 발 전에 끌어서 옮긴다`);
+  }
+  // 멈춤 (Shift): 판을 어둡게 덮고 적 공격 범위 · 공 · 대쉬 화살표만 밝게
+  function drawFocus() {
+    const f = S.focus; if (!f) return;
+    const b = S.ball, p = dashPlan(), t = performance.now() / 1000;
+    ctx.fillStyle = T.mat1; ctx.globalAlpha = 0.68; ctx.fillRect(-30, -30, W + 60, H + 60); ctx.globalAlpha = 1;
+    for (const e of alive()) {
+      const it = e.intent; if (!it) continue;
+      for (const s of sourcesOf(e, it)) {
+        if (it.t === 'area' || (it.t === 'charge' && it.n <= 1)) {
+          const col = it.t === 'charge' ? T.gold : T.danger;
+          ctx.fillStyle = col; ctx.globalAlpha = 0.2; circle(s.x, s.y, it.R); ctx.fill();
+          ctx.globalAlpha = 0.95; ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.setLineDash([10, 8]); ctx.lineDashOffset = -t * 20; ctx.stroke(); ctx.setLineDash([]);
+        } else if (it.t === 'shot' || it.t === 'fan') {
+          const a = Math.atan2(p.y - s.y, p.x - s.x), x0 = s.x + Math.cos(a) * (s.r + 8), y0 = s.y + Math.sin(a) * (s.r + 8);
+          let len = Math.max(0, hyp(p.x - x0, p.y - y0) - b.r);
+          const blk = rayBlock(x0, y0, a, len); if (blk >= 0) len = blk;
+          ctx.strokeStyle = T.danger; ctx.globalAlpha = 0.95; ctx.lineWidth = 3; ctx.setLineDash([6, 8]);
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + Math.cos(a) * len, y0 + Math.sin(a) * len); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle = T.danger; circle(s.x, s.y, 7); ctx.fill();
+          if (blk >= 0) { const bx = x0 + Math.cos(a) * len, by = y0 + Math.sin(a) * len; ctx.strokeStyle = T.muted; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(bx - 8, by - 8); ctx.lineTo(bx + 8, by + 8); ctx.moveTo(bx + 8, by - 8); ctx.lineTo(bx - 8, by + 8); ctx.stroke(); }
+        }
+      }
+      if (it.t === 'rain') for (const m of e.marks || []) {
+        ctx.fillStyle = T.danger; ctx.globalAlpha = 0.2; circle(m.x, m.y, it.R); ctx.fill();
+        ctx.globalAlpha = 0.95; ctx.strokeStyle = T.danger; ctx.lineWidth = 3; ctx.setLineDash([6, 6]); ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+    ctx.globalAlpha = 1;
+    // 화살표: 공 → 대쉬가 닿는 자리는 굵게, 그 뒤 커서까지는 점선
+    const hit = threatsAt(p.x, p.y).length > 0, col = hit ? T.danger : T.keep;
+    ctx.lineCap = 'round';
+    if (p.L > p.d + 2) { ctx.strokeStyle = T.ink; ctx.globalAlpha = 0.5; ctx.lineWidth = 2; ctx.setLineDash([4, 8]); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.mx, p.my); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
+    if (p.d > 4) {
+      const ex = p.x - p.ux * 14, ey = p.y - p.uy * 14;
+      ctx.strokeStyle = T.mat1; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(b.x + 3, b.y + 4); ctx.lineTo(ex + 3, ey + 4); ctx.stroke();
+      ctx.strokeStyle = T.gold; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.atan2(p.uy, p.ux)); ctx.fillStyle = T.gold;
+      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-16, -15); ctx.lineTo(-16, 15); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    // 멈출 자리: 다음 적 차례에 맞는 자리면 빨강, 아니면 초록
+    ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.setLineDash([7, 6]); circle(p.x, p.y, b.r + 6); ctx.stroke(); ctx.setLineDash([]);
+    drawBall();
+    ctx.strokeStyle = T.panel; ctx.globalAlpha = 0.8; ctx.lineWidth = 2; circle(b.x, b.y, b.r + 9); ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.font = `700 16px ${FONT_BODY}`; ctx.fillStyle = col; strokeFill(hit ? '맞는 자리' : '피하는 자리', p.x, p.y + b.r + 24);
+    // 위 쪽지 + 남은 멈춤 시간
+    const k = clamp(1 - f.t / FOCUS.max, 0, 1);
+    note(W / 2, 34, f.src === 'key' ? '멈춤! 방향을 고르고 Shift를 뗀다' : '멈춤! 방향을 고르고 손을 뗀다');
+    ctx.fillStyle = T.mat1; ctx.fillRect(W / 2 - 120, 56, 240, 6); ctx.fillStyle = T.gold; ctx.fillRect(W / 2 - 120, 56, 240 * k, 6);
   }
   function drawAlly() {
     const a = S.ally; if (!a || a.x < 0) return;
@@ -2871,12 +3068,7 @@ body { display: grid; place-items: center; }
     for (const it of S.board || []) {
       const d = it.d, pop = 1 + it.pop * 0.25;
       ctx.save(); ctx.translate(it.x, it.y);
-      if (d.type === 'field') {
-        const col = T.finale;
-        ctx.fillStyle = col; ctx.globalAlpha = 0.16 + it.pop * 0.2; rr(-d.w / 2, -d.h / 2, d.w, d.h, 12); ctx.fill();
-        ctx.globalAlpha = 0.8; ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.setLineDash(d.bad ? [6, 5] : []); ctx.stroke(); ctx.setLineDash([]);
-        ctx.globalAlpha = 1; ctx.fillStyle = col; ctx.font = `${d.weapon ? 22 : 17}px ${FONT_DISPLAY}`; ctx.fillText(d.short, 0, 1);
-      } else if (d.type === 'spin') {
+      if (d.type === 'spin') {
         ctx.rotate(Math.sin(it.t * 0.5) * 0.05);
         const sx = Math.cos(t * (2 + it.spin));
         ctx.fillStyle = T.gold; ctx.globalAlpha = 0.25; rr(-d.w / 2 - 4, -12, d.w + 8, 24, 8); ctx.fill(); ctx.globalAlpha = 1;
@@ -2991,7 +3183,6 @@ body { display: grid; place-items: center; }
     const sh = S.shot, tags = [];
     if (sh.bonus) tags.push(['+' + sh.bonus, T.multi]);
     if (sh.mul !== 1) tags.push(['×' + (Math.round(sh.mul * 100) / 100), sh.mul < 1 ? T.danger : T.gold]);
-    if (sh.weapon) tags.push([BOARD[sh.weapon].short, T.finale]);
     if (sh.fire) tags.push(['불', T.dash]);
     if (sh.size) tags.push([sh.size > 0 ? '거대' : '꼬마', sh.size > 0 ? T.petal : T.danger]);
     if (!tags.length) return;
@@ -3113,14 +3304,6 @@ body { display: grid; place-items: center; }
     if (S.main.shield > 0) { ctx.strokeStyle = T.guard; ctx.lineWidth = 3; ctx.globalAlpha = 0.8; circle(b.x, b.y, r + 10); ctx.stroke(); ctx.globalAlpha = 1; }
     const sh = S.shot;
     if (S.phase === 'shot' && sh.fire) { ctx.strokeStyle = T.dash; ctx.lineWidth = 3; ctx.globalAlpha = 0.6 + 0.3 * Math.sin(performance.now() / 60); circle(b.x, b.y, r + 4); ctx.stroke(); ctx.globalAlpha = 1; }
-    if (S.phase === 'shot' && sh.weapon) {
-      const a = performance.now() / 1000 * 7, x = b.x + Math.cos(a) * (r + 14), y = b.y + Math.sin(a) * (r + 14);
-      ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2); ctx.fillStyle = T.finale; ctx.strokeStyle = T.finale; ctx.lineWidth = 3; ctx.lineCap = 'round';
-      if (sh.weapon === 'sword') { ctx.beginPath(); ctx.moveTo(0, -13); ctx.lineTo(0, 8); ctx.moveTo(-6, 4); ctx.lineTo(6, 4); ctx.stroke(); }
-      else if (sh.weapon === 'shuriken') { ctx.rotate(a * 2); ctx.beginPath(); for (let i = 0; i < 8; i++) { const an = i * Math.PI / 4, q = i % 2 ? 3 : 10; ctx.lineTo(Math.cos(an) * q, Math.sin(an) * q); } ctx.closePath(); ctx.fill(); }
-      else { ctx.beginPath(); ctx.moveTo(0, 10); ctx.lineTo(0, -4); ctx.stroke(); rr(-8, -12, 16, 8, 2); ctx.fill(); }
-      ctx.restore();
-    }
   }
   function drawAim() {
     if (S.phase !== 'aim') return;
@@ -3307,18 +3490,28 @@ body { display: grid; place-items: center; }
   function toLocal(ev) { const r = canvas.getBoundingClientRect(); return { x: (ev.clientX - r.left) * W / r.width, y: (ev.clientY - r.top) * H / r.height }; }
   canvas.addEventListener('pointerdown', (ev) => {
     audio();
-    if (S.phase !== 'aim' || ev.button > 0) return;
+    if (ev.button > 0) return;
+    const p = toLocal(ev); S.mouse = p;
+    if (S.phase === 'shot') { if (canFocus()) { ev.preventDefault(); canvas.setPointerCapture(ev.pointerId); startFocus('ptr'); } return; }
+    if (S.phase !== 'aim') return;
     ev.preventDefault(); canvas.setPointerCapture(ev.pointerId);
-    const p = toLocal(ev); S.aim = { sx: p.x, sy: p.y, cx: p.x, cy: p.y }; sfx.grab();
+    if (grabDevice(p)) return;
+    S.aim = { sx: p.x, sy: p.y, cx: p.x, cy: p.y }; sfx.grab();
   });
   canvas.addEventListener('pointermove', (ev) => {
+    if (S.devDrag) { moveDevice(toLocal(ev)); return; }
     if (!S.aim) return;
     const p = toLocal(ev); S.aim.cx = p.x; S.aim.cy = p.y;
     const info = aimInfo(), n = info ? Math.floor(info.L / 16) : 0;
     if (n !== (S.aim.n || 0)) { S.aim.n = n; sfx.tick(n); }
   });
-  canvas.addEventListener('pointerup', () => { if (!S.aim) return; const info = aimInfo(); S.aim = null; if (info && info.L >= 14 && S.phase === 'aim') { if (S.paw && S.paw.show > 0.2) { S.paw.snap = 0; sfx.snap(); } fire(info.d); } });
-  canvas.addEventListener('pointercancel', () => { S.aim = null; });
+  canvas.addEventListener('pointerup', () => { if (S.focus && S.focus.src === 'ptr') { releaseFocus(); return; } if (S.devDrag) { dropDevice(); return; } if (!S.aim) return; const info = aimInfo(); S.aim = null; if (info && info.L >= 14 && S.phase === 'aim') { if (S.paw && S.paw.show > 0.2) { S.paw.snap = 0; sfx.snap(); } fire(info.d); } });
+  canvas.addEventListener('pointercancel', () => { S.aim = null; if (S.devDrag) { S.devDrag.ok = false; dropDevice(); } if (S.focus && S.focus.src === 'ptr') releaseFocus(); });
+  // 커서 자리 (멈춤 화살표)
+  document.addEventListener('pointermove', (ev) => { const p = toLocal(ev); S.mouse = { x: clamp(p.x, 0, W), y: clamp(p.y, 0, H) }; });
+  document.addEventListener('keydown', (ev) => { if (ev.key !== 'Shift' || ev.repeat || !canFocus()) return; ev.preventDefault(); startFocus('key'); });
+  document.addEventListener('keyup', (ev) => { if (ev.key === 'Shift' && S.focus && S.focus.src === 'key') releaseFocus(); });
+  window.addEventListener('blur', () => { if (S.focus) releaseFocus(); });
   document.addEventListener('keydown', (ev) => {
     if (ev.code !== 'Space' || ev.repeat) return;
     const tag = document.activeElement && document.activeElement.tagName;
@@ -3393,10 +3586,10 @@ body { display: grid; place-items: center; }
     $('#hpText').textContent = `${m.hp}/${m.maxHp}`;
     $('#shieldText').textContent = m.shield > 0 ? `보호막 ${m.shield}` : '';
     $('#hpBar').closest('.bar').style.setProperty('--v', (m.hp / m.maxHp * 100).toFixed(1));
-    const gp = S.skill.active ? 100 : S.gauge / GAUGE_MAX * 100;
-    $('#gaugeText').textContent = S.skill.active ? '발동!' : `${S.gauge}/${GAUGE_MAX}`;
+    const gp = S.skill.active ? 100 : S.gauge / gaugeMax() * 100;
+    $('#gaugeText').textContent = S.skill.active ? '발동!' : `${S.gauge}/${gaugeMax()}`;
     $('#gaugeBar').closest('.bar').style.setProperty('--v', gp.toFixed(1));
-    const ready = S.gauge >= GAUGE_MAX && !S.skill.active && (S.phase === 'aim' || S.phase === 'shot');
+    const ready = S.gauge >= gaugeMax() && !S.skill.active && (S.phase === 'aim' || S.phase === 'shot');
     const btn = $('#skillBtn');
     btn.disabled = !ready; btn.classList.toggle('ready', ready); btn.classList.toggle('active', S.skill.active || S.phase === 'cutin' || S.phase === 'iai');
     btn.style.setProperty('--p', gp.toFixed(1) + '%');
@@ -3453,7 +3646,15 @@ body { display: grid; place-items: center; }
     state: S,
     click(id) { const b = document.getElementById(id); if (b) { b.click(); return true; } return false; },
     shoot(deg) { if (S.phase !== 'aim') return false; const a = deg * Math.PI / 180; fire({ x: Math.cos(a), y: -Math.sin(a) }); return true; },
-    fillGauge() { S.gauge = GAUGE_MAX; syncUI(true); },
+    fillGauge() { S.gauge = gaugeMax(); syncUI(true); },
+    get gaugeMax() { return gaugeMax(); },
+    get ctl() { return heroCtl(); },
+    threats(x, y) { return threatsAt(x, y).length; },
+    aimDash(x, y) { S.mouse = { x, y }; const p = dashPlan(); return { x: p.x, y: p.y, n: threatsAt(p.x, p.y).length }; },
+    focus(x, y) { if (!canFocus()) return false; S.mouse = { x, y }; startFocus('key'); return true; },
+    release() { if (!S.focus) return false; releaseFocus(); return true; },
+    devs() { return S.board.filter((it) => it.dev && !it.dead).map((it) => ({ k: it.k, x: it.x, y: it.y })); },
+    moveDev(i, x, y) { const it = S.board.filter((o) => o.dev && !o.dead)[i], rl = S.reloc; if (!it || !rl || S.phase !== 'aim' || (!rl.moved.has(it) && relocLeft() <= 0) || !devOk(it, x, y)) return false; it.x = x; it.y = y; it.bx = x; rl.moved.add(it); return true; },
     skill: trySkill,
     place(i, x, y) { const k = S.held[i]; if (S.phase !== 'aim' || !k || ITEMS[k].use || !placeOk(k, x, y)) return false; placeItem(i, x, y); return true; },
     view() { return $('#app').dataset.view; },
