@@ -1,0 +1,40 @@
+// 2챕터 시험: node tools/ch2_test.mjs <index.html> <폴더>
+import { createRequire } from 'module';
+const require = createRequire('/opt/node22/lib/node_modules/');
+const { chromium } = require('playwright');
+const [file, out] = process.argv.slice(2);
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+const errors = [];
+page.on('pageerror', (e) => errors.push(e.message));
+page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+await page.addInitScript(() => { try { localStorage.setItem('furryup-persona', JSON.stringify({ name: '시험', race: 'rabbit', color: 0, size: '소형', suggested: 'rabbit', custom: false })); } catch (e) {} });
+await page.goto('file://' + file);
+await page.waitForTimeout(600);
+const ev = (f, a) => page.evaluate(f, a);
+const log = {};
+await ev(() => window.furryV3.screen('chapter', 'hanato')); await page.waitForTimeout(300);
+await ev(() => document.querySelector('.lob-ch[data-ch="2"]').click()); await page.waitForTimeout(300);
+log.lockedSel = await ev(() => window.furryV3.state.chSel);
+await ev(() => { window.furryV3.meta().stat.clears = 1; window.furryV3.screen('chapter', 'hanato'); }); await page.waitForTimeout(300);
+await ev(() => document.querySelector('.lob-ch[data-ch="2"]').click()); await page.waitForTimeout(2200);
+log.sel = await ev(() => ({ sel: window.furryV3.state.chSel, h3: document.querySelector('.lob-det h3').textContent }));
+await page.screenshot({ path: `${out}/ch2_select.png` });
+await ev(() => document.getElementById('chGo').click()); await page.waitForTimeout(400);
+log.setup = await ev(() => ({ ph: window.furryV3.state.phase, title: document.querySelector('.og-title').textContent }));
+await ev(() => document.getElementById('suGo').click()); await page.waitForTimeout(400);
+log.run = await ev(() => ({ ch: window.furryV3.state.ch, save: window.furryV3.runSave().ch }));
+// 몬스터 세기 견주기: 1장 · 2장 첫 전투, 중간 보스
+const hpOf = async (ch, node) => ev(([ch, node]) => { const F = window.furryV3; F.quickCh('hanato', ch); F.jump(node); F.skip(); return F.state.enemies.map((e) => `${e.key}:${e.maxHp}`).join(' '); }, [ch, node]);
+log.b1 = await hpOf(1, 1); log.b2 = await hpOf(2, 1);
+log.m1 = await hpOf(1, 7); log.m2 = await hpOf(2, 7);
+await page.screenshot({ path: `${out}/ch2_mid.png` });
+// 2장 클리어 → 기록 · 보상 · 티어 3
+const j0 = await ev(() => window.furryV3.meta().jelly);
+log.clear = await ev(() => { const F = window.furryV3; F.quickCh('hanato', 2); F.finish(true); const M = F.meta(); return { clears2: M.stat.clears2, best2: M.rec.hanato.ch2.best, best1: M.rec.hanato.best }; });
+log.jellyGain = (await ev(() => window.furryV3.meta().jelly)) - j0;
+await ev(() => { const M = window.furryV3.meta(); M.medal = 100; M.tree.tier = 2; window.furryV3.screen('tree'); }); await page.waitForTimeout(300);
+await ev(() => { const b = document.querySelector('.tree-open'); if (b) b.click(); }); await page.waitForTimeout(500);
+log.tier = await ev(() => window.furryV3.tree().tier);
+console.log(JSON.stringify({ errors, log }, null, 1));
+await browser.close();
