@@ -3313,22 +3313,20 @@ body { display: grid; place-items: center; }
     };
     add(`<div class="lob-sel"><div class="sel" data-f="${ms.indexOf(foc) ? 'R' : 'L'}">${half(ms[0], 'L')}${half(ms[1], 'R')}</div></div>`
       + `<div class="lob-vs" data-mo="off">${FACTIONS[fac].short}<br>그룹</div>`
-      + '<div class="og-hint" style="left:60px;top:1030px;z-index:8">마우스를 올리면 앞으로 · ←/→</div>');
+      + '<div class="og-hint" style="left:60px;top:1030px;z-index:8">마우스를 올리면 앞으로 · 누르면 골라서 본부로 · ←/→ · Enter</div>');
     const list = [...Object.entries(FACTIONS).map(([f, F]) => [f, F.short, `${F.mains.filter(unlocked).length}/${F.mains.length}`]), ...LOCKED_RACES.map(([r]) => ['x' + r, r, '0/2', true])];
     tabs(list, 560, 112, fac, (f) => showSelect(f));
     const sel = $('#ovBody .sel');
     let cur = foc;
-    const go = ogBtn('이 친구로 출발', 'p', 'selGo', 'left:1090px;top:968px;transform:rotate(-1.5deg);z-index:8', () => { if (unlocked(cur)) beginRun(cur); else { showShop('main', cur); } });
-    const ch = ogBtn('챕터 고르기', '', 'selChapter', 'left:560px;top:978px;transform:rotate(1.5deg);z-index:8;font-size:28px', () => unlocked(cur) && showChapter(cur));
     const face = (side) => {
       if (sel.dataset.f !== side) { sel.dataset.f = side; const n = sel.querySelector(`.half.${side} .nm`); n.classList.remove('lob-hit'); void n.offsetWidth; n.classList.add('lob-hit'); }
-      cur = sel.querySelector(`.half.${side}`).dataset.k; META.pick = unlocked(cur) ? cur : META.pick;
-      go.innerHTML = unlocked(cur) ? '이 친구로 출발' : `잠김<small>상점에서 해금 · 당근젤리 ${fmtN(SHOP_MAIN[cur].price)}</small>`;
-      go.classList.toggle('off', !unlocked(cur)); go.classList.toggle('p', unlocked(cur)); ch.classList.toggle('off', !unlocked(cur));
+      cur = sel.querySelector(`.half.${side}`).dataset.k;
     };
-    for (const hEl of sel.querySelectorAll('.half')) { hEl.addEventListener('mouseenter', () => face(hEl.dataset.s)); hEl.addEventListener('click', () => face(hEl.dataset.s)); }
+    // 누르면 바로 그 캐릭터로 정하고 원정대 본부로. 잠긴 캐릭터는 상점 메인 탭으로 (해금)
+    const pick = () => { if (!unlocked(cur)) { showShop('main', cur); return; } META.pick = cur; saveMeta(); sfx.place(); showLobby(); };
+    for (const hEl of sel.querySelectorAll('.half')) { hEl.addEventListener('mouseenter', () => face(hEl.dataset.s)); hEl.addEventListener('click', () => { face(hEl.dataset.s); pick(); }); }
     face(sel.dataset.f);
-    S.keys = { ArrowLeft: () => face('L'), ArrowRight: () => face('R'), Enter: () => go.click() };
+    S.keys = { ArrowLeft: () => face('L'), ArrowRight: () => face('R'), Enter: pick };
     moEnter('select' + fac, 'lob-go');
     syncUI(true);
   }
