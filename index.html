@@ -1506,6 +1506,7 @@ body { display: grid; place-items: center; }
 .K .menu-card h3 { margin: 26px 0 10px; font: 400 20px/1 var(--font-market-label); color: var(--ink-muted); }
 .K .tog { display: flex; align-items: center; gap: 14px; margin: 10px 0; font: 400 28px/1 var(--font-market-label); cursor: pointer; }
 .K .tog input { width: 30px; height: 30px; accent-color: var(--accent); }
+.K #optTransit label { display: inline-flex; align-items: center; gap: 8px; margin-left: 10px; cursor: pointer; }
 .K .menu-row { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 26px; }
 .K .menu-row .ticket:not(.on):not(.cy) { background: var(--surface-2); }
 .K .menu-row .ticket, .K #ovActions .ticket, .K .cy-chips .ticket { position: relative; }
@@ -1672,112 +1673,155 @@ body { display: grid; place-items: center; }
 .K .grow .dot { flex: none; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--c, var(--spirit)); color: var(--ink); }
 .K .grow .dot .fu-ico { width: 30px; height: 30px; }
 /* v0.10 원정대 본부 (디자인 시스템 og_*)를 이 프로토에 붙이며 더한 것: 버튼으로 바꾼 부품, 그림 없는 캐릭터 첫 글자, 유물 선반 스크롤 */
-/* 칸 사이 전환 (v0.13 흐름 · v0.13.1 모양): 디자인 시스템에 이 화면이 없어 지도 띠 · 종이 쪽지 · 와펜 · 공용 모션(mo-*)으로 짓는다 (기획서 7-7).
-   지도 띠가 툭 떨어지고 → 지난 칸에 「완료」 도장 → 메인 말이 통통 걸어가 다음 칸이 흔들리고 → 쪽지가 찰싹 붙고 몬스터 실루엣이 쑥 돋는다 → 바늘땀 막대가 다 차면 저절로 넘어간다 */
-#overlay[data-kind="transit"] .tr2-map { top: 150px; transform: translateY(-440px) rotate(-1deg); transition: transform var(--tr-drop, .35s) cubic-bezier(.2, 1.3, .4, 1); }
-#overlay[data-kind="transit"] .tr2-map.in { transform: rotate(-1deg); }
-.tr2-map:not(.arrive) .flagpin, .tr2-map:not(.arrive) .flagpin + .wlab { opacity: 0; }
-.tr2-map .flagpin, .tr2-map .flagpin + .wlab { transition: opacity .2s; }
-.tr2-map:not(.arrive) .wp.now { background: var(--surface); box-shadow: 0 0 0 4px var(--ink); }
-.tr2-map.arrive .wp.now { animation: tr2-wig .45s ease 2; }
-.tr2-map.arrive .flagpin { animation: mo-drop .35s var(--mo-pop); }
+/* 칸 사이 전환 (v0.13 흐름 · v0.14.1 모양): 판 · 정비 위에 뜨는 쪽지가 아니라 화면 전체가 바뀌는 씬 (사용자 요청 10-20).
+   디자인 시스템에 이 화면이 없어 지도 띠 · 종이 쪽지 · 와펜 · 공용 모션(mo-*)으로 짓는다. 시안 둘: 길 걷기(road) · 지도 확대(map), 메뉴에서 고른다 (시험용).
+   단계는 showTransit이 붙이는 클래스: 씬 .tr2-map에 .in(동그라미가 열리며 씬이 나타남) → .walk(원정대가 걷는다) → .arrive, 쪽지 .tr2-note에 .show */
+.tr2-scene { position: absolute; inset: 0; z-index: 8; overflow: hidden; clip-path: circle(0 at 50% 56%); transition: clip-path var(--tr-drop, .35s) cubic-bezier(.3, .8, .4, 1); }
+.tr2-scene.in { clip-path: circle(140% at 50% 56%); }
+.tr2-scene .tmap.tr2-strip { left: 50%; top: 16px; transform: translateX(-50%) scale(.75) rotate(-1deg); transform-origin: 50% 0; }
+.tr2-strip:not(.go) .flagpin, .tr2-strip:not(.go) .flagpin + .wlab { opacity: 0; }
+.tr2-map.arrive .tr2-strip .flagpin, .tr2-map.arrive .tr2-strip .flagpin + .wlab { opacity: 1; }
+.tr2-map.arrive .tr2-strip .flagpin { animation: mo-drop .35s var(--mo-pop); }
+.tr2-map:not(.arrive) .tr2-strip .wp.now { background: var(--surface); box-shadow: 0 0 0 4px var(--ink); }
+.tr2-map.arrive .tr2-strip .wp.now { animation: tr2-wig .45s ease 2; }
 @keyframes tr2-wig { 25% { transform: rotate(-14deg) scale(1.3); } 75% { transform: rotate(10deg) scale(1.2); } }
-.tr2-done { position: absolute; z-index: 6; padding: 4px 9px; translate: -50% -50%; rotate: -14deg; border: 3px solid var(--accent); color: var(--accent-ink); background: rgba(255, 250, 240, .9); font: 400 20px/1 var(--font-market-display); white-space: nowrap; opacity: 0; pointer-events: none; }
+.tr2-done { position: absolute; z-index: 6; padding: 4px 9px; translate: -50% -50%; rotate: -14deg; border: 3px solid var(--accent); color: var(--accent-ink); background: rgba(255, 250, 240, .92); font: 400 20px/1 var(--font-market-display); white-space: nowrap; opacity: 0; pointer-events: none; }
 .tr2-map.walk .tr2-done { opacity: 1; animation: ag-stamp .32s var(--mo-pop); }
 .tr2-walker { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; overflow: hidden; z-index: 5; background: var(--surface); box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px var(--accent); transition: translate var(--tr-walk, 1.2s) ease-in-out; }
 .tr2-walker img, .tr2-walker .ini { width: 100%; height: 100%; object-fit: cover; }
-.tr2-map.walk .tr2-walker { translate: var(--tx) var(--ty); animation: tr2-hop calc(var(--tr-walk, 1.2s) / 4) ease-in-out 4; }
-.tr2-map.arrive .tr2-walker { animation: mo-squish .42s var(--mo-pop); }
-@keyframes tr2-hop { 0%, 100% { scale: 1 1; } 14% { scale: 1.14 .86; margin-top: -30px; } 50% { scale: .94 1.08; margin-top: -48px; } 86% { scale: 1.14 .86; margin-top: -30px; } }
-/* 다음 칸 쪽지: 왼쪽 글 · 오른쪽 그림 칸 (LayoutSplit + ImageSlot) */
-.tr2-note { position: absolute; left: 400px; top: 404px; width: 1120px; min-height: 380px; display: grid; grid-template-columns: 1fr 420px; gap: 36px; padding: 44px 48px 52px;
-  background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -12px; box-shadow: 0 10px 0 0 rgba(0, 0, 0, .4); rotate: -1.2deg; opacity: 0; }
+.tr2-map.walk .tr2-walker { translate: var(--tx) var(--ty); }
+/* 원정대 얼굴 스티커 (동료 · 합류 메인) */
+.tr2-face { position: relative; display: block; border-radius: 50%; overflow: hidden; background: var(--c, var(--surface)); box-shadow: 0 0 0 5px var(--surface), 0 0 0 8px var(--accent), 0 8px 0 3px rgba(0, 0, 0, .3); }
+.tr2-face img, .tr2-face .ini { width: 100%; height: 100%; object-fit: cover; }
+.tr2-face .ini { display: grid; place-items: center; font: 400 44px/1 var(--font-market-display); color: var(--ink); }
+/* 한 걸음: 몸이 말랑하게 눌렸다 튀어 오른다 */
+@keyframes tr2-step { 0%, 100% { translate: 0 0; scale: 1 1; } 18% { scale: 1.08 .9; } 50% { translate: 0 -34px; scale: .95 1.06; } 82% { scale: 1.08 .92; } }
+/* 다음 칸 쪽지 공통 */
+.tr2-note { position: absolute; z-index: 6; color: var(--ink); opacity: 0; }
 .tr2-note.show { opacity: 1; animation: mo-slap .45s var(--mo-pop); }
 .tr2-note.boss.show { animation: mo-slap .45s var(--mo-pop), tr2-shake .5s ease .45s; }
 @keyframes tr2-shake { 20% { translate: -10px 0; } 40% { translate: 9px 0; } 60% { translate: -6px 0; } 80% { translate: 3px 0; } }
-.tr2-note.boss { background: var(--accent); color: var(--on-accent); outline-color: var(--stitch-l); }
-.tr2-warn { position: absolute; left: -26px; right: -26px; top: -42px; padding: 14px; text-align: center; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); background-size: 73.5px 73.5px;
+.tr2-paper { position: relative; background: var(--surface); outline: 3px dashed var(--stitch); outline-offset: -12px; box-shadow: 0 10px 0 0 rgba(0, 0, 0, .4); }
+.tr2-note.boss .tr2-paper { background: var(--accent); color: var(--on-accent); outline-color: var(--stitch-l); }
+.tr2-warn { position: absolute; left: -26px; right: -26px; top: -42px; z-index: 2; padding: 14px; text-align: center; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); background-size: 73.5px 73.5px;
   color: var(--surface); font: 400 38px/1 var(--font-market-display); letter-spacing: .08em; text-shadow: 3px 3px 0 var(--mat-1); box-shadow: 0 6px 0 rgba(0, 0, 0, .35); }
 .tr2-note.show .tr2-warn { animation: mo-slap .4s var(--mo-pop) .1s backwards, tr2-stripe 1.2s linear .5s infinite; }
 @keyframes tr2-stripe { to { background-position: 73.5px 0; } }
-.tr2-txt { display: flex; flex-direction: column; min-width: 0; }
-.tr2-kind { align-self: flex-start; padding: 7px 14px 6px; background: var(--accent); color: var(--on-accent); font: 400 26px/1 var(--font-market-label); rotate: -2deg; }
+.tr2-kind { align-self: flex-start; display: inline-block; padding: 7px 14px 6px; background: var(--accent); color: var(--on-accent); font: 400 26px/1 var(--font-market-label); rotate: -2deg; }
 .tr2-note.boss .tr2-kind { background: var(--spirit); color: var(--ink); }
-.tr2-name { margin-top: 16px; font: 400 76px/1.02 var(--font-market-display); word-break: keep-all; }
-.tr2-txt p { margin: 12px 0 0; font: 400 30px/1.3 var(--font-market-text); }
-.tr2-stat { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 22px; }
+.tr2-name { margin-top: 14px; font: 400 70px/1.02 var(--font-market-display); word-break: keep-all; }
+.tr2-gm { margin: 10px 0 0; font: 400 30px/1.3 var(--font-market-text); }
+.tr2-stat { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 .tr2-stat span { padding: 8px 14px; background: var(--surface-2); color: var(--ink); font: 400 22px/1 var(--font-market-label); box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
 .tr2-note.show .tr2-stat span { animation: mo-drop .35s var(--mo-out) calc(.35s + var(--i) * .07s) backwards; }
-/* 그림 칸: 풀밭 띠 위로 몬스터 실루엣이 하나씩 쑥 돋고, 저마다 다른 박자로 둥실 */
-.tr2-slot { position: relative; height: 290px; align-self: center; border-radius: 18px; background: var(--surface-2); box-shadow: inset 0 0 0 3px var(--line); overflow: hidden; }
-.tr2-note.boss .tr2-slot { background: rgba(0, 0, 0, .18); box-shadow: inset 0 0 0 3px var(--stitch-l); }
-.tr2-slot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: var(--floordot); box-shadow: inset 0 6px 0 rgba(0, 0, 0, .12); }
-.tr2-foes { position: absolute; left: 16px; right: 16px; bottom: 7px; z-index: 1; display: flex; justify-content: center; align-items: flex-end; gap: 18px; }
-.tr2-foe { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.tr2-foe .sil { display: block; transform-origin: 50% 100%; }
-.tr2-note.show .tr2-foe .sil { animation: mo-sprout .5s var(--mo-pop) calc(.4s + var(--i) * .16s) backwards, mo-bob calc(1.5s + var(--i) * .37s) ease-in-out calc(.9s + var(--i) * .16s) infinite; }
-.tr2-foe img { display: block; height: 170px; max-width: 200px; object-fit: contain; object-position: 50% 100%; filter: brightness(0) opacity(.78); }
-.tr2-foes[data-n="2"] img { height: 150px; max-width: 170px; }
-.tr2-foes[data-n="3"] img { height: 116px; max-width: 116px; }
-.tr2-foe i { width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-1); color: var(--surface); font: 400 44px/1 var(--font-market-display); font-style: normal; }
-/* ×수 꼬리표는 실루엣 발밑 풀밭 위에 (그림과 겹치지 않게) */
-.tr2-foe b { position: relative; z-index: 2; margin-top: 4px; padding: 5px 12px 4px; border-radius: 999px; background: var(--accent-2); color: var(--ink); font: 400 24px/1 var(--font-market-display); box-shadow: 0 0 0 3px var(--surface); rotate: -4deg; }
-.tr2-note.show .tr2-foe b { animation: ag-stamp .3s var(--mo-pop) calc(.75s + var(--i) * .16s) backwards; }
-.tr2-note.boss .tr2-foes { bottom: 30px; }
-.tr2-note.boss .tr2-foe img { height: 230px; max-width: 360px; filter: brightness(0) opacity(.82); }
-.tr2-note.boss.show .tr2-foe .sil { animation: mo-sprout .6s var(--mo-pop) .5s backwards, mo-sway 2.4s ease-in-out 1.1s infinite; }
-.tr2-big { position: absolute; left: 50%; top: 44%; z-index: 1; width: 150px; height: 150px; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); box-shadow: inset 0 0 0 10px var(--spirit), inset 0 0 0 14px var(--accent); font: 400 92px/1 var(--font-market-display); }
-.tr2-big .fu-ico { width: 72px; height: 72px; }
-.tr2-note.show .tr2-big { animation: mo-slap .45s var(--mo-pop) .35s backwards, mo-wobble 2.2s ease-in-out .9s infinite; }
-/* 저절로 넘어가기까지: 쪽지 아래 바늘땀 막대가 찬다 */
-.tr2-timer { position: absolute; left: 48px; right: 48px; bottom: 22px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.tr2-timer { position: absolute; left: 40px; right: 40px; bottom: 20px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
 .tr2-note.boss .tr2-timer { background: rgba(0, 0, 0, .25); }
 .tr2-timer i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; scale: 0 1; background: var(--accent-2); }
 .tr2-note.show .tr2-timer i { transition: scale var(--tr-panel, 1.8s) linear; scale: 1 1; }
+/* 몬스터 실루엣: 하나씩 쑥 돋고 저마다 다른 박자로 둥실, ×수 꼬리표는 발밑 */
+.tr2-foes { display: flex; justify-content: center; align-items: flex-end; gap: 18px; }
+.tr2-foe { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.tr2-foe .sil { display: block; transform-origin: 50% 100%; }
+.tr2-note.show ~ .tr2-ahead .tr2-foe .sil, .tr2-note.show .tr2-foe .sil { animation: mo-sprout .5s var(--mo-pop) calc(.4s + var(--i) * .16s) backwards, mo-bob calc(1.5s + var(--i) * .37s) ease-in-out calc(.9s + var(--i) * .16s) infinite; }
+.tr2-foe img { display: block; height: 170px; max-width: 200px; object-fit: contain; object-position: 50% 100%; filter: brightness(0) opacity(.8); }
+.tr2-foes[data-n="2"] img { height: 150px; max-width: 170px; }
+.tr2-foes[data-n="3"] img { height: 116px; max-width: 116px; }
+.tr2-foe i { width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-1); color: var(--surface); font: 400 44px/1 var(--font-market-display); font-style: normal; }
+.tr2-foe b { position: relative; z-index: 2; margin-top: 4px; padding: 5px 12px 4px; border-radius: 999px; background: var(--accent-2); color: var(--ink); font: 400 24px/1 var(--font-market-display); box-shadow: 0 0 0 3px var(--surface); rotate: -4deg; }
+.tr2-note.show ~ .tr2-ahead .tr2-foe b, .tr2-note.show .tr2-foe b { animation: ag-stamp .3s var(--mo-pop) calc(.75s + var(--i) * .16s) backwards; }
+.tr2-big { width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); box-shadow: inset 0 0 0 10px var(--spirit), inset 0 0 0 14px var(--accent); font: 400 92px/1 var(--font-market-display); }
+.tr2-big .fu-ico { width: 72px; height: 72px; }
+.tr2-note.show .tr2-big { animation: mo-slap .45s var(--mo-pop) .35s backwards, mo-wobble 2.2s ease-in-out .9s infinite; }
+
+/* ── 시안 1 · 길 걷기: 밤 숲 교역로를 원정대가 한 줄로 통통 걸어 들어오고, 길가 팻말에 다음 칸, 길 앞에 몬스터가 기다린다 ── */
+.tr2-scene[data-style="road"] { background: linear-gradient(180deg, var(--far) 0%, var(--deep) 62%, var(--tent) 100%); }
+.tr2-moon { position: absolute; left: 1540px; top: 170px; width: 120px; height: 120px; border-radius: 50%; background: var(--done); box-shadow: 0 0 0 18px rgba(226, 214, 174, .12), 0 0 0 40px rgba(226, 214, 174, .06); }
+.tr2-layer { position: absolute; left: 0; width: 5760px; transition: translate var(--tr-walk, 1.2s) cubic-bezier(.3, .1, .4, 1); }
+.tr2-map.walk .tr2-layer { translate: var(--px) 0; }
+.tr2-hills { top: 430px; height: 420px; background: radial-gradient(ellipse 340px 220px at 300px 260px, var(--tent) 99%, transparent 100%) 0 0 / 760px 420px repeat-x; opacity: .9; }
+.tr2-pines { top: 330px; height: 470px; }
+.tr2-pines i { position: absolute; bottom: 0; width: 0; height: 0; border-left: var(--w) solid transparent; border-right: var(--w) solid transparent; border-bottom: var(--h) solid var(--floordot); }
+.tr2-ground { position: absolute; left: 0; right: 0; top: 800px; bottom: 0; background: var(--tent); }
+.tr2-road { position: absolute; left: -40px; right: -40px; top: 846px; height: 120px; background: var(--rope-2); box-shadow: inset 0 10px 0 rgba(0, 0, 0, .14), 0 -6px 0 var(--floordot); }
+.tr2-road::after { content: ""; position: absolute; left: 0; right: -200px; top: 54px; height: 10px; background: repeating-linear-gradient(90deg, var(--rope) 0 60px, transparent 60px 110px); transition: translate var(--tr-walk, 1.2s) cubic-bezier(.3, .1, .4, 1); }
+.tr2-map.walk .tr2-road::after { translate: -440px 0; }
+.tr2-party { position: absolute; left: 90px; bottom: 140px; z-index: 5; display: flex; align-items: flex-end; gap: 6px; translate: -820px 0; transition: translate var(--tr-walk, 1.2s) cubic-bezier(.3, .1, .4, 1); }
+.tr2-map.walk .tr2-party { translate: 0 0; }
+.tr2-party > * { flex: none; }
+.tr2-map.walk .tr2-party > * { animation: tr2-step calc(var(--tr-walk, 1.2s) / 3) ease-in-out calc(var(--i) * -.13s) 3; }
+.tr2-map.arrive .tr2-party > * { animation: mo-squish .42s var(--mo-pop) calc(var(--i) * .06s); }
+.tr2-party .tr2-face { width: 120px; height: 120px; margin-bottom: 26px; }
+.tr2-party .tr2-hero { position: relative; height: 470px; margin: 0 -40px 0 10px; }
+.tr2-party .tr2-hero img { height: 100%; display: block; filter: drop-shadow(0 10px 0 rgba(0, 0, 0, .3)); }
+.tr2-party .tr2-hero.ally { height: 330px; margin-left: -10px; }
+.tr2-map.arrive .tr2-party .tr2-hero:not(.ally) { animation: mo-squish .42s var(--mo-pop), mo-breathe 3s ease-in-out .5s infinite; }
+.tr2-hey { position: absolute; left: 50%; top: -20px; padding: 8px 16px; translate: -50% 0; border-radius: 16px; background: var(--surface); color: var(--ink); font: 400 30px/1 var(--font-market-display); box-shadow: 0 5px 0 rgba(0, 0, 0, .3); opacity: 0; white-space: nowrap; }
+.tr2-hey::after { content: ""; position: absolute; left: 50%; bottom: -12px; margin-left: -10px; border: 10px solid transparent; border-top-color: var(--surface); border-bottom: 0; }
+.tr2-map.arrive .tr2-hey { opacity: 1; animation: ag-stamp .32s var(--mo-pop) .1s backwards; }
+.tr2-scene[data-style="road"] .tr2-note { left: 760px; top: 300px; width: 640px; transform-origin: 50% 100%; }
+.tr2-scene[data-style="road"] .tr2-paper { padding: 38px 40px 46px; display: flex; flex-direction: column; rotate: -1.5deg; }
+.tr2-post { position: absolute; left: 50%; top: 100%; width: 34px; height: 420px; margin-left: -17px; z-index: -1; background: var(--mat-2); box-shadow: inset -8px 0 0 rgba(0, 0, 0, .2); }
+.tr2-scene[data-style="road"] .tr2-name { font-size: 64px; }
+.tr2-ahead { position: absolute; right: 70px; bottom: 150px; width: 430px; z-index: 4; }
+.tr2-ahead .tr2-foes { align-items: flex-end; }
+.tr2-ahead .tr2-foe img { filter: brightness(0) opacity(.85) drop-shadow(0 0 0 var(--far)); }
+.tr2-ahead .tr2-big { margin: 0 auto 40px; }
+.tr2-ahead .tr2-foe b { z-index: 5; }
+.tr2-note.boss .tr2-pin { display: none; }
+.tr2-bush { position: absolute; left: -40px; right: -40px; bottom: -40px; height: 110px; z-index: 3; background: radial-gradient(circle at 50% 100%, var(--floordot) 62%, transparent 63%) 0 0 / 120px 110px repeat-x, radial-gradient(circle at 50% 100%, var(--deep) 62%, transparent 63%) 60px 18px / 120px 92px repeat-x; }
+.tr2-scene[data-style="road"].boss { background: linear-gradient(180deg, var(--mat-1) 0%, var(--accent-ink) 70%, var(--tent) 100%); }
+.tr2-scene[data-style="road"].boss .tr2-moon { background: var(--accent); box-shadow: 0 0 0 18px rgba(176, 60, 98, .25), 0 0 0 46px rgba(176, 60, 98, .12); }
+.tr2-scene[data-style="road"].boss .tr2-ahead { right: 20px; bottom: 120px; width: 560px; }
+.tr2-scene[data-style="road"].boss .tr2-ahead .tr2-foe img { height: 560px; max-width: 560px; filter: brightness(0) opacity(.9); }
+.tr2-scene[data-style="road"].boss .tr2-ahead .tr2-foe .sil { animation: mo-sprout .6s var(--mo-pop) .5s backwards, mo-sway 2.4s ease-in-out 1.1s infinite; }
+.tr2-scene.boss .tr2-scene-warn { position: absolute; left: -20px; right: -20px; top: 112px; z-index: 7; height: 26px; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); background-size: 73.5px 73.5px; animation: tr2-stripe 1.2s linear infinite; }
+
+/* ── 시안 2 · 지도 확대: 교역로 지도를 화면 가득 펼쳐 지금 칸 앞뒤만 크게. 큰 말이 된 원정대가 다음 칸으로 깡충, 쪽지는 지도 위에 핀으로 꽂힌다 ── */
+.tr2-scene[data-style="map"] { background: var(--mat-1); }
+.tr2-sheet { position: absolute; left: 40px; top: 40px; right: 40px; bottom: 40px; overflow: hidden; background: var(--surface) radial-gradient(circle, rgba(43, 33, 24, .08) 2px, transparent 2.5px) 0 0 / 36px 36px; box-shadow: inset 0 0 0 14px var(--accent), inset 0 0 0 18px var(--surface), 0 14px 0 rgba(0, 0, 0, .4); rotate: -.6deg; }
+.tr2-sheet::after { content: ""; position: absolute; inset: 26px; outline: 3px dashed var(--stitch); pointer-events: none; }
+.tr2-sheet .lake { position: absolute; border-radius: 50%; background: var(--glass); }
+.tr2-sheet .wood { position: absolute; border-radius: 50%; background: var(--enemy); opacity: .3; }
+.tr2-ttl { position: absolute; left: 70px; top: 58px; font: 400 64px/1 var(--font-market-display); color: var(--mat-1); }
+.tr2-ttl small { display: block; margin-top: 10px; font: 400 26px/1 var(--font-market-label); color: var(--ink); }
+.tr2-sheet svg.tr2-path { position: absolute; left: 0; top: 0; width: 1840px; height: 1000px; overflow: visible; }
+.tr2-sheet svg.tr2-path path { fill: none; stroke: var(--mat-3); stroke-width: 10; stroke-dasharray: 22 18; stroke-linecap: round; }
+.tr2-node { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--ink); box-shadow: 0 0 0 6px var(--mat-3), 0 8px 0 rgba(0, 0, 0, .25); }
+.tr2-node .fu-ico { width: 54px; height: 54px; }
+.tr2-node.done { background: var(--accent); color: var(--on-accent); box-shadow: inset 0 0 0 8px var(--on-accent), 0 0 0 6px var(--accent), 0 8px 0 rgba(0, 0, 0, .25); rotate: -12deg; }
+.tr2-node.fort { width: 170px; height: 150px; margin: -75px 0 0 -85px; border-radius: 48% 48% 40% 40%; background: var(--mat-1); color: var(--surface); box-shadow: 0 8px 0 rgba(0, 0, 0, .25); }
+.tr2-node.fort::before, .tr2-node.fort::after { content: ""; position: absolute; top: -18px; width: 62px; height: 62px; border-radius: 50%; background: var(--mat-1); }
+.tr2-node.fort::before { left: 0; } .tr2-node.fort::after { right: 0; }
+.tr2-node.fort .fu-ico { position: relative; z-index: 1; width: 64px; height: 64px; }
+.tr2-node.to { box-shadow: 0 0 0 7px var(--surface), 0 0 0 13px var(--accent-2), 0 8px 0 rgba(0, 0, 0, .25); }
+.tr2-map.arrive .tr2-node.to { animation: tr2-wig .45s ease 2; }
+.tr2-node .lb { position: absolute; top: calc(100% + 20px); left: 50%; translate: -50% 0; white-space: nowrap; font: 400 26px/1 var(--font-market-label); color: var(--ink); }
+.tr2-sheet .tr2-done { font-size: 32px; padding: 6px 14px; border-width: 4px; }
+.tr2-token { position: absolute; z-index: 5; width: 0; height: 0; transition: translate var(--tr-walk, 1.2s) ease-in-out; }
+.tr2-map.walk .tr2-token { translate: var(--tx) var(--ty); }
+.tr2-token .tr2-face { position: absolute; left: -90px; top: -200px; width: 180px; height: 180px; }
+.tr2-token .tr2-face.s { width: 92px; height: 92px; left: calc(-160px - var(--i) * 70px); top: -120px; }
+.tr2-map.walk .tr2-token .tr2-face { animation: tr2-step calc(var(--tr-walk, 1.2s) / 3) ease-in-out calc(var(--i) * -.12s) 3; }
+.tr2-map.arrive .tr2-token .tr2-face { animation: mo-squish .42s var(--mo-pop) calc(var(--i) * .06s); }
+.tr2-token .tr2-hey { top: -270px; }
+.tr2-scene[data-style="map"] .tr2-note { left: 420px; top: 610px; width: 1120px; }
+.tr2-scene[data-style="map"] .tr2-paper { display: grid; grid-template-columns: 1fr 380px; gap: 30px; padding: 36px 40px 46px; rotate: 1deg; }
+.tr2-pin { position: absolute; left: 50%; top: -18px; z-index: 3; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: var(--accent-2); box-shadow: inset -5px -5px 0 rgba(0, 0, 0, .2), 0 4px 0 rgba(0, 0, 0, .3); }
+.tr2-scene[data-style="map"] .tr2-txt { display: flex; flex-direction: column; min-width: 0; }
+.tr2-scene[data-style="map"] .tr2-stat { margin-top: auto; padding-top: 18px; }
+.tr2-slot { position: relative; height: 250px; align-self: center; border-radius: 18px; background: var(--surface-2); box-shadow: inset 0 0 0 3px var(--line); overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+.tr2-note.boss .tr2-slot { background: rgba(0, 0, 0, .18); box-shadow: inset 0 0 0 3px var(--stitch-l); }
+.tr2-slot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: var(--floordot); }
+.tr2-slot .tr2-foes { position: relative; z-index: 1; width: 100%; padding: 0 14px 6px; }
+.tr2-slot .tr2-big { position: relative; z-index: 1; margin-bottom: 52px; }
+.tr2-note.boss .tr2-slot .tr2-foe img { height: 210px; max-width: 330px; }
+.tr2-note.boss .tr2-slot .tr2-foes { padding-bottom: 26px; }
+.tr2-note.boss.show .tr2-slot .tr2-foe .sil { animation: mo-sprout .6s var(--mo-pop) .5s backwards, mo-sway 2.4s ease-in-out 1.1s infinite; }
+.tr2-scene[data-style="map"].boss .tr2-sheet { background-color: var(--surface-2); }
+
 @media (prefers-reduced-motion: reduce) {
-  .tr2-map, .tr2-walker, .tr2-note .tr2-timer i { transition-duration: .01s !important; }
-  .tr2-map *, .tr2-note, .tr2-note * { animation: none !important; }
+  .tr2-scene, .tr2-scene *, .tr2-scene *::after { transition-duration: .01s !important; animation: none !important; }
 }
-/* 원정대 강화 트리 (v0.14, 임시 디자인: 계획판 재료 — 코르크 판 · 쪽지) */
-.K .tree-cork { position: absolute; inset: 18px; background-color: #b4875a; background-image: radial-gradient(rgba(84, 52, 28, .38) 1.6px, transparent 2.2px); background-size: 15px 15px; overflow: hidden; }
-.K .tree-row { position: absolute; left: 0; width: 200px; height: 96px; display: flex; align-items: center; padding-left: 22px; background: var(--mat-1); color: var(--on-dark); clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%); }
-.K .tree-row b { font: 400 26px/1 var(--font-market-display); }
-.K .tree-col { position: absolute; top: 0; bottom: 0; border-left: 4px dashed rgba(246, 236, 212, .45); background: rgba(36, 27, 15, .28); }
-.K .tree-col.open { background: transparent; }
-.K .tree-head { position: absolute; left: 10px; right: 10px; top: 12px; height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: var(--surface); color: var(--ink); outline: 2px dashed var(--stitch); outline-offset: -6px; }
-.K .tree-col:not(.open) .tree-head { background: #9c7a4e; color: var(--on-dark); }
-.K .tree-head b { font: 400 28px/1 var(--font-market-display); }
-.K .tree-head small { display: flex; align-items: center; gap: 6px; font: 400 18px/1 var(--font-market-label); }
-.K .tree-open { margin-left: auto; padding: 10px 18px; background: var(--accent); color: var(--on-accent); font: 400 20px/1 var(--font-market-label); box-shadow: 0 4px 0 0 rgba(0, 0, 0, .3); }
-.K .tree-open.off { background: var(--mat-1); color: var(--on-dark); opacity: .85; }
-.K .tree-lk { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 400 18px/1 var(--font-market-label); }
-.K .tree-lk .fu-ico, .K .tree-why .fu-ico { width: 18px; height: 18px; }
-.K .tree-node { position: absolute; width: 164px; height: 108px; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 10px 8px; background: var(--surface); color: var(--ink); text-align: left; z-index: 2;
-  box-shadow: 3px 6px 0 0 rgba(40, 24, 10, .3); transform: rotate(var(--r, -1deg)); transition: transform .3s cubic-bezier(.34, 1.6, .5, 1), box-shadow .3s; }
-.K .tree-node:hover { transform: rotate(var(--r, -1deg)) translateY(-3px); }
-.K .tree-node .tree-top { display: flex; gap: 8px; align-items: flex-start; }
-.K .tree-node i { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-2); outline: 2px dashed var(--stitch); outline-offset: -4px; }
-.K .tree-node i .fu-ico { width: 22px; height: 22px; }
-.K .tree-node b { font: 400 18px/1.15 var(--font-market-label); word-break: keep-all; }
-.K .tree-node b small { display: block; margin-top: 2px; font: 400 14px/1 var(--font-market-text); color: var(--ink-muted); }
-.K .tree-foot { display: flex; justify-content: flex-end; }
-.K .tree-foot .og-cost { font-size: 15px; padding: 2px 9px 2px 4px; } .K .tree-foot .og-cost i { width: 20px; height: 20px; }
-.K .tree-got { padding: 3px 10px; border: 3px solid var(--accent); color: var(--accent); font: 400 16px/1 var(--font-market-display); font-style: normal; transform: rotate(-8deg); }
-.K .tree-why { display: flex; align-items: center; gap: 4px; font: 400 14px/1 var(--font-market-label); color: var(--ink-muted); }
-.K .tree-node.own i { background: var(--accent); color: var(--on-accent); }
-.K .tree-node.lock, .K .tree-node.need { background: #e6d9b8; }
-.K .tree-node.lock { opacity: .72; }
-.K .tree-node.lock i { background: var(--mat-1); color: var(--on-dark); }
-.K .tree-node.on { z-index: 5; box-shadow: 4px 9px 0 0 rgba(40, 24, 10, .34); }
-.K .tree-node.on::after { content: ""; position: absolute; inset: -12px -16px; border: 4px solid var(--accent); border-radius: 50%; transform: rotate(-3deg); pointer-events: none; }
-.K .tree-info { padding: 22px 34px; }
-.K .tree-info .og-h small { font: 400 18px/1 var(--font-market-label); color: var(--ink-muted); }
-.K .tree-info p { margin: 10px 0 0; font: 400 22px/1.3 var(--font-market-text); }
-.K .tree-info .tree-sum { font-size: 20px; color: var(--ink-muted); }
-.K .tree-info .tree-sum em { font-style: normal; color: var(--accent-ink); }
-.K .tree-st { position: absolute; right: 30px; top: 24px; padding: 6px 14px; background: var(--surface-2); font: 400 18px/1 var(--font-market-label); }
-.K .tree-st.can { background: var(--accent); color: var(--on-accent); }
-.K .tree-st.own { background: var(--mat-1); color: var(--on-dark); }
 #overlay[data-kind="og"]:not([hidden]) ~ .menu-btn, #overlay[data-kind="fix"]:not([hidden]) ~ .menu-btn { display: none; }
 /* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
 .K .lob-sel .sel .half { pointer-events: none; }
@@ -1907,6 +1951,7 @@ body { display: grid; place-items: center; }
       <label class="tog"><input type="checkbox" id="optCutin" checked> 스킬 컷씬</label>
       <label class="tog"><input type="checkbox" id="optSound" checked> 소리</label>
       <label class="tog"><input type="checkbox" id="optFast"> 칸 전환 빠르게 (시험용)</label>
+      <div class="tog" id="optTransit">전환 씬 (시험용) <label><input type="radio" name="optTransit" value="road" checked> 길 걷기</label><label><input type="radio" name="optTransit" value="map"> 지도 확대</label></div>
       <section id="meSec" hidden><h3>플레이어</h3><div class="me" id="me"></div></section>
       <div class="menu-row">
         <button class="ticket" id="restart" type="button">원정 그만두기</button>
@@ -2645,17 +2690,53 @@ body { display: grid; place-items: center; }
     if (t === 'story') return { kind: '이야기', name: CH_INFO.area[0] };
     return { kind: '?', name: '무슨 일이 생길까' };
   }
+  // 칸 사이 전환 씬 (v0.14.1, 화면 전체가 바뀐다). 시안 둘: 길 걷기 · 지도 확대 (메뉴 「전환 씬」, 시험용)
   function transitHtml(from, to) {
     const I = nextInfo(to), bossAt = CHAPTER.lastIndexOf('boss'), left = bossAt - to, t = CHAPTER[to];
+    const style = S.opts.transitStyle === 'map' ? 'map' : 'road';
     const foe = ([key, n], i) => `<span class="tr2-foe" data-foe="${key}" data-n="${n}" title="${FOES[key].name}" style="--i:${i}"><span class="sil">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}</span>${I.boss ? '' : `<b>×${n}</b>`}</span>`;
-    const slot = I.foes ? `<div class="tr2-foes" data-n="${I.foes.length}">${I.foes.map(foe).join('')}</div>` : `<span class="tr2-big">${t === 'event' ? '?' : ico(NODE_ICO[t] || 'question')}</span>`;
+    const pic = I.foes ? `<div class="tr2-foes" data-n="${I.foes.length}">${I.foes.map(foe).join('')}</div>` : `<span class="tr2-big">${t === 'event' ? '?' : ico(NODE_ICO[t] || 'question')}</span>`;
     const stat = [['at', `${to + 1} / ${CHAPTER.length}칸`], ['left', left > 0 ? `보스까지 ${left}칸` : '보스!'], ['hp', `체력 ${S.main.hp}/${S.main.maxHp}`], ['gold', `씨앗 ${S.gold}`]];
-    return `<div class="tmap tr2-map">${trackHtml(to)}<span class="tr2-done" style="left:${mapX(from)}px;top:${MAP_Y[from]}px">완료</span><span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
-      + `<div class="tr2-note${I.boss ? ' boss' : ''}" data-type="${t}" data-node="${to + 1}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}`
-      + `<div class="tr2-txt"><div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>${I.line ? `<p class="tr2-gm">${I.line}</p>` : ''}`
-      + `<div class="tr2-stat">${stat.map(([c, s], i) => `<span class="tr2-${c}" style="--i:${i}">${s}</span>`).join('')}</div></div>`
-      + `<div class="tr2-slot">${slot}</div><span class="tr2-timer"><i></i></span></div>`
-      + '<div class="tapekeys" style="left:760px;top:990px"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
+    const txt = `<div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>${I.line ? `<p class="tr2-gm">${I.line}</p>` : ''}`
+      + `<div class="tr2-stat">${stat.map(([c, s], i) => `<span class="tr2-${c}" style="--i:${i}">${s}</span>`).join('')}</div>`;
+    const noteAttr = `class="tr2-note${I.boss ? ' boss' : ''}" data-type="${t}" data-node="${to + 1}"`, warn = I.boss ? '<div class="tr2-warn">보스 등장</div>' : '';
+    // 원정대: 메인이 맨 앞(오른쪽), 그 뒤로 합류 메인 · 동료 얼굴이 줄줄이
+    const mates = KIND_ORDER.filter((k) => S.levels[k] > 0);
+    const hey = `<span class="tr2-hey">${I.boss ? '!!' : t === 'event' ? '?' : '!'}</span>`;
+    const face = (k, i, cls) => `<span class="tr2-face${cls ? ' ' + cls : ''}" style="--i:${i};--c:var(--char-${k})">${faceImg(k)}</span>`;
+    const root = (inner) => `<div class="tr2-scene tr2-map${I.boss ? ' boss' : ''}" data-style="${style}">${inner}</div>`
+      + '<div class="tapekeys" style="left:760px;top:1000px;z-index:9"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
+    if (style === 'road') {
+      const n = mates.length + (S.ally ? 1 : 0);
+      const party = mates.map((k, j) => face(k, n - j + (S.ally ? 0 : 0), '')).join('')
+        + (S.ally ? `<span class="tr2-hero ally" style="--i:1"><img alt="" src="${heroSrc(S.ally.kind)}"></span>` : '')
+        + `<span class="tr2-hero" style="--i:0"><img alt="" src="${heroSrc(S.hero)}">${hey}</span>`;
+      const pines = Array.from({ length: 20 }, (_, i) => `<i style="left:${i * 290 + (i * 97) % 120}px;--w:${50 + (i * 37) % 40}px;--h:${170 + (i * 53) % 150}px"></i>`).join('');
+      return root('<span class="tr2-moon"></span><div class="tr2-layer tr2-hills" style="--px:-380px"></div>'
+        + `<div class="tr2-layer tr2-pines" style="--px:-700px">${pines}</div><div class="tr2-ground"></div><div class="tr2-road"></div>${I.boss ? '<span class="tr2-scene-warn"></span>' : ''}`
+        + `<div class="tmap tr2-strip">${trackHtml(to)}<span class="tr2-done" style="left:${mapX(from)}px;top:${MAP_Y[from]}px">완료</span><span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
+        + `<div class="tr2-party">${party}</div>`
+        + `<div ${noteAttr}><div class="tr2-paper">${warn}${txt}<span class="tr2-timer"><i></i></span></div><span class="tr2-post"></span></div>`
+        + `<div class="tr2-ahead">${pic}<span class="tr2-bush"></span></div>`);
+    }
+    // 지도 확대: 지금 칸 앞뒤 다섯 칸만 크게
+    const lo = Math.max(0, Math.min(from - 1, CHAPTER.length - 5)), ids = [0, 1, 2, 3, 4].map((j) => lo + j);
+    const P = ids.map((i, j) => [210 + j * 355, 320 + Math.round(34 * Math.sin(i * 1.7))]), at = (i) => P[i - lo];
+    const road = P.map(([x, y], j) => `${j ? 'L' : 'M'}${x} ${y}`).join(' ');
+    const nodes = ids.map((i) => {
+      const [x, y] = at(i), tt = CHAPTER[i], fort = tt === 'mid' || tt === 'boss', st = i <= from ? ' done' : i === to ? ' to' : '';
+      const lb = tt === 'mid' ? `중간 보스 · ${BOSS_INFO.mid.name}` : tt === 'boss' ? `보스 · ${BOSS_INFO.boss.name}` : `${i + 1}칸 · ${NODE_LABEL[tt]}`;
+      return `<span class="tr2-node${fort ? ' fort' : ''}${st}" style="left:${x}px;top:${y}px">${ico(NODE_ICO[tt])}<span class="lb">${lb}</span></span>`;
+    }).join('');
+    const [fx, fy] = at(from), [tx, ty] = at(to);
+    const crew = [S.ally ? S.ally.kind : null, ...mates].filter(Boolean).slice(0, 4).map((k, j) => face(k, j + 1, 's')).join('');
+    return root('<div class="tr2-sheet"><span class="lake" style="left:620px;top:600px;width:360px;height:150px"></span><span class="lake" style="left:1420px;top:110px;width:260px;height:110px"></span>'
+      + '<span class="wood" style="left:160px;top:560px;width:260px;height:140px"></span><span class="wood" style="left:1180px;top:480px;width:220px;height:120px"></span>'
+      + `<div class="tr2-ttl">교역로 지도<small>${HEROES[S.hero || 'hanato'].name} 원정 · ${to + 1}/${CHAPTER.length} 칸</small></div>`
+      + `<svg class="tr2-path" viewBox="0 0 1840 1000"><path d="${road}"/></svg>${nodes}`
+      + `<span class="tr2-done" style="left:${fx}px;top:${fy}px">완료</span>`
+      + `<div class="tr2-token" style="left:${fx}px;top:${fy}px;--tx:${tx - fx}px;--ty:${ty - fy}px">${crew}${face(S.hero, 0, '')}${hey}</div></div>`
+      + `<div ${noteAttr}><span class="tr2-pin"></span><div class="tr2-paper">${warn}<div class="tr2-txt">${txt}</div><div class="tr2-slot">${pic}</div><span class="tr2-timer"><i></i></span></div></div>`);
   }
   function clearField() {
     S.enemies = []; S.board = []; S.walls = []; S.pads = []; S.crates = []; S.portals = []; S.webs = []; S.gates = []; S.clouds = []; S.mine = []; S.cuts = []; S.atk = [];
@@ -6589,6 +6670,7 @@ body { display: grid; place-items: center; }
   for (const [id, key] of [['optCutin', 'cutin'], ['optSound', 'sound'], ['optFast', 'fast']]) {
     $('#' + id).addEventListener('change', (ev) => { S.opts[key] = ev.target.checked; savePrefs(); });
   }
+  for (const r of document.querySelectorAll('#optTransit input')) r.addEventListener('change', () => { S.opts.transitStyle = r.value; savePrefs(); });
 
   // ---------- 패널 ----------
   // 지도 띠 (섞기 A): 챕터 16칸. 지난 칸은 덩굴을 끊은 도장, 지금 칸은 깃발 핀, 중간 보스 · 보스는 덤불 요새
@@ -6689,6 +6771,7 @@ body { display: grid; place-items: center; }
   function loadPrefs() {
     try { const o = JSON.parse(localStorage.getItem('furryup-v3') || 'null'); if (o) Object.assign(S.opts, o); } catch (e) { /* 없어도 된다 */ }
     $('#optCutin').checked = S.opts.cutin; $('#optSound').checked = S.opts.sound; $('#optFast').checked = !!S.opts.fast;
+    for (const r of document.querySelectorAll('#optTransit input')) r.checked = r.value === (S.opts.transitStyle || 'road');
   }
   function savePersona() { try { localStorage.setItem('furryup-persona', JSON.stringify(S.persona)); } catch (e) { /* 없어도 된다 (이번 창에서만 기억) */ } }
   function loadPersona() {
