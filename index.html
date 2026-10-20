@@ -1398,7 +1398,15 @@
 #overlay[data-kind="aug"]:not([hidden]) ~ .menu-btn { display: none; }
 .K .fx-svc.off { opacity: .5; filter: saturate(.3); cursor: default; }
 .K .se-tag.is-sel, .K .se-line.is-sel { box-shadow: 0 0 0 5px var(--a-sel, var(--a-deco, var(--accent))), 0 8px 0 5px rgba(0,0,0,.25); }
-.K .se-line { position: relative; width: 100%; padding: 6px 8px; margin-left: -8px; text-align: left; color: inherit; }
+.K .se-line { position: relative; width: calc(100% + 16px); padding: 6px 8px; margin: 14px 0 0 -8px; text-align: left; color: inherit; }
+/* 정비 배치 고침 (v0.11.4): 상비약 차림표는 보급품 띠와 같은 높이에서 시작하고 내용만큼만 (두 줄 간격 같게) */
+.K .se-menu { top: 578px !important; height: auto !important; padding: 20px 26px 22px; }
+.K .se-menu h4 { margin-bottom: 2px; }
+/* 사기 · 찜은 고른 물건 말풍선 안에서 크게 (새로 고침은 위쪽으로 떼어 다음 스테이지로와 멀리) */
+.K .se-pop .acts { gap: 12px; margin-top: 16px; }
+.K .se-pop .sh-buy { flex: 1; min-width: 0; justify-content: center; padding: 16px 12px; font-size: 24px; white-space: nowrap; }
+.K .se-pop .fx-mini { flex: none; min-width: 96px; justify-content: center; padding: 16px 18px; font-size: 22px; }
+.K .se-pop .fx-mini.on { background: var(--a-deco, var(--accent)); color: var(--on-accent); }
 .K .se-line.is-sel { background: rgba(246,236,212,.08); }
 .K .se-line .fx-stamp { font-size: 20px; left: 55%; top: 50%; }
 .K .se-tag { text-align: left; } .K .se-tag .fx-pin { left: -4px; top: -12px; }
@@ -3263,7 +3271,7 @@ body { display: grid; place-items: center; }
       + S.stock.rest.map((o, j) => { const R = restOf(o.id), poor = !o.sold && S.gold < R.price; return `<button type="button" class="se-line${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-rest="${j}"><span class="fx-tok" style="--s:66px;--c:var(--hp)">${ico(R.ico)}</span><div><b>${R.name}</b><small>체력 +${R.heal}</small></div><span class="fx-pr${poor ? ' poor' : ''}"><i></i>${R.price}</span>${o.sold ? '<span class="fx-stamp">이번엔 샀어요</span>' : ''}</button>`; }).join('') + '</div>';
     const full = sel && !sel.sold && fullOf(sel);
     h += `<div class="se-pop"><div class="who">오토 · ${S.fixSay}</div>` + (sel ? `<h3>${I.name}</h3><p>${I.ef}</p><div class="dst">들어갈 곳 · ${sel.sold ? '이미 샀어요' : full ? '칸이 가득 · 사면 하나를 골라 내보내요 (되팔기)' : I.dest}</div>`
-      + `<div class="acts">${sel.g === 'rest' ? '' : `<button type="button" class="fx-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'}</button>`}<button type="button" class="sh-buy${sel.sold || S.gold < I.pr ? ' off' : ''}" id="fixBuy">${sel.sold ? '이미 샀어요' : S.gold < I.pr ? `엽전 ${I.pr - S.gold} 모자라요` : `사기 · ${I.pr}엽전`} <span class="key">Enter</span></button></div>` : '') + '</div>'
+      + `<div class="acts">${sel.g === 'rest' ? '' : `<button type="button" class="fx-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'} <span class="key">F</span></button>`}<button type="button" class="sh-buy${sel.sold || S.gold < I.pr ? ' off' : ''}" id="fixBuy">${sel.sold ? '이미 샀어요' : S.gold < I.pr ? `엽전 ${I.pr - S.gold} 모자라요` : `사기 · ${I.pr}엽전`} <span class="key">Enter</span></button></div>` : '') + '</div>'
       + `<span class="og-patch sticker fix-oto" style="--c:var(--char-oto)">${faceImg('oto', 'fill')}</span>`;
     // 짐 띠: 동료 4 · 장치 6 · 보급품 3. 고른 물건이 들어갈 주머니가 밝아지고 「여기로」, 칸에 마우스를 올리면 설명 쪽지
     const mates = Array.from({ length: 4 }, (_, i) => {
@@ -3286,7 +3294,7 @@ body { display: grid; place-items: center; }
       + `<div class="pk${hot === 'dev' ? ' hot' : ''}" data-zone="dev"><h5>장치 <small>${S.devices.length}/${SHOP.deviceMax} · 눌러서 되팔기</small></h5><div class="fx-slots" style="gap:9px">${devs}</div><span class="here">여기로 ↓</span></div>`
       + `<div class="pk${hot === 'sup' ? ' hot' : ''}" data-zone="sup"><h5>보급품 <small>${S.held.length}/${SHOP.itemSlots}</small></h5><div class="fx-slots" style="gap:12px">${tins}</div><span class="here">여기로 ↓</span></div></div>`
       + '<div class="sv-tip" hidden><div class="h"><span class="ic"></span><div><b></b><small></small></div></div><p></p><div class="f"></div></div>'
-      + `<button type="button" class="fx-svc sh-reroll" id="fixReroll" style="position:absolute;left:1530px;top:884px;width:360px;z-index:6"><span class="fx-tok" style="--s:54px;--c:var(--accent-2)">${ico('turn')}</span><div><b>새로 고침</b><small>쪽지 4장 + 보급품 2장 · 다음엔 엽전 ${fix.reroll + 1}</small></div><span class="fx-pr s${S.gold < fix.reroll ? ' poor' : ''}"><i></i>${fix.reroll}</span></button>`;
+      + `<button type="button" class="fx-svc sh-reroll" id="fixReroll" style="position:absolute;left:1280px;top:20px;width:360px;z-index:6"><span class="fx-tok" style="--s:54px;--c:var(--accent-2)">${ico('turn')}</span><div><b>새로 고침 <span class="key">R</span></b><small>쪽지 · 보급품 바뀜 · 누를수록 +1</small></div><span class="fx-pr s${S.gold < fix.reroll ? ' poor' : ''}"><i></i>${fix.reroll}</span></button>`;
     if (preview) h += `<div class="og-btn p" style="left:1490px;top:972px;transform:rotate(-1.5deg);z-index:8">다음 스테이지로<small>${S.node + 2}/${CHAPTER.length} · ${NODE_LABEL[nx] || ''}</small></div>`;
     else h += `<div class="sv-hero" style="left:-170px;top:400px;height:680px"><img class="sticker" src="${heroSrc(S.hero)}" alt="" style="height:680px;transform:scaleX(-1)"></div>`;
     return h;
