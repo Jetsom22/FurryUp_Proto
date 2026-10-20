@@ -2536,11 +2536,11 @@ body { display: grid; place-items: center; }
   }
   function transitHtml(from, to) {
     const I = nextInfo(to), bossAt = CHAPTER.lastIndexOf('boss'), left = bossAt - to;
-    const foe = ([key, n]) => `<span class="tr2-foe">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}${I.boss ? '' : `×${n}`}</span>`;
+    const foe = ([key, n]) => `<span class="tr2-foe" data-foe="${key}" data-n="${n}" title="${FOES[key].name}">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}${I.boss ? '' : `×${n}`}</span>`;
     return `<div class="tmap tr2-map">${trackHtml(to)}<span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
-      + `<div class="tr2-note${I.boss ? ' boss' : ''}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}<div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>`
-      + (I.line ? `<p>${I.line}</p>` : '') + (I.foes ? `<div class="tr2-foes">${I.foes.map(foe).join('')}</div>` : '')
-      + `<div class="tr2-stat"><span>${to + 1} / ${CHAPTER.length}칸</span><span>${left > 0 ? `보스까지 ${left}칸` : '보스!'}</span><span>체력 ${S.main.hp}/${S.main.maxHp}</span><span>씨앗 ${S.gold}</span></div></div>`
+      + `<div class="tr2-note${I.boss ? ' boss' : ''}" data-type="${CHAPTER[to]}" data-node="${to + 1}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}<div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>`
+      + (I.line ? `<p class="tr2-gm">${I.line}</p>` : '') + (I.foes ? `<div class="tr2-foes">${I.foes.map(foe).join('')}</div>` : '')
+      + `<div class="tr2-stat"><span class="tr2-at">${to + 1} / ${CHAPTER.length}칸</span><span class="tr2-left">${left > 0 ? `보스까지 ${left}칸` : '보스!'}</span><span class="tr2-hp">체력 ${S.main.hp}/${S.main.maxHp}</span><span class="tr2-gold">씨앗 ${S.gold}</span></div></div>`
       + '<div class="tapekeys" style="left:760px;top:990px"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
   }
   function clearField() {
