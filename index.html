@@ -1480,7 +1480,7 @@ body { display: grid; place-items: center; }
 .K .shout.combo { left: 1090px; top: 196px; font-size: 92px; transform: rotate(-7deg) scale(var(--pop, 1)); transform-origin: 30% 60%; z-index: 8; pointer-events: none; }
 /* 보스 팻말 (디자인 시스템에 없는 요소: 나무 판자 + 크림 이름표) */
 /* 보스전 (v0.14.2, 사용자 답: 시안 A + C). 위 교역로 지도 띠가 걷히고, 그 자리에 보스가 판 뒤에서 상반신을 내민다 (맵 밖 포트레이트 D13 · D14 그대로).
-   이름 · 체력 · 기믹 · 다음 행동은 판 윗단 왼쪽 현수막. 판 바닥은 보스 빛으로 물들고 테두리에 가시 (캔버스 drawBossField). 시작은 「경고!」 */
+   이름 · 체력 · 기믹 · 다음 행동은 판 윗단 왼쪽 현수막. 판 바닥은 보스 빛으로 물들고 테두리에 보스 빛이 번진다 (캔버스 drawBossField). 시작은 「경고!」 */
 .K #track { transition: translate .5s cubic-bezier(.5, -.3, .7, .4); }
 #app.boss-on #track { translate: 0 -260px; }
 #app.boss-on #stageWrap { z-index: 2; }
@@ -1488,10 +1488,10 @@ body { display: grid; place-items: center; }
 #app.boss-on #stageWrap .boardsign { opacity: 0; translate: 0 -24px; }
 .K .bossplate { position: absolute; left: 0; top: 0; width: 1920px; height: 0; z-index: 1; }
 .K .bossplate canvas { position: absolute; left: 962px; top: -40px; width: 556px; height: 556px; z-index: 0; }
-.K .bossplate:not([hidden]) canvas { animation: bp-rise .75s var(--mo-spring) .45s backwards; }
+.K .bossplate:not([hidden]) canvas { animation: bp-rise .8s var(--mo-spring) .4s backwards; }
 @keyframes bp-rise { from { translate: 0 320px; } 40% { translate: 0 -18px; } }
 .K .bp-in { position: absolute; left: 488px; top: 12px; width: 480px; z-index: 3; color: var(--on-dark); }
-.K .bossplate:not([hidden]) .bp-in { animation: mo-drop .45s var(--mo-spring) .6s backwards; }
+.K .bossplate:not([hidden]) .bp-in { animation: mo-drop .45s var(--mo-spring) .75s backwards; }
 .K .bp-in::before { content: attr(data-kind); display: inline-block; padding: 7px 14px 6px; background: var(--accent-2); color: var(--ink); font: 400 22px/1 var(--font-market-display); rotate: -3deg; box-shadow: 0 4px 0 rgba(0,0,0,.35); }
 .K .bp-name { margin-top: 6px; font: 400 54px/1 var(--font-market-display); color: var(--surface); text-shadow: 4px 4px 0 var(--mat-1); white-space: nowrap; }
 .K .bp-hp { position: relative; margin-top: 8px; width: 460px; height: 30px; background: var(--mat-1); box-shadow: 0 0 0 4px var(--surface), 0 6px 0 4px rgba(0,0,0,.35); transform: skewX(-10deg); }
@@ -1728,6 +1728,9 @@ body { display: grid; place-items: center; }
 .tr2-stat { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 .tr2-stat span { padding: 8px 14px; background: var(--surface-2); color: var(--ink); font: 400 22px/1 var(--font-market-label); box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
 .tr2-note.show .tr2-stat span { animation: mo-drop .35s var(--mo-out) calc(.35s + var(--i) * .07s) backwards; }
+.tr2-next { position: absolute; right: 120px; top: 940px; z-index: 9; transform: rotate(-2deg); font-size: 40px; }
+.tr2-next:not([hidden]) { animation: mo-slap .4s var(--mo-pop) .25s backwards; }
+.tr2-scene.arrive ~ .tr2-keys { opacity: 0; transition: opacity .2s; }
 .tr2-timer { position: absolute; left: 40px; right: 40px; bottom: 20px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
 .tr2-note.boss .tr2-timer { background: rgba(0, 0, 0, .25); }
 .tr2-timer i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; scale: 0 1; background: var(--accent-2); }
@@ -2257,7 +2260,7 @@ body { display: grid; place-items: center; }
   const NODE_LABEL = { story: '스토리', battle: '전투', event: '이벤트', mid: '중간 보스', boss: '보스' };
   // 칸 사이 전환 (D93 · D109, 인게임 기획서 2-3 · 7-7): 지도 띠가 내려오고(drop) 메인이 걸어가고(walk) 다음 칸 쪽지(panel)가 뜬 뒤 저절로. 초.
   // fast = 설정 '칸 전환 빠르게'(시험용, 나중에 뺀다)를 켜면 전체를 이 초로 줄인다. 임시값 · 임시 연출 (모양 · 애니메이션은 UI 담당)
-  const TRANSIT = { drop: 0.35, walk: 1.2, panel: 1.8, fast: 0.5 };
+  const TRANSIT = { drop: 0.35, walk: 1.6, panel: 1.8, fast: 0.5 };
   const BOSS_INFO = { mid: { name: '시슬라', gimmick: '가시 갑옷' }, boss: { name: '아이비른', gimmick: '씨앗 폭탄' } };
   // 스토리는 시나리오 담당이 쓴다. 여기는 형식 시험용 테스트 대사뿐
   // 열은 CampStory 표 그대로: side (L 메인 · R 상대 · P 플레이어 · N 나레이션) · who · b (talk · shout · think · narr) · say, 그리고 face · bg · hand
@@ -2755,18 +2758,21 @@ body { display: grid; place-items: center; }
     const body = $('#ovBody');
     body.style.setProperty('--tr-drop', `${T0.drop * k}s`); body.style.setProperty('--tr-walk', `${T0.walk * k}s`); body.style.setProperty('--tr-panel', `${T0.panel * k}s`);
     body.innerHTML = transitHtml(from, to);
-    let left = false;
-    const go = () => { if (left || S.drawN !== n0) return; left = true; S.keys = null; body.removeEventListener('click', onClick); body.style.cssText = ''; hideOverlay(); then(); };
+    let left = false, arrived = false;
+    const map = body.querySelector('.tr2-map'), note = body.querySelector('.tr2-note'), next = body.querySelector('#transitNext');
+    const go = () => { if (left || S.drawN !== n0) return; left = true; S.keys = null; S.transitGo = null; body.removeEventListener('click', onClick); body.style.cssText = ''; hideOverlay(); then(); };
+    // 원정대가 닿으면 멈추고 「다음 칸으로」를 기다린다 (사용자 답 10-20: 저절로 넘기면 너무 빠르다). 그 전 클릭 · Enter는 끝 장면으로 빨리 감기
+    const arrive = () => { if (arrived || left || S.drawN !== n0) return; arrived = true; map.classList.add('in', 'walk', 'arrive'); note.classList.add('show'); next.hidden = false; sfx.place(); };
+    const step = () => (arrived ? go() : arrive());
     // 정비 「다음 스테이지로」 · 이벤트 고르기는 #ovBody 안 단추라, 전환을 연 그 클릭이 거품으로 올라와 바로 넘기지 않게 그 뒤 클릭만 받는다
-    const t0 = performance.now(), onClick = (e) => { if (e.timeStamp > t0) go(); };
+    const t0 = performance.now(), onClick = (e) => { if (e.timeStamp <= t0) return; if (e.target.closest('#transitNext')) go(); else if (!arrived) arrive(); };
     const auto = () => { if (menuOpen()) { later(auto, 300, n0); return; } go(); };
-    S.keys = { Enter: go, ' ': go };
+    S.keys = { Enter: step, ' ': step }; S.transitGo = go;
     body.addEventListener('click', onClick);
-    const map = body.querySelector('.tr2-map'), note = body.querySelector('.tr2-note');
     later(() => map.classList.add('in'), 30, n0);
     later(() => map.classList.add('walk'), ms(T0.drop), n0);
-    later(() => { map.classList.add('arrive'); note.classList.add('show'); sfx.place(); }, ms(T0.drop + T0.walk), n0);
-    later(auto, ms(all), n0);
+    later(arrive, ms(T0.drop + T0.walk), n0);
+    if (S.opts.fast) later(auto, ms(all), n0); // 「칸 전환 빠르게」(시험용)만 예전처럼 저절로
     syncUI(true);
   }
   // 다음 칸 쪽지에 보일 것 (인게임 기획서 2-3 표)
@@ -2798,7 +2804,8 @@ body { display: grid; place-items: center; }
     const hey = `<span class="tr2-hey">${I.boss ? '!!' : t === 'event' ? '?' : '!'}</span>`;
     const face = (k, i, cls) => `<span class="tr2-face${cls ? ' ' + cls : ''}" style="--i:${i};--c:var(--char-${k})">${faceImg(k)}</span>`;
     const root = (inner) => `<div class="tr2-scene tr2-map${I.boss ? ' boss' : ''}" data-style="road">${inner}</div>`
-      + '<div class="tapekeys" style="left:760px;top:1000px;z-index:9"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
+      + '<div class="tapekeys tr2-keys" style="left:760px;top:1000px;z-index:9"><span><span class="key">클릭</span><span class="key">Enter</span>빨리 보기</span></div>'
+      + '<button type="button" class="og-btn p mo-idle-pulse tr2-next" id="transitNext" hidden>다음 칸으로<small>Enter</small></button>';
       const n = mates.length + (S.ally ? 1 : 0);
       const party = mates.map((k, j) => face(k, n - j + (S.ally ? 0 : 0), '')).join('')
         + (S.ally ? `<span class="tr2-hero ally" style="--i:1"><img alt="" src="${heroSrc(S.ally.kind)}"></span>` : '')
@@ -2808,7 +2815,7 @@ body { display: grid; place-items: center; }
         + `<div class="tr2-layer tr2-pines" style="--px:-700px">${pines}</div><div class="tr2-ground"></div><div class="tr2-road"></div>${I.boss ? '<span class="tr2-scene-warn"></span>' : ''}`
         + `<div class="tmap tr2-strip">${trackHtml(to)}<span class="tr2-done" style="left:${mapX(from)}px;top:${MAP_Y[from]}px">완료</span><span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
         + `<div class="tr2-party">${party}</div>`
-        + `<div ${noteAttr}><div class="tr2-paper">${warn}${txt}<span class="tr2-timer"><i></i></span></div><span class="tr2-post"></span></div>`
+        + `<div ${noteAttr}><div class="tr2-paper">${warn}${txt}</div><span class="tr2-post"></span></div>`
         + `<div class="tr2-ahead">${pic}<span class="tr2-bush"></span></div>`);
   }
   function clearField() {
@@ -6058,7 +6065,10 @@ body { display: grid; place-items: center; }
   }
   function drawBossCard() {
     const b = theBoss(), card = $('#bossCard');
-    const show = !!b && ['aim', 'shot', 'enemy', 'cutin', 'wait', 'iai', 'dry'].includes(S.phase);
+    const fight = !!b && ['aim', 'shot', 'enemy', 'cutin', 'wait', 'iai', 'dry'].includes(S.phase);
+    // 등장 순서: 지도 띠가 보이는 판에 「경고!」 → 띠가 걷히고 → 보스가 판 뒤에서 솟는다 (사용자 답 10-20)
+    if (!fight) S.bossIn = 0; else if (!S.bossIn) S.bossIn = performance.now();
+    const show = fight && (reduceMotion || performance.now() - S.bossIn > BOSS_INTRO_MS);
     if (card.hidden === show) { card.hidden = !show; $('#app').classList.toggle('boss-on', show); }
     if (!show) return;
     const bpIn = card.querySelector('.bp-in'), kind = b.key === 'thistle' ? '중간 보스' : '보스';
@@ -6762,8 +6772,9 @@ body { display: grid; place-items: center; }
     }
     ctx.restore();
   }
-  // 보스전 판: 바닥이 보스 빛으로 물들고 가장자리가 어두워지며 테두리에 가시 (시슬라 분홍 · 아이비른 보라)
+  // 보스전 판: 바닥이 보스 빛으로 물들고 가장자리가 어두워지며 테두리에 보스 빛이 번진다 (시슬라 분홍 · 아이비른 보라)
   const BOSS_ANCHOR = { x: 730, y: -50 };
+  const BOSS_INTRO_MS = 650; // 「경고!」가 뜬 뒤 지도 띠를 걷기까지
   const bossTint = (b) => (b.key === 'thistle' ? T.petal : T.finale);
   function drawBossField(b) {
     const col = bossTint(b), t = performance.now() / 1000;
@@ -6772,10 +6783,14 @@ body { display: grid; place-items: center; }
     const g = ctx.createRadialGradient(W / 2, H * 0.45, H * 0.3, W / 2, H * 0.45, W * 0.62);
     g.addColorStop(0, 'rgba(24, 31, 15, 0)'); g.addColorStop(1, 'rgba(24, 31, 15, 0.55)');
     ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = col; ctx.globalAlpha = 0.85 + 0.1 * Math.sin(t * 2);
-    const thorn = (x, y, nx, ny, s) => { ctx.beginPath(); ctx.moveTo(x - ny * s * 0.5, y + nx * s * 0.5); ctx.lineTo(x + nx * s, y + ny * s); ctx.lineTo(x + ny * s * 0.5, y - nx * s * 0.5); ctx.closePath(); ctx.fill(); };
-    for (let x = 14; x < W; x += 30) { const s = 13 + (x * 7 % 9); thorn(x, 0, 0, 1, s); thorn(x + 15, H, 0, -1, s); }
-    for (let y = 14; y < H; y += 30) { const s = 13 + (y * 5 % 9); thorn(0, y, 1, 0, s); thorn(W, y + 15, -1, 0, s); }
+    // 테두리: 가장자리에서 안쪽으로 은은하게 번지는 보스 빛 (뾰족한 가시는 피해 판정으로 보여 뺐다, 사용자 답 10-20)
+    const edge = 70, pulse = 0.4 + 0.12 * Math.sin(t * 1.6);
+    ctx.globalAlpha = pulse;
+    for (const [x0, y0, x1, y1, rx, ry, rw, rh] of [[0, 0, 0, edge, 0, 0, W, edge], [0, H, 0, H - edge, 0, H - edge, W, edge], [0, 0, edge, 0, 0, 0, edge, H], [W, 0, W - edge, 0, W - edge, 0, edge, H]]) {
+      const lg = ctx.createLinearGradient(x0, y0, x1, y1);
+      lg.addColorStop(0, col); lg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = lg; ctx.fillRect(rx, ry, rw, rh);
+    }
     ctx.restore(); ctx.globalAlpha = 1;
   }
   const easeOut = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
@@ -7093,7 +7108,7 @@ body { display: grid; place-items: center; }
     pool: () => ({ devices: [...DEVICES], kinds: [...KIND_ORDER] }),
     load: (k) => loadOf(k || S.hero || META.pick),
     treeFx: (key) => treeFx(key),
-    skip() { if (S.phase !== 'transit') return false; $('#ovBody').click(); return true; },
+    skip() { if (S.phase !== 'transit' || !S.transitGo) return false; S.transitGo(); return true; },
     jump(i) { if (!S.inRun) return false; S.node = i - 1; nextNode(); return S.phase; },
     syn: () => synOn().map((o) => ({ ...o, fx: synFx(o.race, o.t, ' · ') })),
     stat: () => ({ atk: atkNow(), speed: speedMul(), twice: twice(), slug: slugT() }),
