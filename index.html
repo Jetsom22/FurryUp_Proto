@@ -2684,18 +2684,18 @@ body { display: grid; place-items: center; }
       S.mul = { hp: enc.hp, atk: enc.atk };
       S.enemies = enc.foes.map(([k, x, y]) => makeFoe(k, x, y, enc.hp * BAL.foeHp, enc.atk));
       buildMap(enc.map);
-      banner(`전투 ${S.battles} · ${enc.tag}`, T.accent);
+      startShout(T.accent);
     } else if (type === 'mid') {
       S.gimmick = 'armor'; buildMap(MAPS.mid);
       S.enemies = [offField(makeFoe('thistle', 0, 0, 1, 1)),
         makeFoe('thorn', 300, 200, 1, 1), makeFoe('thorn', 660, 200, 1, 1), makeFoe('thorn', 480, 330, 1, 1),
         makeFoe('bud', 480, 105, 1, 1), makeFoe('bud', 220, 390, 1, 1), makeFoe('bud', 740, 390, 1, 1)];
-      banner(`${BOSS_INFO.mid.name} · ${BOSS_INFO.mid.gimmick}`, T.danger);
+      startShout(T.danger);
     } else if (type === 'boss') {
       S.gimmick = 'seeds'; buildMap(MAPS.boss);
       S.enemies = [offField(makeFoe('ivy', 0, 0, 1, 1)), makeFoe('vine', 300, 210, 1, 1), makeFoe('vine', 660, 210, 1, 1), makeFoe('vine', 480, 120, 1, 1)];
       plantSeeds(3);
-      banner(`${BOSS_INFO.boss.name} · ${BOSS_INFO.boss.gimmick}`, T.petal);
+      startShout(T.petal);
     } else {
       const sp = SPECIALS[special.id];
       special.left = sp.shots;
@@ -2705,7 +2705,7 @@ body { display: grid; place-items: center; }
         for (let i = 0; i < n; i++) { const at = freeSpot(r, undefined, undefined, 0, 0, null, true); if (at) S.enemies.push(makeFoe(key, at.x, at.y, 1, 1)); }
       }
       special.total = S.enemies.length;
-      banner(sp.banner, T.spark);
+      banner(sp.banner, T.spark); // 특수 판은 칸 사이 쪽지가 없어 규칙 띠를 남긴다
     }
     S.enemies.forEach((e, i) => { e.id = i; });
     S.webs = [];
@@ -2890,7 +2890,9 @@ body { display: grid; place-items: center; }
       }
     }
   }
-  function banner(text, color) { S.fx.banner = { text, color, t: 0 }; }
+  function banner(text, color) { S.fx.banner = { text, color, t: 0, dur: 1.6 }; }
+  // 전투 시작: 판 이름 · 보스 이름은 칸 사이 전환 쪽지가 맡고, 판 위에는 짧은 외침만 (기획서 2-3 · 사용자 답 10-20)
+  function startShout(color) { S.fx.banner = { text: '시작!', color, t: 0, dur: 1.15, shout: true }; }
 
   // ---------- CYOA 설문 · 프로필 ----------
   const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
@@ -5487,7 +5489,7 @@ body { display: grid; place-items: center; }
     fx.shake = Math.max(0, fx.shake - dt * 60);
     fx.comboPop = Math.max(0, fx.comboPop - dt * 5);
     if (S.phase !== 'shot') fx.comboShow = Math.max(0, fx.comboShow - dt);
-    if (fx.banner) { fx.banner.t += dt; if (fx.banner.t > 1.6) fx.banner = null; }
+    if (fx.banner) { fx.banner.t += dt; if (fx.banner.t > fx.banner.dur) fx.banner = null; }
     fx.flash = Math.max(0, (fx.flash || 0) - dt);
     S.ball.sq = Math.max(0, (S.ball.sq || 0) - dt * 7);
     if (fx.dying) { for (const d of fx.dying) d.t += dt; fx.dying = fx.dying.filter((d) => d.t < 0.5); }
@@ -6440,7 +6442,8 @@ body { display: grid; place-items: center; }
   }
   function drawBanner() {
     const bn = S.fx.banner; if (!bn) return;
-    const k = bn.t / 1.6, a = k < 0.15 ? k / 0.15 : k > 0.75 ? (1 - k) / 0.25 : 1;
+    if (bn.shout) { drawShout(bn); return; }
+    const k = bn.t / bn.dur, a = k < 0.15 ? k / 0.15 : k > 0.75 ? (1 - k) / 0.25 : 1;
     ctx.globalAlpha = clamp(a, 0, 1);
     ctx.font = `34px ${FONT_DISPLAY}`;
     const w = Math.max(260, ctx.measureText(bn.text).width + 80);
@@ -6450,6 +6453,27 @@ body { display: grid; place-items: center; }
     ctx.strokeStyle = 'rgba(38, 42, 23, 0.45)'; ctx.lineWidth = 3; ctx.setLineDash([9, 7]); ctx.strokeRect(-w / 2 + 9, -29, w - 18, 58); ctx.setLineDash([]);
     ctx.fillStyle = T['ink-dark']; ctx.fillText(bn.text, 0, 3); ctx.restore();
     ctx.globalAlpha = 1;
+  }
+  // 「시작!」 외침: 글자마다 차례로 크게 튀어 (디자인 시스템 ttl-letter 결) 잠깐 머물다 위로 빠지며 사라진다. 동작 줄이기면 제자리에 떴다 사라진다
+  function drawShout(bn) {
+    const chars = [...bn.text], size = 132, gap = 0.08, out = bn.dur - 0.28;
+    const fade = bn.t > out ? clamp(1 - (bn.t - out) / 0.28, 0, 1) : 1, lift = bn.t > out ? (1 - fade) * 40 : 0;
+    ctx.save(); ctx.translate(W / 2, H / 2 - lift); ctx.rotate(-0.07);
+    ctx.font = `${size}px ${FONT_DISPLAY}`; ctx.lineJoin = 'round';
+    const ws = chars.map((ch) => ctx.measureText(ch).width), total = ws.reduce((a, b) => a + b, 0);
+    let x = -total / 2;
+    chars.forEach((ch, i) => {
+      const p = reduceMotion ? 1 : clamp((bn.t - i * gap) / 0.32, 0, 1), s = reduceMotion ? 1 : easeBack(p);
+      const cx = x + ws[i] / 2; x += ws[i];
+      if (p <= 0) return;
+      ctx.save(); ctx.globalAlpha = fade * clamp(p * 3, 0, 1); ctx.translate(cx, (1 - s) * 30); ctx.scale(s, s); ctx.rotate((i % 2 ? 1 : -1) * 0.05);
+      ctx.lineWidth = 22; ctx.strokeStyle = T.mat1; ctx.strokeText(ch, 7, 9);
+      ctx.fillStyle = T.mat1; ctx.fillText(ch, 7, 9);
+      ctx.lineWidth = 16; ctx.strokeStyle = T['ink-dark']; ctx.strokeText(ch, 0, 0);
+      ctx.fillStyle = bn.color; ctx.fillText(ch, 0, 0);
+      ctx.restore();
+    });
+    ctx.restore(); ctx.globalAlpha = 1;
   }
   const easeOut = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
   const easeBack = (t) => { t = clamp(t, 0, 1); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
