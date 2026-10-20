@@ -265,10 +265,12 @@
 /* right column */
 .K .mate small, .K .mate .stars { color: var(--accent-ink); }
 .K .stamp { box-shadow: inset 0 0 0 12px var(--spirit), inset 0 0 0 16px var(--accent); outline: 3px dashed var(--stitch-l); outline-offset: -30px; }
-/* 시너지 와펜 (170px): 효과가 세 줄이어도 점선 안에 들도록 점선을 바깥으로, 줄 간격을 좁게 */
-.K #syn { outline-offset: -23px; }
+/* 시너지 와펜 (192px): 갯민숭 효과가 네 줄이어도 점선 안에 들도록 키우고, 점선을 바깥으로 · 글 폭을 원 안쪽으로 */
+.K #syn { outline-offset: -20px; }
 .K #syn em { font-size: 16px; margin-bottom: 2px; }
-.K #syn small { font-size: 14px; line-height: 1.15; margin-top: 5px; }
+.K #syn small { font-size: 14px; line-height: 1.12; margin-top: 5px; max-width: 128px; word-break: keep-all; }
+/* 꺼진 시너지: 회색 와펜, 글은 읽히게 (흐리게만 하지 않는다) */
+.K .stamp.off { filter: grayscale(1) brightness(.92); opacity: .85; }
 /* 둘째 시너지 와펜 (130px): 테두리를 얇게, 머리글 없이 이름 · 숫자 두 줄 + 단 14px */
 .K #syn2 { box-shadow: inset 0 0 0 7px var(--spirit), inset 0 0 0 10px var(--accent); outline-offset: -17px; padding: 0 22px; }
 .K #syn2 b { font-size: 24px; line-height: 1.02; }
@@ -1750,7 +1752,7 @@ body { display: grid; place-items: center; }
 
     <div class="sec" id="teamHead" style="left:1540px;top:196px">동료 0/4</div>
     <div id="team" aria-label="동료"></div>
-    <div class="stamp" id="syn" style="left:1546px;top:618px;width:170px;height:170px" aria-label="시너지"></div>
+    <div class="stamp" id="syn" style="left:1534px;top:606px;width:192px;height:192px" aria-label="시너지"></div>
     <div class="stamp" id="syn2" style="left:1742px;top:764px;width:130px;height:130px;display:none" aria-label="시너지 2"></div>
     <div class="sec" id="devHead" style="left:1736px;top:612px">장치 0/4</div>
     <div class="pins" id="kits" style="left:1730px;top:650px;grid-template-columns:repeat(2,44px);gap:8px 8px" aria-label="장치"></div>
@@ -6371,7 +6373,7 @@ body { display: grid; place-items: center; }
     // 시너지 와펜: 켜진 시너지를 최대 둘 (D104). 하나도 없으면 메인 종족을 회색 OFF
     const on = synOn(), wap = (el, o, big) => {
       if (!o) { el.style.display = 'none'; return; }
-      el.style.display = ''; el.style.opacity = o.t ? '' : '0.6'; el.style.filter = o.t ? '' : 'grayscale(1)';
+      el.style.display = ''; el.classList.toggle('off', !o.t);
       // 작은 와펜(둘째)은 효과 글이 들어갈 자리가 없어 단만 적고, 효과는 올리면 보이는 풀이로
       el.title = o.t ? synFx(o.race, o.t, ' · ') : '';
       el.innerHTML = `${big ? '<em>시너지</em>' : ''}<b>${synLabel(o.race, o.t)}</b>${o.t && big ? `<small>${synFx(o.race, o.t, '<br>')}</small>` : ''}`;
