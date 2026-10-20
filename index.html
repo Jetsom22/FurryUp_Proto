@@ -2129,9 +2129,10 @@ body { display: grid; place-items: center; }
     hipsel: { name: '히프셀', fac: 'slug', race: '갯민숭달팽이', hp: 60, atk: 7, def: 3, skill: '점액 파문', style: '흔적', desc: `적을 뚫고 지나가며 점액을 남긴다. 점액은 ${SLIME.life}초 동안 그 위 적을 녹인다`, sdesc: `제자리에서 동심원으로 퍼지는 점액 장판 (${SLIME.field.life}초, 발과 발 사이에도) · 보호막 +${SLIME.shield}`, unit: '점액 · 1.4초마다 가까운 적 발밑에', gauge: 45, ctl: { shot: 4.5, dash: 120, moves: 3 } },
   });
   // 팩션: 마을 하나 = 메인 2 · 동료 4 · 판 위 장치 몫. 민숭마을은 ×2 범퍼 대신 번개 기둥 (D67 제안: 번개 기둥 → 작은 해양 생물)
+  // 마을 (D110: 마을 = 종족). 장치는 마을마다 3종 (인게임 기획서 3-15 제안, 사용자 답 v0.16). 룰렛 범퍼는 도전과제 보상에서 민숭마을 장치로 옮겼다
   const FACTIONS = {
-    rabbit: { name: '긴 귀 토끼 마을', race: '토끼', short: '토끼', mains: ['hanato', 'rito'], kinds: ['ryuto', 'sato', 'oto', 'santo'], devices: ['plus', 'mult', 'spinner', 'booster'] },
-    slug: { name: '민숭마을', race: '갯민숭달팽이', short: '갯민숭', mains: ['doris', 'hipsel'], kinds: ['bosung', 'pongsung', 'jilsung', 'mongsung'], devices: ['plus', 'bolt', 'spinner', 'booster'] },
+    rabbit: { name: '긴 귀 토끼 마을', race: '토끼', short: '토끼', mains: ['hanato', 'rito'], kinds: ['ryuto', 'sato', 'oto', 'santo'], devices: ['plus', 'mult', 'booster'] },
+    slug: { name: '민숭마을', race: '갯민숭달팽이', short: '갯민숭', mains: ['doris', 'hipsel'], kinds: ['bosung', 'pongsung', 'jilsung', 'mongsung'], devices: ['bolt', 'spinner', 'roulette'] },
   };
   const facOf = (k) => FACTIONS[HEROES[k || S.hero || 'hanato'].fac];
   const P = (t, v, o) => ({ t, v, ...o });
@@ -2424,7 +2425,7 @@ body { display: grid; place-items: center; }
     { id: 'big42', col: 'battle', name: '한 방에 -42', desc: '한 번에 피해 42 주기', goal: 42, val: () => META.stat.bigHit, rw: { medal: 4 } },
     { id: 'ally1', col: 'collect', name: '첫 동료', desc: '원정에서 동료 1명 영입하기', goal: 1, val: () => META.stat.recruits, rw: { medal: 1 } },
     { id: 'party4', col: 'collect', name: '가득 찬 원정대', desc: '동료 4칸 모두 채우기', goal: 4, val: () => META.stat.party, rw: { relic: 'luckycoin' } },
-    { id: 'dev4', col: 'collect', name: '장치 수집가', desc: '서로 다른 장치 4종 얻기', goal: 4, val: () => Object.keys(META.seen.dev).length, rw: { dev: 'roulette' } },
+    { id: 'dev4', col: 'collect', name: '장치 수집가', desc: '서로 다른 장치 4종 얻기', goal: 4, val: () => Object.keys(META.seen.dev).length, rw: { medal: 3 } },
     { id: 'relic4', col: 'collect', hide: true, name: '유물 수집가', desc: '유물 4개 모으기', goal: 4, val: () => Object.keys(META.relics).length, rw: { relic: 'combobell' } },
     { id: 'ryuto', col: 'bond', name: '막내를 찾아서', desc: '이벤트에서 막내를 두 번 만나기', goal: 2, val: () => META.stat.kid, rw: { ally: 'ryuto' } },
     { id: 'withOto', col: 'bond', name: '퇴마사의 맛집', desc: '오토와 함께 원정 3번', goal: 3, val: () => META.stat.withOto, rw: { relic: 'toolbox' } },
@@ -7089,6 +7090,7 @@ body { display: grid; place-items: center; }
     persona(p) { S.persona = p ? { name: '시험', size: RACES[p.race].size, color: 0, suggested: p.race, custom: false, ...p } : null; renderPanel(); },
     restock() { if (S.phase !== 'shop') return false; rollStock(); renderShop(); return true; },
     tree: () => META.tree,
+    pool: () => ({ devices: [...DEVICES], kinds: [...KIND_ORDER] }),
     load: (k) => loadOf(k || S.hero || META.pick),
     treeFx: (key) => treeFx(key),
     skip() { if (S.phase !== 'transit') return false; $('#ovBody').click(); return true; },
