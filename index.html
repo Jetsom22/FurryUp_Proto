@@ -1738,6 +1738,46 @@ body { display: grid; place-items: center; }
   .tr2-map, .tr2-walker, .tr2-note .tr2-timer i { transition-duration: .01s !important; }
   .tr2-map *, .tr2-note, .tr2-note * { animation: none !important; }
 }
+/* 원정대 강화 트리 (v0.14, 임시 디자인: 계획판 재료 — 코르크 판 · 쪽지) */
+.K .tree-cork { position: absolute; inset: 18px; background-color: #b4875a; background-image: radial-gradient(rgba(84, 52, 28, .38) 1.6px, transparent 2.2px); background-size: 15px 15px; overflow: hidden; }
+.K .tree-row { position: absolute; left: 0; width: 200px; height: 96px; display: flex; align-items: center; padding-left: 22px; background: var(--mat-1); color: var(--on-dark); clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%); }
+.K .tree-row b { font: 400 26px/1 var(--font-market-display); }
+.K .tree-col { position: absolute; top: 0; bottom: 0; border-left: 4px dashed rgba(246, 236, 212, .45); background: rgba(36, 27, 15, .28); }
+.K .tree-col.open { background: transparent; }
+.K .tree-head { position: absolute; left: 10px; right: 10px; top: 12px; height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: var(--surface); color: var(--ink); outline: 2px dashed var(--stitch); outline-offset: -6px; }
+.K .tree-col:not(.open) .tree-head { background: #9c7a4e; color: var(--on-dark); }
+.K .tree-head b { font: 400 28px/1 var(--font-market-display); }
+.K .tree-head small { display: flex; align-items: center; gap: 6px; font: 400 18px/1 var(--font-market-label); }
+.K .tree-open { margin-left: auto; padding: 10px 18px; background: var(--accent); color: var(--on-accent); font: 400 20px/1 var(--font-market-label); box-shadow: 0 4px 0 0 rgba(0, 0, 0, .3); }
+.K .tree-open.off { background: var(--mat-1); color: var(--on-dark); opacity: .85; }
+.K .tree-lk { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 400 18px/1 var(--font-market-label); }
+.K .tree-lk .fu-ico, .K .tree-why .fu-ico { width: 18px; height: 18px; }
+.K .tree-node { position: absolute; width: 164px; height: 108px; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 10px 8px; background: var(--surface); color: var(--ink); text-align: left; z-index: 2;
+  box-shadow: 3px 6px 0 0 rgba(40, 24, 10, .3); transform: rotate(var(--r, -1deg)); transition: transform .3s cubic-bezier(.34, 1.6, .5, 1), box-shadow .3s; }
+.K .tree-node:hover { transform: rotate(var(--r, -1deg)) translateY(-3px); }
+.K .tree-node .tree-top { display: flex; gap: 8px; align-items: flex-start; }
+.K .tree-node i { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-2); outline: 2px dashed var(--stitch); outline-offset: -4px; }
+.K .tree-node i .fu-ico { width: 22px; height: 22px; }
+.K .tree-node b { font: 400 18px/1.15 var(--font-market-label); word-break: keep-all; }
+.K .tree-node b small { display: block; margin-top: 2px; font: 400 14px/1 var(--font-market-text); color: var(--ink-muted); }
+.K .tree-foot { display: flex; justify-content: flex-end; }
+.K .tree-foot .og-cost { font-size: 15px; padding: 2px 9px 2px 4px; } .K .tree-foot .og-cost i { width: 20px; height: 20px; }
+.K .tree-got { padding: 3px 10px; border: 3px solid var(--accent); color: var(--accent); font: 400 16px/1 var(--font-market-display); font-style: normal; transform: rotate(-8deg); }
+.K .tree-why { display: flex; align-items: center; gap: 4px; font: 400 14px/1 var(--font-market-label); color: var(--ink-muted); }
+.K .tree-node.own i { background: var(--accent); color: var(--on-accent); }
+.K .tree-node.lock, .K .tree-node.need { background: #e6d9b8; }
+.K .tree-node.lock { opacity: .72; }
+.K .tree-node.lock i { background: var(--mat-1); color: var(--on-dark); }
+.K .tree-node.on { z-index: 5; box-shadow: 4px 9px 0 0 rgba(40, 24, 10, .34); }
+.K .tree-node.on::after { content: ""; position: absolute; inset: -12px -16px; border: 4px solid var(--accent); border-radius: 50%; transform: rotate(-3deg); pointer-events: none; }
+.K .tree-info { padding: 22px 34px; }
+.K .tree-info .og-h small { font: 400 18px/1 var(--font-market-label); color: var(--ink-muted); }
+.K .tree-info p { margin: 10px 0 0; font: 400 22px/1.3 var(--font-market-text); }
+.K .tree-info .tree-sum { font-size: 20px; color: var(--ink-muted); }
+.K .tree-info .tree-sum em { font-style: normal; color: var(--accent-ink); }
+.K .tree-st { position: absolute; right: 30px; top: 24px; padding: 6px 14px; background: var(--surface-2); font: 400 18px/1 var(--font-market-label); }
+.K .tree-st.can { background: var(--accent); color: var(--on-accent); }
+.K .tree-st.own { background: var(--mat-1); color: var(--on-dark); }
 #overlay[data-kind="og"]:not([hidden]) ~ .menu-btn, #overlay[data-kind="fix"]:not([hidden]) ~ .menu-btn { display: none; }
 /* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
 .K .lob-sel .sel .half { pointer-events: none; }
@@ -2172,6 +2212,31 @@ body { display: grid; place-items: center; }
   const REWARD = { clear: { jelly: 320, medal: 6 }, tiers: [[7, 40, 0], [15, 120, 2], [16, 200, 4]], xp: { node: 10, mid: 40, win: 120 } };
   // 레벨: 다음 레벨까지 base + step × (지금 레벨 - 1). 아직 보여 주기만 한다
   const LEVEL = { base: 100, step: 80 };
+  // 원정대 강화 트리 (O16 · O18 ~ O21, 아웃게임 기획서 3-5 · 4-3): 게임 전체(모든 메인)에 걸린다. 칸 · 값 · 훈장 값은 모두 예시 (사용자 답: 데이터 테이블 작업 전까지 임시)
+  // tiers: 다음 티어를 여는 조건 (clear = 그 장을 아무 메인으로 한 번 깸, medal = 원정 훈장). 티어 안 칸은 순서 없이 당근젤리로 (사용자 답).
+  // 칸: name은 그 칸까지 찍었을 때의 합계, fx는 이 칸이 더하는 값. need = 먼저 찍을 칸. wait = 그 화면이 아직 없어 효과가 걸리지 않음
+  const TREE = {
+    rows: [['prep', '원정 준비'], ['aug', '증강'], ['fix', '정비'], ['reward', '원정 보상']],
+    tiers: [{ n: 1 }, { n: 2, clear: 1, medal: 15 }, { n: 3, clear: 2, medal: 30 }],
+    nodes: [
+      { id: 'supply1', tier: 1, row: 'prep', name: '시작 보급 칸 1', ico: 'bag', cost: 300, fx: { supplySlots: 1 }, wait: '출발 준비' },
+      { id: 'union1', tier: 1, row: 'prep', name: '연합 1', sub: '마을 2곳', ico: 'campfire', cost: 300, fx: { villages: 1 }, wait: '출발 준비' },
+      { id: 'reroll1', tier: 1, row: 'aug', name: '다시 뽑기 +1', ico: 'turn', cost: 250, fx: { rerolls: 1 } },
+      { id: 'refresh1', tier: 1, row: 'fix', name: '새로 고침 첫 값 −1', ico: 'coin', cost: 250, fx: { refresh: 1 } },
+      { id: 'jelly10', tier: 1, row: 'reward', name: '원정 끝 젤리 +10%', ico: 'carrot', cost: 300, fx: { jelly: 10 } },
+      { id: 'preset1', tier: 2, row: 'prep', name: '유물 프리셋 +1', ico: 'star', cost: 500, fx: { presets: 1 }, wait: '유물 화면' },
+      { id: 'seed3', tier: 2, row: 'prep', name: '시작 씨앗 +3', ico: 'coin', cost: 400, fx: { startGold: 3 } },
+      { id: 'union2', tier: 2, row: 'prep', name: '연합 2', sub: '마을 3곳', ico: 'campfire', cost: 600, fx: { villages: 1 }, need: 'union1', wait: '출발 준비' },
+      { id: 'reroll2', tier: 2, row: 'aug', name: '다시 뽑기 +2', ico: 'turn', cost: 500, fx: { rerolls: 1 }, need: 'reroll1' },
+      { id: 'rest1', tier: 2, row: 'fix', name: '상비약 값 −1', ico: 'heal', cost: 400, fx: { restOff: 1 } },
+      { id: 'xp10', tier: 2, row: 'reward', name: '원정 경험 +10%', ico: 'book', cost: 400, fx: { xp: 10 } },
+      { id: 'supply2', tier: 3, row: 'prep', name: '시작 보급 칸 2', ico: 'bag', cost: 800, fx: { supplySlots: 1 }, need: 'supply1', wait: '출발 준비' },
+      { id: 'cards4', tier: 3, row: 'aug', name: '증강 카드 4장', ico: 'skill', cost: 800, fx: { cards: 1 } },
+      { id: 'jelly20', tier: 3, row: 'reward', name: '원정 끝 젤리 +20%', ico: 'carrot', cost: 800, fx: { jelly: 10 }, need: 'jelly10' },
+    ],
+  };
+  const TREE_FX = { supplySlots: (v) => `시작 보급 칸 +${v}`, villages: (v) => `마을 진열 +${v}곳`, rerolls: (v) => `증강 다시 뽑기 +${v}`, refresh: (v) => `정비 새로 고침 첫 값 −${v}`, jelly: (v) => `원정 끝 당근젤리 +${v}%`,
+    presets: (v) => `유물 프리셋 +${v}`, startGold: (v) => `원정 시작 씨앗 +${v}`, restOff: (v) => `상비약 값 −${v}`, xp: (v) => `원정 경험 +${v}%`, cards: (v) => `증강 카드 +${v}장` };
   // 강화 계획판 (OgGrowth): 메인마다 따로 남는다. 쪽지 한 장 = 강화 칸, cost는 단계마다 드는 당근젤리, need는 열리는 조건 (다른 칸 단계).
   // 정비의 '메인 강화'(런 안, 씨앗)와 다른 것이다. 투지 step = 전투 시작 투지, 속도 step = 공 속도 %, 스킬 step = 스킬 피해 %
   const GROW = [
@@ -2260,7 +2325,7 @@ body { display: grid; place-items: center; }
   const META_KEY = 'furryup-meta2';
   const blankRec = () => ({ runs: 0, clears: 0, best: 0, bestCombo: 0, dealt: 0, with: {} });
   const perMain = (f) => Object.fromEntries(Object.keys(HEROES).map((k) => [k, f()]));
-  const blankMeta = () => ({ v: 2, jelly: 0, medal: 0, pick: 'hanato', mains: { hanato: true, doris: true }, allies: { sato: true, bosung: true }, supply: {}, devs: {}, grow: perMain(() => ({ base: 1 })), xp: perMain(() => 0), relics: {}, equip: [], ach: {}, unl: { face: 0, line: {} },
+  const blankMeta = () => ({ v: 2, jelly: 0, medal: 0, pick: 'hanato', mains: { hanato: true, doris: true }, allies: { sato: true, bosung: true }, supply: {}, devs: {}, grow: perMain(() => ({ base: 1 })), xp: perMain(() => 0), relics: {}, equip: [], tree: { tier: 1, lv: {} }, ach: {}, unl: { face: 0, line: {} },
     seen: { main: {}, ally: {}, foe: {}, dev: {}, cg: {}, story: perMain(() => []) }, rec: perMain(blankRec), stat: { runs: 0, clears: 0, mids: 0, bumps: 0, skills: 0, bigHit: 0, recruits: 0, party: 0, kid: 0, withOto: 0, santoBuys: 0, dodge: 0 } });
   let META = blankMeta();
   function mergeMeta(base, m) {
@@ -2273,6 +2338,10 @@ body { display: grid; place-items: center; }
   function loadMeta() { try { const m = JSON.parse(localStorage.getItem(META_KEY) || 'null'); if (m && m.v === 2) META = mergeMeta(blankMeta(), m); } catch (e) { /* 없어도 된다 */ } }
   function saveMeta() { try { localStorage.setItem(META_KEY, JSON.stringify(META)); } catch (e) { /* 이번 창에서만 기억 */ } }
   const unlocked = (k) => !!META.mains[k];
+  // 원정대 강화: 찍은 칸들의 효과 합 · 장을 깼는가 (아무 메인, 지금은 1장뿐) · 칸 상태
+  const treeFx = (key) => TREE.nodes.reduce((a, n) => a + (META.tree.lv[n.id] ? n.fx[key] || 0 : 0), 0);
+  const chCleared = (n) => n === 1 && META.stat.clears > 0;
+  const treeSt = (n) => (META.tree.lv[n.id] ? 'own' : META.tree.tier < n.tier ? 'lock' : n.need && !META.tree.lv[n.need] ? 'need' : META.jelly < n.cost ? 'poor' : 'can');
   const gLv = (k, id) => (META.grow[k] || {})[id] || 0;
   // 강화 계획판을 반영한 메인 값 (조작 묶음 ctl은 메인 기본값 그대로)
   function trained(k) {
@@ -2464,7 +2533,7 @@ body { display: grid; place-items: center; }
     S.levels = Object.fromEntries(ALL_KINDS.map((k) => [k, 0])); S.goo = []; S.straws = []; S.waves = [];
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
     S.gold = 0; S.devices = []; S.held = []; S.up = {}; S.ally = null; S.trap = 0; S.unlock = 0;
-    S.gain = null; S.special = null; S.evDone = []; S.stock = null; S.aug = null; S.augReroll = AUG.rerolls; S.drag = null; S.bGold = { combo: 0 };
+    S.gain = null; S.special = null; S.evDone = []; S.stock = null; S.aug = null; S.augReroll = AUG.rerolls + treeFx('rerolls'); S.drag = null; S.bGold = { combo: 0 };
     S.run = { bestCombo: 0, totalHits: 0, skillUses: 0, dealt: 0, gold: 0, bumps: 0, bigHit: 0 };
     S.grow = null; S.candy = false; S.fix = null; S.pins = null; S.swapCancel = null;
     S.ball = { x: 480, y: 540, vx: 0, vy: 0, r: 30 };
@@ -2494,6 +2563,7 @@ body { display: grid; place-items: center; }
     for (const id of META.equip) if (META.relics[id]) S.relics[id] = 1;
     if (sp.lunch) { S.main.maxHp += 10; S.main.hp += 10; }
     if (sp.purse) S.startGold += 5;
+    S.treeGold = treeFx('startGold');
     if (sp.herb) S.held.push('heal');
     if (sp.kit) S.devices.push(pickOne(DEVICES));
     if (sp.letter) { const free = KIND_ORDER.filter((n) => META.allies[n] && S.levels[n] === 0); if (free.length) { const n = pickOne(free); S.levels[n] = 1; META.seen.ally[n] = 1; } }
@@ -3035,7 +3105,7 @@ body { display: grid; place-items: center; }
       clearInterval(S.storyAuto); S.storyAuto = null; S.storyKey = null;
       $('#handClip').hidden = true; S.storyBg = null;
       if (replay) { replay.back(); return; }
-      if (no === 1) gainGold([['시작', GOLD.start], ...(S.startGold ? [['주머니', S.startGold]] : [])]);
+      if (no === 1) gainGold([['시작', GOLD.start], ...(S.startGold ? [['주머니', S.startGold]] : []), ...(S.treeGold ? [['원정대 강화', S.treeGold]] : [])]);
       stageDone();
     };
     st.onclick = (e) => { if (!e.target.closest('.menu-btn')) next(); };
@@ -3170,7 +3240,8 @@ body { display: grid; place-items: center; }
     const medal = win ? REWARD.clear.medal : tier[2];
     const parts = [[win ? '클리어' : `${done}칸까지`, jelly]];
     if (S.relics.pouch) { const add = Math.round(jelly * 0.2); parts.push(['젤리 주머니', add]); jelly += add; }
-    const xp = REWARD.xp.node * done + (S.midDone ? REWARD.xp.mid : 0) + (win ? REWARD.xp.win : 0);
+    if (treeFx('jelly')) { const add = Math.round(jelly * treeFx('jelly') / 100); parts.push(['원정대 강화', add]); jelly += add; }
+    const xp = Math.round((REWARD.xp.node * done + (S.midDone ? REWARD.xp.mid : 0) + (win ? REWARD.xp.win : 0)) * (1 + treeFx('xp') / 100));
     META.xp[k] = (META.xp[k] || 0) + xp;
     // 메인 × 보스 유물: 그 메인으로 그 보스를 처음 쓰러뜨리면
     for (const [boss, ok] of [['thistle', S.midDone], ['ivy', win]]) {
@@ -3234,12 +3305,13 @@ body { display: grid; place-items: center; }
   const augPool = () => augAll().filter((u) => up(u.id) < u.max);
   const augDesc = (u) => (typeof u.desc === 'function' ? u.desc() : u.desc);
   const restOf = (id) => FIX.rest.find((r) => r.id === id);
+  const restPrice = (id) => Math.max(0, restOf(id).price - treeFx('restOff'));
   const attr = (o) => JSON.stringify(o).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   // 전투 · 중간 보스 뒤: 정비 진열을 깔고, 고를 증강이 있으면 증강 고르기부터
   function openShop() {
     S.phase = 'shop';
     clearField();
-    S.fix = { reroll: FIX.reroll, sel: null, sell: -1 };
+    S.fix = { reroll: Math.max(0, FIX.reroll - treeFx('refresh')), sel: null, sell: -1 };
     rollStock();
     S.stock.rest = FIX.rest.map((r) => ({ g: 'rest', id: r.id, row: 'r' }));
     const g = S.gain;
@@ -3280,7 +3352,7 @@ body { display: grid; place-items: center; }
     return got;
   }
   function priceOf(o) {
-    if (o.g === 'rest') return restOf(o.id).price;
+    if (o.g === 'rest') return restPrice(o.id);
     if (o.g === 'aug') return FIX.augPrice;
     if (o.g === 'ally') return PRICE.ally[Math.min(2, S.levels[o.k])];
     if (o.g === 'main') return PRICE.main;
@@ -3337,7 +3409,7 @@ body { display: grid; place-items: center; }
   }
   // 증강 → 정비 (AugToFix): 두 화면을 이어 붙인 띠. 고르면 카드가 쑥 올라 「획득!」, 띠가 왼쪽으로 미끄러지고 메인이 깡충 뛰며 돌아서 정비 왼쪽 끝에 선다
   function openAug() {
-    S.aug = { cards: shuffle(augPool()).slice(0, AUG.cards), sel: 0, done: false };
+    S.aug = { cards: shuffle(augPool()).slice(0, AUG.cards + treeFx('cards')), sel: 0, done: false };
     showOverlay('', 'aug');
     $('#ovBody').innerHTML = `<div class="tr-strip"><div class="tr-half">${augHtml()}</div><div class="tr-half" id="trFix" style="left:1920px" inert>${fixHtml(true)}</div></div>`
       + `<div class="tr-hero" style="left:1600px;top:400px;height:680px"><div class="tr-hop"><img class="sticker" src="${heroSrc(S.hero)}" alt="" style="height:680px"></div></div>`;
@@ -3422,7 +3494,7 @@ body { display: grid; place-items: center; }
       h += `<button type="button" class="se-tag${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-it="${i}" style="left:${x}px;top:${y}px;rotate:${r}deg"><span class="fx-tok" style="--s:66px;--c:${J.c}">${J.tok}</span><b>${J.name}</b><div class="sh-ef">${J.ef}</div><span class="fx-pr s${poor ? ' poor' : ''}"><i></i>${J.pr}</span>${tag(o)}</button>`;
     });
     h += '<div class="se-menu"><h4>상비약 차림표<small>늘 있어요 · 정비마다 한 번씩</small></h4>'
-      + S.stock.rest.map((o, j) => { const R = restOf(o.id), poor = !o.sold && S.gold < R.price; return `<button type="button" class="se-line${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-rest="${j}"><span class="fx-tok" style="--s:66px;--c:var(--hp)">${ico(R.ico)}</span><div><b>${R.name}</b><small>체력 +${R.heal}</small></div><span class="fx-pr${poor ? ' poor' : ''}"><i></i>${R.price}</span>${o.sold ? '<span class="fx-stamp">이번엔 샀어요</span>' : ''}</button>`; }).join('') + '</div>';
+      + S.stock.rest.map((o, j) => { const R = { ...restOf(o.id), price: restPrice(o.id) }, poor = !o.sold && S.gold < R.price; return `<button type="button" class="se-line${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-rest="${j}"><span class="fx-tok" style="--s:66px;--c:var(--hp)">${ico(R.ico)}</span><div><b>${R.name}</b><small>체력 +${R.heal}</small></div><span class="fx-pr${poor ? ' poor' : ''}"><i></i>${R.price}</span>${o.sold ? '<span class="fx-stamp">이번엔 샀어요</span>' : ''}</button>`; }).join('') + '</div>';
     const full = sel && !sel.sold && fullOf(sel);
     h += `<div class="se-pop"><div class="who">오토 · ${S.fixSay}</div>` + (sel ? `<h3>${I.name}</h3><p>${I.ef}</p><div class="dst">들어갈 곳 · ${sel.sold ? '이미 샀어요' : full ? '칸이 가득 · 사면 하나를 골라 내보내요 (되팔기)' : I.dest}</div>`
       + `<div class="acts">${sel.g === 'rest' ? '' : `<button type="button" class="fx-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'} <span class="key">F</span></button>`}<button type="button" class="sh-buy${sel.sold || S.gold < I.pr ? ' off' : ''}" id="fixBuy">${sel.sold ? '이미 샀어요' : S.gold < I.pr ? `씨앗 ${I.pr - S.gold} 모자라요` : `사기 · ${I.pr}씨앗`} <span class="key">Enter</span></button></div>` : '') + '</div>'
@@ -3987,6 +4059,7 @@ body { display: grid; place-items: center; }
     const h = HEROES[k], P = PROFILE[k], lv = levelOf(k);
     sel = sel || S.growSel || 'atk'; S.growSel = sel;
     ogFrame('growth', '성장', '메인 캐릭터 강화 · 유물');
+    tabs([['main', '메인 강화'], ['tree', '원정대 강화']], 1440, 122, 'main', (m) => (m === 'tree' ? showTree() : showGrowth(k)));
     tabs(Object.keys(HEROES).map((m) => [m, HEROES[m].name, unlocked(m) ? `Lv.${levelOf(m).lv}` : '잠김', !unlocked(m)]), 40, 122, k, (m) => showGrowth(m));
     add(`<img class="shp-hero sticker" src="${heroSrc(k)}" alt="${h.name}">`
       + `<div class="shp-lv" style="left:40px;top:200px;transform:rotate(-2deg)"><b>${h.name}</b><em>Lv. ${lv.lv}</em><div class="xp"><i style="width:${Math.round(lv.xp / lv.need * 100)}%"></i></div><p>원정 경험 ${lv.xp} / ${lv.need} · ${P.breed} · ${P.job}</p></div>`);
@@ -4076,6 +4149,57 @@ body { display: grid; place-items: center; }
     const mains = Object.keys(HEROES).filter(unlocked), mi = mains.indexOf(k);
     S.keys = { q: () => showGrowth(mains[(mi + mains.length - 1) % mains.length]), e: () => showGrowth(mains[(mi + 1) % mains.length]), Enter: () => up.click() };
     moEnter('growth' + k, 'shp-go');
+    syncUI(true);
+  }
+
+  // 원정대 강화 (성장 화면 탭, O18 · O21): 문명 6 기술표처럼 티어 열이 왼쪽에서 오른쪽, 가지 넷이 줄. 임시 디자인 (계획판 재료)
+  function showTree(sel) {
+    sel = sel || S.treeSel || TREE.nodes[0].id; S.treeSel = sel;
+    ogFrame('growth', '성장', '원정대 강화 · 모든 메인에 걸린다');
+    tabs([['main', '메인 강화'], ['tree', '원정대 강화']], 1440, 122, 'tree', (m) => (m === 'main' ? showGrowth(META.pick) : showTree()));
+    const T = META.tree, X0 = 226, CW = 520, RY = (i) => 100 + 128 * i;
+    let h = '';
+    TREE.rows.forEach(([, name], i) => { h += `<div class="tree-row" style="top:${RY(i)}px"><b>${name}</b></div>`; });
+    for (const t of TREE.tiers) {
+      const open = T.tier >= t.n, next = t.n === T.tier + 1, ok = next && chCleared(t.clear);
+      h += `<div class="tree-col${open ? ' open' : ''}" style="left:${X0 + CW * (t.n - 1)}px;width:${CW - 16}px"><div class="tree-head"><b>티어 ${t.n}</b>`
+        + (t.n === 1 ? '<small>처음부터</small>' : `<small>${t.clear}장 클리어 + ${costHtml('medal', t.medal)}</small>`)
+        + (open ? '' : next ? `<button type="button" class="tree-open${ok ? '' : ' off'}" data-tier="${t.n}">${ok ? '열기' : `${t.clear}장 클리어부터`}</button>` : `<span class="tree-lk">${ico('lock')}</span>`) + '</div></div>';
+    }
+    for (const n of TREE.nodes) {
+      const cell = TREE.nodes.filter((o) => o.tier === n.tier && o.row === n.row), j = cell.indexOf(n), ri = TREE.rows.findIndex((r) => r[0] === n.row), st = treeSt(n);
+      const need = n.need && TREE.nodes.find((o) => o.id === n.need);
+      const foot = st === 'own' ? '<em class="tree-got">배움</em>' : st === 'lock' ? `<span class="tree-why">${ico('lock')}티어 ${n.tier}</span>` : st === 'need' ? `<span class="tree-why">${need.name} 먼저</span>` : costHtml('jelly', n.cost);
+      h += `<button type="button" class="tree-node ${st}${n.id === sel ? ' on' : ''}" data-node="${n.id}" data-tier="${n.tier}" data-row="${n.row}" style="left:${X0 + CW * (n.tier - 1) + 8 + 168 * j}px;top:${RY(ri) - 6}px;--r:${j % 2 ? 1 : -1}deg">`
+        + `<div class="tree-top"><i>${ico(n.ico)}</i><b>${n.name}${n.sub ? `<small>${n.sub}</small>` : ''}</b></div><div class="tree-foot">${foot}</div></button>`;
+    }
+    add(`<div class="og-sheet tree-board" style="left:40px;top:196px;width:1840px;height:640px;transform:rotate(-0.3deg)"><div class="tree-cork">${h}</div></div>`);
+    // 고른 칸 쪽지
+    const n = TREE.nodes.find((o) => o.id === sel), st = treeSt(n), key = Object.keys(n.fx)[0];
+    const now = treeFx(key), after = now + (st === 'own' ? 0 : n.fx[key]);
+    const why = { own: '배웠다', lock: `티어 ${n.tier}이 열리면`, need: `「${(TREE.nodes.find((o) => o.id === n.need) || {}).name}」 먼저`, poor: '당근젤리가 모자라요', can: '배울 수 있어요' }[st];
+    add(`<div class="og-sheet tree-info" style="left:40px;top:858px;width:1360px;height:172px;transform:rotate(0.4deg)"><div class="og-h">${n.name}${n.sub ? ` <small>${n.sub}</small>` : ''}</div>`
+      + `<p>${TREE_FX[key](n.fx[key])} · 티어 ${n.tier} · ${TREE.rows.find((r) => r[0] === n.row)[1]}</p>`
+      + `<p class="tree-sum">모두 합쳐 ${now ? TREE_FX[key](now) : '없음'}${st === 'own' ? '' : ` → ${TREE_FX[key](after)}`}${n.wait ? ` <em>· ${n.wait}이 생기면 걸린다</em>` : ''}</p><span class="tree-st ${st}">${why}</span></div>`);
+    const mc = $('#ovBody .og-chip[data-cur="jelly"]'), n0 = S.drawN;
+    const up = ogBtn(st === 'own' ? '배움' : `배우기<small>당근젤리 ${fmtN(n.cost)}</small>`, st === 'can' ? 'p' : '', 'treeUp', 'left:1470px;top:930px;transform:rotate(-2deg);z-index:9', () => {
+      const c = $(`#ovBody .tree-node[data-node="${n.id}"]`);
+      if (treeSt(n) !== 'can') { SHK(c); SHK(up); if (treeSt(n) === 'poor') RE(mc, 'cdx-bump'); return; }
+      const m = META.jelly;
+      META.jelly -= n.cost; META.tree.lv[n.id] = 1; saveMeta(); sfx.buy();
+      c.classList.remove('can'); c.classList.add('own'); SQ(c); CHIPSET(mc, m, META.jelly);
+      later(() => showTree(n.id), 700, n0);
+    });
+    if (st !== 'can') up.classList.add('off');
+    for (const c of document.querySelectorAll('#ovBody .tree-node')) c.addEventListener('click', () => { if (c.dataset.node === sel) { SQ(c); return; } showTree(c.dataset.node); });
+    for (const b of document.querySelectorAll('#ovBody .tree-open')) b.addEventListener('click', () => {
+      const t = TREE.tiers.find((x) => x.n === +b.dataset.tier);
+      if (!chCleared(t.clear) || META.medal < t.medal) { SHK(b); if (chCleared(t.clear)) RE($('#ovBody .og-chip[data-cur="medal"]'), 'cdx-bump'); return; }
+      META.medal -= t.medal; META.tree.tier = t.n; saveMeta(); sfx.buy();
+      showTree(TREE.nodes.find((o) => o.tier === t.n).id);
+    });
+    S.keys = { Enter: () => up.click() };
+    moEnter('tree', 'shp-go');
     syncUI(true);
   }
 
@@ -6595,7 +6719,7 @@ body { display: grid; place-items: center; }
     quick(h) { const k = typeof h === 'string' ? h : Object.keys(HEROES)[h || 0]; META.mains[k] = true; beginRun(k); return S.phase; },
     straws: () => S.straws.map((s) => s.e.key),
     goo: () => (S.goo || []).length,
-    screen(name, a, b) { ({ title: showTitle, lobby: showLobby, select: showSelect, chapter: showChapter, growth: showGrowth, shop: showShop, codex: showCodex, ach: showAch, gallery: showGallery })[name](a, b); return S.phase; },
+    screen(name, a, b) { ({ title: showTitle, lobby: showLobby, select: showSelect, chapter: showChapter, growth: showGrowth, tree: showTree, shop: showShop, codex: showCodex, ach: showAch, gallery: showGallery })[name](a, b); return S.phase; },
     get ctl() { return heroCtl(); },
     threats(x, y) { return threatsAt(x, y).length; },
     aimDash(x, y) { S.mouse = { x, y }; const p = dashPlan(); return { x: p.x, y: p.y, n: threatsAt(p.x, p.y).length }; },
@@ -6614,6 +6738,8 @@ body { display: grid; place-items: center; }
     rerender() { renderSlots(); renderPanel(); syncUI(true); },
     persona(p) { S.persona = p ? { name: '시험', size: RACES[p.race].size, color: 0, suggested: p.race, custom: false, ...p } : null; renderPanel(); },
     restock() { if (S.phase !== 'shop') return false; rollStock(); renderShop(); return true; },
+    tree: () => META.tree,
+    treeFx: (key) => treeFx(key),
     skip() { if (S.phase !== 'transit') return false; $('#ovBody').click(); return true; },
     jump(i) { if (!S.inRun) return false; S.node = i - 1; nextNode(); return S.phase; },
     syn: () => synOn().map((o) => ({ ...o, fx: synFx(o.race, o.t, ' · ') })),
