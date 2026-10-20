@@ -21,13 +21,14 @@ for (let i = 0; i < 40 && (await ph()) === 'story'; i++) { await ev(() => docume
 await ev(() => window.furryV3.skip()); await page.waitForTimeout(300);
 // 전투 중 상태를 바꾸고 이긴다 → 증강 → 정비 → 다음 칸 (저장)
 await ev(() => { const S = window.furryV3.state; S.main.hp = 55; S.levels.sato = 1; S.devices.push('mult'); for (const e of S.enemies) e.hp = 1; });
-for (let i = 0; i < 200 && (await ph()) !== 'shop'; i++) {
+for (let i = 0; i < 600 && (await ph()) !== 'shop'; i++) {
   if ((await ph()) === 'aim') await ev(() => { const S = window.furryV3.state; const t = S.enemies.find((e) => e.alive && !e.off) || S.enemies[0]; window.furryV3.shoot(t ? Math.atan2(-(t.y - S.ball.y), t.x - S.ball.x) * 180 / Math.PI : 90); });
   else await ev(() => window.furryV3.sim(0.5));
   await page.waitForTimeout(20);
 }
 await page.waitForTimeout(600);
-await ev(() => document.getElementById('augPick').click()); await page.waitForTimeout(2500);
+log.preShop = await ev(() => ({ ph: window.furryV3.state.phase, aug: !!document.getElementById('augPick'), hp: window.furryV3.state.main.hp }));
+await ev(() => { const b = document.getElementById('augPick'); if (b) b.click(); }); await page.waitForTimeout(2500);
 const before = await ev(() => { const S = window.furryV3.state; return { gold: S.gold, hp: S.main.hp, up: S.up, levels: S.levels.sato, devices: S.devices, battles: S.battles, stories: S.stories }; });
 await ev(() => document.getElementById('shopNext').click()); await page.waitForTimeout(400);
 log.atTransit = await ev(() => { const R = window.furryV3.runSave(); return { ph: window.furryV3.state.phase, node: R.node, gold: R.gold, hp: R.main.hp }; });
