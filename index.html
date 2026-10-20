@@ -1672,33 +1672,72 @@ body { display: grid; place-items: center; }
 .K .grow .dot { flex: none; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--c, var(--spirit)); color: var(--ink); }
 .K .grow .dot .fu-ico { width: 30px; height: 30px; }
 /* v0.10 원정대 본부 (디자인 시스템 og_*)를 이 프로토에 붙이며 더한 것: 버튼으로 바꾼 부품, 그림 없는 캐릭터 첫 글자, 유물 선반 스크롤 */
-/* 칸 사이 전환 (v0.13, 임시 디자인: 지도 띠 + 다음 칸 쪽지. 모양 · 귀여운 애니메이션은 UI 담당) */
+/* 칸 사이 전환 (v0.13 흐름 · v0.13.1 모양): 디자인 시스템에 이 화면이 없어 지도 띠 · 종이 쪽지 · 와펜 · 공용 모션(mo-*)으로 짓는다 (기획서 7-7).
+   지도 띠가 툭 떨어지고 → 지난 칸에 「완료」 도장 → 메인 말이 통통 걸어가 다음 칸이 흔들리고 → 쪽지가 찰싹 붙고 몬스터 실루엣이 쑥 돋는다 → 바늘땀 막대가 다 차면 저절로 넘어간다 */
 #overlay[data-kind="transit"] .tr2-map { top: 150px; transform: translateY(-440px) rotate(-1deg); transition: transform var(--tr-drop, .35s) cubic-bezier(.2, 1.3, .4, 1); }
 #overlay[data-kind="transit"] .tr2-map.in { transform: rotate(-1deg); }
 .tr2-map:not(.arrive) .flagpin, .tr2-map:not(.arrive) .flagpin + .wlab { opacity: 0; }
 .tr2-map .flagpin, .tr2-map .flagpin + .wlab { transition: opacity .2s; }
+.tr2-map:not(.arrive) .wp.now { background: var(--surface); box-shadow: 0 0 0 4px var(--ink); }
 .tr2-map.arrive .wp.now { animation: tr2-wig .45s ease 2; }
+.tr2-map.arrive .flagpin { animation: mo-drop .35s var(--mo-pop); }
 @keyframes tr2-wig { 25% { transform: rotate(-14deg) scale(1.3); } 75% { transform: rotate(10deg) scale(1.2); } }
+.tr2-done { position: absolute; z-index: 6; padding: 4px 9px; translate: -50% -50%; rotate: -14deg; border: 3px solid var(--accent); color: var(--accent-ink); background: rgba(255, 250, 240, .9); font: 400 20px/1 var(--font-market-display); white-space: nowrap; opacity: 0; pointer-events: none; }
+.tr2-map.walk .tr2-done { opacity: 1; animation: ag-stamp .32s var(--mo-pop); }
 .tr2-walker { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; overflow: hidden; z-index: 5; background: var(--surface); box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px var(--accent); transition: translate var(--tr-walk, 1.2s) ease-in-out; }
 .tr2-walker img, .tr2-walker .ini { width: 100%; height: 100%; object-fit: cover; }
-.tr2-map.walk .tr2-walker { translate: var(--tx) var(--ty); animation: tr2-hop .3s ease-in-out 4; }
-@keyframes tr2-hop { 50% { margin-top: -42px; } }
-.tr2-note { position: absolute; left: 560px; top: 380px; width: 800px; padding: 40px 48px 32px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -12px; box-shadow: 0 10px 0 0 rgba(0, 0, 0, .4);
-  transform: rotate(-1.2deg) scale(.6); opacity: 0; transition: transform .3s cubic-bezier(.2, 1.4, .4, 1), opacity .2s; }
-.tr2-note.show { transform: rotate(-1.2deg); opacity: 1; }
+.tr2-map.walk .tr2-walker { translate: var(--tx) var(--ty); animation: tr2-hop calc(var(--tr-walk, 1.2s) / 4) ease-in-out 4; }
+.tr2-map.arrive .tr2-walker { animation: mo-squish .42s var(--mo-pop); }
+@keyframes tr2-hop { 0%, 100% { scale: 1 1; } 14% { scale: 1.14 .86; margin-top: -30px; } 50% { scale: .94 1.08; margin-top: -48px; } 86% { scale: 1.14 .86; margin-top: -30px; } }
+/* 다음 칸 쪽지: 왼쪽 글 · 오른쪽 그림 칸 (LayoutSplit + ImageSlot) */
+.tr2-note { position: absolute; left: 400px; top: 404px; width: 1120px; min-height: 380px; display: grid; grid-template-columns: 1fr 420px; gap: 36px; padding: 44px 48px 52px;
+  background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -12px; box-shadow: 0 10px 0 0 rgba(0, 0, 0, .4); rotate: -1.2deg; opacity: 0; }
+.tr2-note.show { opacity: 1; animation: mo-slap .45s var(--mo-pop); }
+.tr2-note.boss.show { animation: mo-slap .45s var(--mo-pop), tr2-shake .5s ease .45s; }
+@keyframes tr2-shake { 20% { translate: -10px 0; } 40% { translate: 9px 0; } 60% { translate: -6px 0; } 80% { translate: 3px 0; } }
 .tr2-note.boss { background: var(--accent); color: var(--on-accent); outline-color: var(--stitch-l); }
-.tr2-warn { position: absolute; left: -24px; right: -24px; top: -38px; padding: 12px; text-align: center; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); color: var(--surface); font: 400 36px/1 var(--font-market-display); text-shadow: 3px 3px 0 var(--mat-1); }
-.tr2-kind { font: 400 30px/1 var(--font-market-label); color: var(--accent); }
-.tr2-note.boss .tr2-kind { color: var(--spirit); }
-.tr2-name { margin-top: 12px; font: 400 64px/1.05 var(--font-market-display); }
-.tr2-note p { margin: 12px 0 0; font: 400 28px/1.3 var(--font-market-text); }
-.tr2-foes { display: flex; flex-wrap: wrap; gap: 14px 26px; margin-top: 20px; }
-.tr2-foe { display: flex; align-items: center; gap: 8px; font: 400 30px/1 var(--font-market-label); }
-.tr2-foe img { height: 84px; filter: brightness(0) opacity(.75); }
-.tr2-note.boss .tr2-foe img { height: 120px; filter: brightness(0) invert(1) opacity(.85); }
-.tr2-foe i { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-1); color: var(--surface); font: 400 30px/1 var(--font-market-display); font-style: normal; }
-.tr2-stat { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 3px dashed var(--stitch); }
-.tr2-stat span { padding: 8px 14px; background: var(--surface-2); color: var(--ink); font: 400 22px/1 var(--font-market-label); }
+.tr2-warn { position: absolute; left: -26px; right: -26px; top: -42px; padding: 14px; text-align: center; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); background-size: 73.5px 73.5px;
+  color: var(--surface); font: 400 38px/1 var(--font-market-display); letter-spacing: .08em; text-shadow: 3px 3px 0 var(--mat-1); box-shadow: 0 6px 0 rgba(0, 0, 0, .35); }
+.tr2-note.show .tr2-warn { animation: mo-slap .4s var(--mo-pop) .1s backwards, tr2-stripe 1.2s linear .5s infinite; }
+@keyframes tr2-stripe { to { background-position: 73.5px 0; } }
+.tr2-txt { display: flex; flex-direction: column; min-width: 0; }
+.tr2-kind { align-self: flex-start; padding: 7px 14px 6px; background: var(--accent); color: var(--on-accent); font: 400 26px/1 var(--font-market-label); rotate: -2deg; }
+.tr2-note.boss .tr2-kind { background: var(--spirit); color: var(--ink); }
+.tr2-name { margin-top: 16px; font: 400 76px/1.02 var(--font-market-display); word-break: keep-all; }
+.tr2-txt p { margin: 12px 0 0; font: 400 30px/1.3 var(--font-market-text); }
+.tr2-stat { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 22px; }
+.tr2-stat span { padding: 8px 14px; background: var(--surface-2); color: var(--ink); font: 400 22px/1 var(--font-market-label); box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+.tr2-note.show .tr2-stat span { animation: mo-drop .35s var(--mo-out) calc(.35s + var(--i) * .07s) backwards; }
+/* 그림 칸: 풀밭 띠 위로 몬스터 실루엣이 하나씩 쑥 돋고, 저마다 다른 박자로 둥실 */
+.tr2-slot { position: relative; height: 290px; align-self: center; border-radius: 18px; background: var(--surface-2); box-shadow: inset 0 0 0 3px var(--line); overflow: hidden; }
+.tr2-note.boss .tr2-slot { background: rgba(0, 0, 0, .18); box-shadow: inset 0 0 0 3px var(--stitch-l); }
+.tr2-slot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: var(--floordot); box-shadow: inset 0 6px 0 rgba(0, 0, 0, .12); }
+.tr2-foes { position: absolute; left: 16px; right: 16px; bottom: 7px; z-index: 1; display: flex; justify-content: center; align-items: flex-end; gap: 18px; }
+.tr2-foe { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.tr2-foe .sil { display: block; transform-origin: 50% 100%; }
+.tr2-note.show .tr2-foe .sil { animation: mo-sprout .5s var(--mo-pop) calc(.4s + var(--i) * .16s) backwards, mo-bob calc(1.5s + var(--i) * .37s) ease-in-out calc(.9s + var(--i) * .16s) infinite; }
+.tr2-foe img { display: block; height: 170px; max-width: 200px; object-fit: contain; object-position: 50% 100%; filter: brightness(0) opacity(.78); }
+.tr2-foes[data-n="2"] img { height: 150px; max-width: 170px; }
+.tr2-foes[data-n="3"] img { height: 116px; max-width: 116px; }
+.tr2-foe i { width: 110px; height: 110px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-1); color: var(--surface); font: 400 44px/1 var(--font-market-display); font-style: normal; }
+/* ×수 꼬리표는 실루엣 발밑 풀밭 위에 (그림과 겹치지 않게) */
+.tr2-foe b { position: relative; z-index: 2; margin-top: 4px; padding: 5px 12px 4px; border-radius: 999px; background: var(--accent-2); color: var(--ink); font: 400 24px/1 var(--font-market-display); box-shadow: 0 0 0 3px var(--surface); rotate: -4deg; }
+.tr2-note.show .tr2-foe b { animation: ag-stamp .3s var(--mo-pop) calc(.75s + var(--i) * .16s) backwards; }
+.tr2-note.boss .tr2-foes { bottom: 30px; }
+.tr2-note.boss .tr2-foe img { height: 230px; max-width: 360px; filter: brightness(0) opacity(.82); }
+.tr2-note.boss.show .tr2-foe .sil { animation: mo-sprout .6s var(--mo-pop) .5s backwards, mo-sway 2.4s ease-in-out 1.1s infinite; }
+.tr2-big { position: absolute; left: 50%; top: 44%; z-index: 1; width: 150px; height: 150px; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); box-shadow: inset 0 0 0 10px var(--spirit), inset 0 0 0 14px var(--accent); font: 400 92px/1 var(--font-market-display); }
+.tr2-big .fu-ico { width: 72px; height: 72px; }
+.tr2-note.show .tr2-big { animation: mo-slap .45s var(--mo-pop) .35s backwards, mo-wobble 2.2s ease-in-out .9s infinite; }
+/* 저절로 넘어가기까지: 쪽지 아래 바늘땀 막대가 찬다 */
+.tr2-timer { position: absolute; left: 48px; right: 48px; bottom: 22px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.tr2-note.boss .tr2-timer { background: rgba(0, 0, 0, .25); }
+.tr2-timer i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; scale: 0 1; background: var(--accent-2); }
+.tr2-note.show .tr2-timer i { transition: scale var(--tr-panel, 1.8s) linear; scale: 1 1; }
+@media (prefers-reduced-motion: reduce) {
+  .tr2-map, .tr2-walker, .tr2-note .tr2-timer i { transition-duration: .01s !important; }
+  .tr2-map *, .tr2-note, .tr2-note * { animation: none !important; }
+}
 #overlay[data-kind="og"]:not([hidden]) ~ .menu-btn, #overlay[data-kind="fix"]:not([hidden]) ~ .menu-btn { display: none; }
 /* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
 .K .lob-sel .sel .half { pointer-events: none; }
@@ -2505,13 +2544,15 @@ body { display: grid; place-items: center; }
     showOverlay('', 'transit');
     const to = S.node, n0 = S.drawN, T0 = TRANSIT, all = T0.drop + T0.walk + T0.panel, k = S.opts.fast ? T0.fast / all : 1, ms = (sec) => sec * k * 1000;
     const body = $('#ovBody');
-    body.style.setProperty('--tr-drop', `${T0.drop * k}s`); body.style.setProperty('--tr-walk', `${T0.walk * k}s`);
+    body.style.setProperty('--tr-drop', `${T0.drop * k}s`); body.style.setProperty('--tr-walk', `${T0.walk * k}s`); body.style.setProperty('--tr-panel', `${T0.panel * k}s`);
     body.innerHTML = transitHtml(from, to);
     let left = false;
-    const go = () => { if (left || S.drawN !== n0) return; left = true; S.keys = null; body.style.cssText = ''; hideOverlay(); then(); };
+    const go = () => { if (left || S.drawN !== n0) return; left = true; S.keys = null; body.removeEventListener('click', onClick); body.style.cssText = ''; hideOverlay(); then(); };
+    // 정비 「다음 스테이지로」 · 이벤트 고르기는 #ovBody 안 단추라, 전환을 연 그 클릭이 거품으로 올라와 바로 넘기지 않게 그 뒤 클릭만 받는다
+    const t0 = performance.now(), onClick = (e) => { if (e.timeStamp > t0) go(); };
     const auto = () => { if (menuOpen()) { later(auto, 300, n0); return; } go(); };
     S.keys = { Enter: go, ' ': go };
-    body.addEventListener('click', go, { once: true });
+    body.addEventListener('click', onClick);
     const map = body.querySelector('.tr2-map'), note = body.querySelector('.tr2-note');
     later(() => map.classList.add('in'), 30, n0);
     later(() => map.classList.add('walk'), ms(T0.drop), n0);
@@ -2535,12 +2576,15 @@ body { display: grid; place-items: center; }
     return { kind: '?', name: '무슨 일이 생길까' };
   }
   function transitHtml(from, to) {
-    const I = nextInfo(to), bossAt = CHAPTER.lastIndexOf('boss'), left = bossAt - to;
-    const foe = ([key, n]) => `<span class="tr2-foe" data-foe="${key}" data-n="${n}" title="${FOES[key].name}">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}${I.boss ? '' : `×${n}`}</span>`;
-    return `<div class="tmap tr2-map">${trackHtml(to)}<span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
-      + `<div class="tr2-note${I.boss ? ' boss' : ''}" data-type="${CHAPTER[to]}" data-node="${to + 1}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}<div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>`
-      + (I.line ? `<p class="tr2-gm">${I.line}</p>` : '') + (I.foes ? `<div class="tr2-foes">${I.foes.map(foe).join('')}</div>` : '')
-      + `<div class="tr2-stat"><span class="tr2-at">${to + 1} / ${CHAPTER.length}칸</span><span class="tr2-left">${left > 0 ? `보스까지 ${left}칸` : '보스!'}</span><span class="tr2-hp">체력 ${S.main.hp}/${S.main.maxHp}</span><span class="tr2-gold">씨앗 ${S.gold}</span></div></div>`
+    const I = nextInfo(to), bossAt = CHAPTER.lastIndexOf('boss'), left = bossAt - to, t = CHAPTER[to];
+    const foe = ([key, n], i) => `<span class="tr2-foe" data-foe="${key}" data-n="${n}" title="${FOES[key].name}" style="--i:${i}"><span class="sil">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}</span>${I.boss ? '' : `<b>×${n}</b>`}</span>`;
+    const slot = I.foes ? `<div class="tr2-foes" data-n="${I.foes.length}">${I.foes.map(foe).join('')}</div>` : `<span class="tr2-big">${t === 'event' ? '?' : ico(NODE_ICO[t] || 'question')}</span>`;
+    const stat = [['at', `${to + 1} / ${CHAPTER.length}칸`], ['left', left > 0 ? `보스까지 ${left}칸` : '보스!'], ['hp', `체력 ${S.main.hp}/${S.main.maxHp}`], ['gold', `씨앗 ${S.gold}`]];
+    return `<div class="tmap tr2-map">${trackHtml(to)}<span class="tr2-done" style="left:${mapX(from)}px;top:${MAP_Y[from]}px">완료</span><span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
+      + `<div class="tr2-note${I.boss ? ' boss' : ''}" data-type="${t}" data-node="${to + 1}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}`
+      + `<div class="tr2-txt"><div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>${I.line ? `<p class="tr2-gm">${I.line}</p>` : ''}`
+      + `<div class="tr2-stat">${stat.map(([c, s], i) => `<span class="tr2-${c}" style="--i:${i}">${s}</span>`).join('')}</div></div>`
+      + `<div class="tr2-slot">${slot}</div><span class="tr2-timer"><i></i></span></div>`
       + '<div class="tapekeys" style="left:760px;top:990px"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
   }
   function clearField() {
