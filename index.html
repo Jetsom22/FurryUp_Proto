@@ -1833,7 +1833,9 @@ body { display: grid; place-items: center; }
 /* 유물 화면 (v0.15, 임시 디자인: 선반 · 상세 쪽지 · 프리셋) */
 .K .rl-shelf, .K .rl-card, .K .rl-pre { padding: 26px 30px; }
 .K .rl-shelf .og-h small, .K .rl-pre .og-h small { margin-left: 10px; font: 400 18px/1 var(--font-market-label); color: var(--ink-muted); }
-.K .rl-list { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.K .rl-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.K .rl-it { position: relative; padding: 10px 12px; } .K .rl-it .og-pips { position: absolute; right: 10px; top: 10px; }
+.K .rl-it b { padding-right: 56px; }
 .K .rl-it { display: flex; align-items: center; gap: 14px; padding: 8px 14px; background: var(--surface-2); color: var(--ink); text-align: left; }
 .K .rl-it i, .K .rl-big, .K .su-slot i, .K .su-rel i, .K .rl-slot i { flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--accent-2); color: var(--ink); font-style: normal; }
 .K .rl-it i { width: 52px; height: 52px; } .K .rl-it i .fu-ico { width: 28px; height: 28px; }
@@ -2382,6 +2384,11 @@ body { display: grid; place-items: center; }
     blossom: rl({ name: '벚꽃 덩굴끈', from: ['hanato', 'ivy'], ico: 'leaf' }, [5, 8, 12], (x) => `스킬을 쓰면 체력 +${x}`),
     thorncharm: rl({ name: '가시 부적', from: ['rito', 'thistle'], ico: 'skill' }, [0.6, 0.8, 1], (x) => `발이 시작될 때 가까운 적 3명에게 부적 (공격력 × ${x})`),
     seedbell: rl({ name: '씨앗 방울', from: ['rito', 'ivy'], ico: 'bell' }, [4, 6, 8], (x) => `전투 시작 투지 +${x}`),
+    // 민숭마을 메인 × 보스 (v0.18, 사용자 요청 · 이름 · 효과 · 값 모두 임시): 빨대(흡혈) · 고무줄(속도) · 점액(보호막 · 지속 피해) 결
+    strawthorn: rl({ name: '가시 빨대', from: ['doris', 'thistle'], ico: 'heal' }, [2, 3, 4], (x) => `발이 끝날 때 타격 10번마다 체력 +${x}`),
+    vinecord: rl({ name: '덩굴 고무줄', from: ['doris', 'ivy'], ico: 'speed' }, [8, 12, 16], (x) => `공 · 부적 속도 +${x}%`),
+    slimeguard: rl({ name: '가시 점액막', from: ['hipsel', 'thistle'], ico: 'shieldplus' }, [8, 12, 16], (x) => `스킬을 쓰면 보호막 +${x}`),
+    seedslime: rl({ name: '씨앗 점액', from: ['hipsel', 'ivy'], ico: 'cloud' }, [10, 15, 20], (x) => `보호막이 있는 동안 주는 피해 +${x}%`),
     woodshield: rl({ name: '나무 방패 조각', ach: 'mid', ico: 'shield' }, [6, 9, 12], (x) => `전투마다 첫 라운드 보호막 +${x}`),
     clover: rl({ name: '토끼풀 부적', ach: 'clear', ico: 'heart' }, [30, 40, 50], (x) => `원정마다 한 번, 쓰러지면 체력 ${x}%로 일어난다`),
     luckycoin: rl({ name: '행운 엽전', ach: 'party4', ico: 'coin' }, [1, 2, 3], (x) => `전투 승리 씨앗 +${x}`),
@@ -2536,7 +2543,7 @@ body { display: grid; place-items: center; }
   const slugT = () => tierOn('갯민숭달팽이');
   const twice = () => { const t = rabbitT(); return !!(t && RABBIT.twice[t - 1]); };
   const atkNow = () => S.main.atk + 2 * up('atk') + (rabbitT() ? RABBIT.atk[rabbitT() - 1] : 0);
-  const speedMul = () => 1 + (rabbitT() ? 0.04 * RABBIT.speed[rabbitT() - 1] : 0) + 0.08 * up('speed') + (S.grow ? S.grow.spd : 0);
+  const speedMul = () => 1 + (rabbitT() ? 0.04 * RABBIT.speed[rabbitT() - 1] : 0) + 0.08 * up('speed') + (S.grow ? S.grow.spd : 0) + relV('vinecord') / 100;
   // 시너지 글: 종족 짧은 이름, 그 단의 효과 (sep으로 잇는다), 다음 문턱
   const synName = (race) => (Object.values(FACTIONS).find((f) => f.race === race) || { short: race }).short;
   const SYN_FX = {
@@ -4894,6 +4901,7 @@ body { display: grid; place-items: center; }
   function trySkill() {
     if (S.gauge < gaugeMax() || S.skill.active || S.focus || S.dash || !(S.phase === 'aim' || S.phase === 'shot')) return;
     S.gauge = 0; S.run.skillUses++;
+    if (relV('slimeguard')) S.main.shield += relV('slimeguard');
     if (S.relics.blossom) { const v = Math.min(relV('blossom'), S.main.maxHp - S.main.hp); S.main.hp += v; if (v) float(S.ball.x, S.ball.y - 64, '+' + v, T.keep, 24, true); }
     if (S.opts.cutin) { S.cutin = { t: 0, dur: reduceMotion ? 0.9 : 1.6, from: S.phase, lines: Array.from({ length: 34 }, () => ({ y: Math.random(), x: Math.random(), w: 60 + Math.random() * 220, s: 0.8 + Math.random() * 1.6 })) }; S.phase = 'cutin'; sfx.skill(); const h = $('#hero'); h.classList.remove('hero-cut'); void h.offsetWidth; h.classList.add('hero-cut'); setTimeout(() => h.classList.remove('hero-cut'), S.cutin.dur * 1000 + 200); }
     else startSkill(S.phase);
@@ -5555,6 +5563,7 @@ body { display: grid; place-items: center; }
     if (e.sealed) amount *= 1 + e.sealed;
     if (e.sucked) amount *= 1 + STRAW.torment;
     if (slugT() && S.main.shield > 0) amount *= 1 + SLUG.dmg;
+    if (S.main.shield > 0 && relV('seedslime')) amount *= 1 + relV('seedslime') / 100;
     if (S.grow && S.grow.skill && (S.skill.active || S.phase === 'iai')) amount *= 1 + S.grow.skill;
     const amt = Math.max(1, Math.round(amount));
     S.run.bigHit = Math.max(S.run.bigHit || 0, amt);
@@ -5593,6 +5602,7 @@ body { display: grid; place-items: center; }
       S.ball.vx = 0; S.ball.vy = 0; S.phase = 'dry'; syncUI(true); return;
     }
     gulpStraws();
+    if (relV('strawthorn') && sh.hits >= 10) { const v = Math.min(Math.floor(sh.hits / 10) * relV('strawthorn'), S.main.maxHp - S.main.hp); S.main.hp += v; if (v) float(S.ball.x, S.ball.y - 64, '+' + v, T.keep, 24, true); }
     for (const g of S.goo || []) if (g.src === 'trail' || g.src === 'ally') g.src = 'fade';
     S.focus = null; S.dash = null; $('#app').classList.remove('focus');
     if (S.skill.active) S.skill.active = false;
