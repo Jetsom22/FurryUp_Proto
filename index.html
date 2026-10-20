@@ -1672,6 +1672,33 @@ body { display: grid; place-items: center; }
 .K .grow .dot { flex: none; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--c, var(--spirit)); color: var(--ink); }
 .K .grow .dot .fu-ico { width: 30px; height: 30px; }
 /* v0.10 원정대 본부 (디자인 시스템 og_*)를 이 프로토에 붙이며 더한 것: 버튼으로 바꾼 부품, 그림 없는 캐릭터 첫 글자, 유물 선반 스크롤 */
+/* 칸 사이 전환 (v0.13, 임시 디자인: 지도 띠 + 다음 칸 쪽지. 모양 · 귀여운 애니메이션은 UI 담당) */
+#overlay[data-kind="transit"] .tr2-map { top: 150px; transform: translateY(-440px) rotate(-1deg); transition: transform var(--tr-drop, .35s) cubic-bezier(.2, 1.3, .4, 1); }
+#overlay[data-kind="transit"] .tr2-map.in { transform: rotate(-1deg); }
+.tr2-map:not(.arrive) .flagpin, .tr2-map:not(.arrive) .flagpin + .wlab { opacity: 0; }
+.tr2-map .flagpin, .tr2-map .flagpin + .wlab { transition: opacity .2s; }
+.tr2-map.arrive .wp.now { animation: tr2-wig .45s ease 2; }
+@keyframes tr2-wig { 25% { transform: rotate(-14deg) scale(1.3); } 75% { transform: rotate(10deg) scale(1.2); } }
+.tr2-walker { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; overflow: hidden; z-index: 5; background: var(--surface); box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px var(--accent); transition: translate var(--tr-walk, 1.2s) ease-in-out; }
+.tr2-walker img, .tr2-walker .ini { width: 100%; height: 100%; object-fit: cover; }
+.tr2-map.walk .tr2-walker { translate: var(--tx) var(--ty); animation: tr2-hop .3s ease-in-out 4; }
+@keyframes tr2-hop { 50% { margin-top: -42px; } }
+.tr2-note { position: absolute; left: 560px; top: 380px; width: 800px; padding: 40px 48px 32px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -12px; box-shadow: 0 10px 0 0 rgba(0, 0, 0, .4);
+  transform: rotate(-1.2deg) scale(.6); opacity: 0; transition: transform .3s cubic-bezier(.2, 1.4, .4, 1), opacity .2s; }
+.tr2-note.show { transform: rotate(-1.2deg); opacity: 1; }
+.tr2-note.boss { background: var(--accent); color: var(--on-accent); outline-color: var(--stitch-l); }
+.tr2-warn { position: absolute; left: -24px; right: -24px; top: -38px; padding: 12px; text-align: center; background: repeating-linear-gradient(-45deg, var(--accent-2) 0 26px, var(--mat-1) 26px 52px); color: var(--surface); font: 400 36px/1 var(--font-market-display); text-shadow: 3px 3px 0 var(--mat-1); }
+.tr2-kind { font: 400 30px/1 var(--font-market-label); color: var(--accent); }
+.tr2-note.boss .tr2-kind { color: var(--spirit); }
+.tr2-name { margin-top: 12px; font: 400 64px/1.05 var(--font-market-display); }
+.tr2-note p { margin: 12px 0 0; font: 400 28px/1.3 var(--font-market-text); }
+.tr2-foes { display: flex; flex-wrap: wrap; gap: 14px 26px; margin-top: 20px; }
+.tr2-foe { display: flex; align-items: center; gap: 8px; font: 400 30px/1 var(--font-market-label); }
+.tr2-foe img { height: 84px; filter: brightness(0) opacity(.75); }
+.tr2-note.boss .tr2-foe img { height: 120px; filter: brightness(0) invert(1) opacity(.85); }
+.tr2-foe i { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--mat-1); color: var(--surface); font: 400 30px/1 var(--font-market-display); font-style: normal; }
+.tr2-stat { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 3px dashed var(--stitch); }
+.tr2-stat span { padding: 8px 14px; background: var(--surface-2); color: var(--ink); font: 400 22px/1 var(--font-market-label); }
 #overlay[data-kind="og"]:not([hidden]) ~ .menu-btn, #overlay[data-kind="fix"]:not([hidden]) ~ .menu-btn { display: none; }
 /* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
 .K .lob-sel .sel .half { pointer-events: none; }
@@ -1800,6 +1827,7 @@ body { display: grid; place-items: center; }
       <h2>메뉴</h2>
       <label class="tog"><input type="checkbox" id="optCutin" checked> 스킬 컷씬</label>
       <label class="tog"><input type="checkbox" id="optSound" checked> 소리</label>
+      <label class="tog"><input type="checkbox" id="optFast"> 칸 전환 빠르게 (시험용)</label>
       <section id="meSec" hidden><h3>플레이어</h3><div class="me" id="me"></div></section>
       <div class="menu-row">
         <button class="ticket" id="restart" type="button">원정 그만두기</button>
@@ -1911,7 +1939,7 @@ body { display: grid; place-items: center; }
   });
   // 팩션: 마을 하나 = 메인 2 · 동료 4 · 판 위 장치 몫. 민숭마을은 ×2 범퍼 대신 번개 기둥 (D67 제안: 번개 기둥 → 작은 해양 생물)
   const FACTIONS = {
-    rabbit: { name: '토끼 마을', race: '토끼', short: '토끼', mains: ['hanato', 'rito'], kinds: ['ryuto', 'sato', 'oto', 'santo'], devices: ['plus', 'mult', 'spinner', 'booster'] },
+    rabbit: { name: '긴 귀 토끼 마을', race: '토끼', short: '토끼', mains: ['hanato', 'rito'], kinds: ['ryuto', 'sato', 'oto', 'santo'], devices: ['plus', 'mult', 'spinner', 'booster'] },
     slug: { name: '민숭마을', race: '갯민숭달팽이', short: '갯민숭', mains: ['doris', 'hipsel'], kinds: ['bosung', 'pongsung', 'jilsung', 'mongsung'], devices: ['plus', 'bolt', 'spinner', 'booster'] },
   };
   const facOf = (k) => FACTIONS[HEROES[k || S.hero || 'hanato'].fac];
@@ -2035,6 +2063,10 @@ body { display: grid; place-items: center; }
   const RABBIT = { speed: [2, 2, 5], atk: [0, 2, 2], twice: [0, 0, 1] };
   const CHAPTER = ['story', 'battle', 'battle', 'event', 'battle', 'battle', 'story', 'mid', 'story', 'battle', 'battle', 'event', 'battle', 'battle', 'story', 'boss'];
   const NODE_LABEL = { story: '스토리', battle: '전투', event: '이벤트', mid: '중간 보스', boss: '보스' };
+  // 칸 사이 전환 (D93 · D109, 인게임 기획서 2-3 · 7-7): 지도 띠가 내려오고(drop) 메인이 걸어가고(walk) 다음 칸 쪽지(panel)가 뜬 뒤 저절로. 초.
+  // fast = 설정 '칸 전환 빠르게'(시험용, 나중에 뺀다)를 켜면 전체를 이 초로 줄인다. 임시값 · 임시 연출 (모양 · 애니메이션은 UI 담당)
+  const TRANSIT = { drop: 0.35, walk: 1.2, panel: 1.8, fast: 0.5 };
+  const BOSS_INFO = { mid: { name: '시슬라', gimmick: '가시 갑옷' }, boss: { name: '아이비른', gimmick: '씨앗 폭탄' } };
   // 스토리는 시나리오 담당이 쓴다. 여기는 형식 시험용 테스트 대사뿐
   // 열은 CampStory 표 그대로: side (L 메인 · R 상대 · P 플레이어 · N 나레이션) · who · b (talk · shout · think · narr) · say, 그리고 face · bg · hand
   const storyLines = (no, name) => [
@@ -2091,7 +2123,7 @@ body { display: grid; place-items: center; }
   // 분위기 질문: 그 종족 팔레트에서 밝은 색 · 가운데 색 · 짙은 색을 제안한다
   const CY_MOOD = { q: '테스트 분위기 질문', a: [['테스트 답 · 밝게', 'light'], ['테스트 답 · 차분하게', 'mid'], ['테스트 답 · 짙게', 'deep']] };
 
-  const S = { opts: { cutin: true, sound: true }, uiT: 0, persona: null };
+  const S = { opts: { cutin: true, sound: true, fast: false }, uiT: 0, persona: null };
   let T = {};
 
   // ---------- 아웃게임 데이터 (v0.10: 디자인 시스템 「원정대 본부」(og_*)의 화면과 그 화면에 담긴 규칙을 따른다. 이름 · 수치는 모두 임시) ----------
@@ -2388,7 +2420,7 @@ body { display: grid; place-items: center; }
   // cyoa === true 이면 저장된 페르소나가 있어도 설문부터 (설정 · 다시 만들기)
   function resetRun() {
     const h0 = HEROES.hanato;
-    S.ctl = null; S.relics = {}; S.inRun = false; S.reviveUsed = false; S.runDodge = 0; S.midDone = false; S.startGold = 0;
+    S.ctl = null; S.relics = {}; S.inRun = false; S.transits = 0; S.reviveUsed = false; S.runDodge = 0; S.midDone = false; S.startGold = 0;
     S.main = { hp: h0.hp, maxHp: h0.hp, atk: h0.atk, def: h0.def, shield: 0, flash: 0 };
     S.levels = Object.fromEntries(ALL_KINDS.map((k) => [k, 0])); S.goo = []; S.straws = []; S.waves = [];
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
@@ -2462,10 +2494,54 @@ body { display: grid; place-items: center; }
     nextNode();
   }
   function nextNode() {
-    setView('battle'); // 스토리 · 이벤트에서 바로 넘어와도 판으로 (다음 칸이 스토리 · 이벤트면 그쪽이 다시 바꾼다)
     S.node++;
-    if (S.node >= CHAPTER.length) { finishRun(true); return; }
-    enterNode();
+    if (S.node >= CHAPTER.length) { setView('battle'); finishRun(true); return; }
+    showTransit(S.node - 1, enterNode);
+  }
+  // 칸 사이 전환: 교역로 지도 띠가 내려오고 메인이 지금 칸에서 다음 칸으로 걸어간 뒤 다음 칸 쪽지, 저절로 넘어간다.
+  // 클릭 · Enter · Space로 바로 넘긴다. 떠나면 판으로 돌려놓고(setView) 다음 칸을 연다: 스토리 · 이벤트면 그쪽이 다시 화면을 바꾼다 (v0.11.1)
+  function showTransit(from, then) {
+    S.phase = 'transit'; S.transits = (S.transits || 0) + 1;
+    showOverlay('', 'transit');
+    const to = S.node, n0 = S.drawN, T0 = TRANSIT, all = T0.drop + T0.walk + T0.panel, k = S.opts.fast ? T0.fast / all : 1, ms = (sec) => sec * k * 1000;
+    const body = $('#ovBody');
+    body.style.setProperty('--tr-drop', `${T0.drop * k}s`); body.style.setProperty('--tr-walk', `${T0.walk * k}s`);
+    body.innerHTML = transitHtml(from, to);
+    let left = false;
+    const go = () => { if (left || S.drawN !== n0) return; left = true; S.keys = null; body.style.cssText = ''; hideOverlay(); then(); };
+    const auto = () => { if (menuOpen()) { later(auto, 300, n0); return; } go(); };
+    S.keys = { Enter: go, ' ': go };
+    body.addEventListener('click', go, { once: true });
+    const map = body.querySelector('.tr2-map'), note = body.querySelector('.tr2-note');
+    later(() => map.classList.add('in'), 30, n0);
+    later(() => map.classList.add('walk'), ms(T0.drop), n0);
+    later(() => { map.classList.add('arrive'); note.classList.add('show'); sfx.place(); }, ms(T0.drop + T0.walk), n0);
+    later(auto, ms(all), n0);
+    syncUI(true);
+  }
+  // 다음 칸 쪽지에 보일 것 (인게임 기획서 2-3 표)
+  function nextInfo(to) {
+    const t = CHAPTER[to];
+    if (t === 'battle') {
+      const n = S.battles + 1, enc = ENCOUNTERS[Math.min(n, ENCOUNTERS.length) - 1], foes = {};
+      for (const [key] of enc.foes) foes[key] = (foes[key] || 0) + 1;
+      return { kind: `전투 ${n}`, name: enc.tag, foes: Object.entries(foes) };
+    }
+    if (t === 'mid' || t === 'boss') {
+      const B = BOSS_INFO[t];
+      return { kind: NODE_LABEL[t], name: B.name, line: B.gimmick, foes: [[t === 'mid' ? 'thistle' : 'ivy', 1]], boss: true };
+    }
+    if (t === 'story') return { kind: '이야기', name: CH_INFO.area[0] };
+    return { kind: '?', name: '무슨 일이 생길까' };
+  }
+  function transitHtml(from, to) {
+    const I = nextInfo(to), bossAt = CHAPTER.lastIndexOf('boss'), left = bossAt - to;
+    const foe = ([key, n]) => `<span class="tr2-foe">${ART_SRC[key] && ART_SRC[key].startsWith('data:') ? `<img alt="" src="${ART_SRC[key]}">` : `<i>${FOES[key].name[0]}</i>`}${I.boss ? '' : `×${n}`}</span>`;
+    return `<div class="tmap tr2-map">${trackHtml(to)}<span class="tr2-walker" style="left:${mapX(from)}px;top:${MAP_Y[from]}px;--tx:${mapX(to) - mapX(from)}px;--ty:${MAP_Y[to] - MAP_Y[from]}px">${faceImg(S.hero)}</span></div>`
+      + `<div class="tr2-note${I.boss ? ' boss' : ''}">${I.boss ? '<div class="tr2-warn">보스 등장</div>' : ''}<div class="tr2-kind">${I.kind}</div><div class="tr2-name">${I.name}</div>`
+      + (I.line ? `<p>${I.line}</p>` : '') + (I.foes ? `<div class="tr2-foes">${I.foes.map(foe).join('')}</div>` : '')
+      + `<div class="tr2-stat"><span>${to + 1} / ${CHAPTER.length}칸</span><span>${left > 0 ? `보스까지 ${left}칸` : '보스!'}</span><span>체력 ${S.main.hp}/${S.main.maxHp}</span><span>씨앗 ${S.gold}</span></div></div>`
+      + '<div class="tapekeys" style="left:760px;top:990px"><span><span class="key">클릭</span><span class="key">Enter</span>바로 넘기기</span></div>';
   }
   function clearField() {
     S.enemies = []; S.board = []; S.walls = []; S.pads = []; S.crates = []; S.portals = []; S.webs = []; S.gates = []; S.clouds = []; S.mine = []; S.cuts = []; S.atk = [];
@@ -2500,12 +2576,12 @@ body { display: grid; place-items: center; }
       S.enemies = [offField(makeFoe('thistle', 0, 0, 1, 1)),
         makeFoe('thorn', 300, 200, 1, 1), makeFoe('thorn', 660, 200, 1, 1), makeFoe('thorn', 480, 330, 1, 1),
         makeFoe('bud', 480, 105, 1, 1), makeFoe('bud', 220, 390, 1, 1), makeFoe('bud', 740, 390, 1, 1)];
-      banner('시슬라 · 가시 갑옷', T.danger);
+      banner(`${BOSS_INFO.mid.name} · ${BOSS_INFO.mid.gimmick}`, T.danger);
     } else if (type === 'boss') {
       S.gimmick = 'seeds'; buildMap(MAPS.boss);
       S.enemies = [offField(makeFoe('ivy', 0, 0, 1, 1)), makeFoe('vine', 300, 210, 1, 1), makeFoe('vine', 660, 210, 1, 1), makeFoe('vine', 480, 120, 1, 1)];
       plantSeeds(3);
-      banner('아이비른 · 씨앗 폭탄', T.petal);
+      banner(`${BOSS_INFO.boss.name} · ${BOSS_INFO.boss.gimmick}`, T.petal);
     } else {
       const sp = SPECIALS[special.id];
       special.left = sp.shots;
@@ -3719,7 +3795,7 @@ body { display: grid; place-items: center; }
     const art = (k, n, x, y, h, r) => `<div class="ttl-bro" data-mo="off" style="--k:${n};left:${x}px;top:${y}px;transform:rotate(${r}deg)"><img class="sticker" alt="${HEROES[k].name}" src="${heroSrc(k)}" style="height:${h}px"></div>`;
     add(`<div class="abs ttl-sign" data-mo="off" style="left:110px;top:110px;width:900px;height:380px;background:var(--sign);transform:rotate(-3deg);box-shadow:inset 0 0 0 40px var(--mat-2),inset 0 0 0 46px var(--mat-3),0 14px 0 0 var(--mat-1)">${bulbs}</div>`
       + `<div class="shout" data-mo="off" style="left:170px;top:180px;font-size:200px;transform:rotate(-5deg)">${[...'퍼리업!'].map((c, n) => `<span class="ttl-ch" style="--k:${n};--lr:${[-14, 10, -8, 12][n]}deg">${c}</span>`).join('')}</div>`
-      + '<div class="abs lab ttl-sub" style="left:220px;top:400px;font-size:28px;color:var(--spirit);transform:rotate(-5deg);letter-spacing:.3em">토끼 마을 원정대 · 튕김 난타</div>'
+      + '<div class="abs lab ttl-sub" style="left:220px;top:400px;font-size:28px;color:var(--spirit);transform:rotate(-5deg);letter-spacing:.3em">긴 귀 토끼 마을 원정대 · 튕김 난타</div>'
       + face('santo', 0, 1500, 250, 220, 6) + face('oto', 1, 1110, 290, 200, -6) + art('rito', 2, 1290, 470, 460, 4) + art('hanato', 3, 860, 420, 560, -3) + face('sato', 4, 1640, 760, 180, 8)
       + '<div class="tapekeys" style="left:150px;top:960px"><span><span class="key">↑</span><span class="key">↓</span>고르기</span><span><span class="key">Enter</span>출발!</span><span><span class="key">Esc</span>메뉴</span></div>');
     const menu = document.createElement('div'); menu.className = 'ttl-menu'; menu.dataset.mo = 'off';
@@ -6318,7 +6394,7 @@ body { display: grid; place-items: center; }
     if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.innerHTML = '정말 지운다<small>한 번 더 누르면 지운다</small>'; return; }
     META = blankMeta(); saveMeta(); setMenu(false); showTitle();
   });
-  for (const [id, key] of [['optCutin', 'cutin'], ['optSound', 'sound']]) {
+  for (const [id, key] of [['optCutin', 'cutin'], ['optSound', 'sound'], ['optFast', 'fast']]) {
     $('#' + id).addEventListener('change', (ev) => { S.opts[key] = ev.target.checked; savePrefs(); });
   }
 
@@ -6326,15 +6402,15 @@ body { display: grid; place-items: center; }
   // 지도 띠 (섞기 A): 챕터 16칸. 지난 칸은 덩굴을 끊은 도장, 지금 칸은 깃발 핀, 중간 보스 · 보스는 덤불 요새
   const MAP_Y = [78, 91, 94, 85, 71, 62, 66, 78, 91, 94, 85, 71, 62, 66, 79, 91];
   const mapX = (i) => 370 + 96 * i;
-  function trackHtml() {
-    const now = Math.min(S.node || 0, CHAPTER.length - 1), road = MAP_Y.map((y, i) => `${i ? 'L' : 'M'}${mapX(i)} ${y}`).join(' ');
+  function trackHtml(at) {
+    const cur = at === undefined ? S.node || 0 : at, now = Math.min(cur, CHAPTER.length - 1), road = MAP_Y.map((y, i) => `${i ? 'L' : 'M'}${mapX(i)} ${y}`).join(' ');
     let h = '<span class="lake" style="left:760px;top:-46px;width:260px;height:100px"></span><span class="lake" style="left:1390px;top:100px;width:200px;height:80px"></span><span class="wood" style="left:440px;top:100px;width:140px;height:84px"></span><span class="wood" style="left:1100px;top:-6px;width:120px;height:72px"></span><span class="wood" style="left:980px;top:104px;width:110px;height:66px"></span><span class="wood" style="left:1640px;top:-20px;width:120px;height:72px"></span>'
       + `<svg class="road" viewBox="0 0 1880 140"><path d="${road}"/></svg>`
       + '<div class="abs disp" style="left:26px;top:14px;font-size:42px;line-height:1;color:var(--mat-1)">교역로 지도</div>'
       + `<div class="abs lab" style="left:28px;top:66px;font-size:20px;color:var(--ink)">${HEROES[S.hero || 'hanato'].name} 원정 · ${now + 1}/${CHAPTER.length} 칸</div>`
       + `<div class="abs hand" style="left:28px;top:94px;font-size:26px;color:var(--ink-muted)">${now + 1}칸 · ${NODE_LABEL[CHAPTER[now]]}</div>`;
     CHAPTER.forEach((t, i) => {
-      const fort = t === 'mid' || t === 'boss', st = i < S.node ? 'done' : i === now ? 'now' : '';
+      const fort = t === 'mid' || t === 'boss', st = i < cur ? 'done' : i === now ? 'now' : '';
       h += `<span class="wp ${st}${fort ? ' fort' : ''}" style="left:${mapX(i)}px;top:${MAP_Y[i]}px" title="${i + 1} ${NODE_LABEL[t]}">${ico(NODE_ICO[t])}</span>`;
       if (st === 'done') h += `<span class="cut" style="left:${mapX(i)}px;top:${MAP_Y[i] - 40}px"><i></i><i></i></span>`;
     });
@@ -6420,7 +6496,7 @@ body { display: grid; place-items: center; }
   function savePrefs() { try { localStorage.setItem('furryup-v3', JSON.stringify(S.opts)); } catch (e) { /* 없어도 된다 */ } }
   function loadPrefs() {
     try { const o = JSON.parse(localStorage.getItem('furryup-v3') || 'null'); if (o) Object.assign(S.opts, o); } catch (e) { /* 없어도 된다 */ }
-    $('#optCutin').checked = S.opts.cutin; $('#optSound').checked = S.opts.sound;
+    $('#optCutin').checked = S.opts.cutin; $('#optSound').checked = S.opts.sound; $('#optFast').checked = !!S.opts.fast;
   }
   function savePersona() { try { localStorage.setItem('furryup-persona', JSON.stringify(S.persona)); } catch (e) { /* 없어도 된다 (이번 창에서만 기억) */ } }
   function loadPersona() {
@@ -6494,6 +6570,8 @@ body { display: grid; place-items: center; }
     rerender() { renderSlots(); renderPanel(); syncUI(true); },
     persona(p) { S.persona = p ? { name: '시험', size: RACES[p.race].size, color: 0, suggested: p.race, custom: false, ...p } : null; renderPanel(); },
     restock() { if (S.phase !== 'shop') return false; rollStock(); renderShop(); return true; },
+    skip() { if (S.phase !== 'transit') return false; $('#ovBody').click(); return true; },
+    jump(i) { if (!S.inRun) return false; S.node = i - 1; nextNode(); return S.phase; },
     syn: () => synOn().map((o) => ({ ...o, fx: synFx(o.race, o.t, ' · ') })),
     stat: () => ({ atk: atkNow(), speed: speedMul(), twice: twice(), slug: slugT() }),
   };

@@ -20,16 +20,17 @@ for (let r = 0; r < +nRuns; r++) for (const hero of heroes) {
   await ev(() => { const M = window.furryV3.meta(); for (const k of Object.keys(M.allies)) M.allies[k] = true; ['oto', 'santo', 'pongsung', 'jilsung', 'mongsung', 'ryuto'].forEach((k) => { M.allies[k] = true; }); });
   await ev((h) => window.furryV3.quick(h), hero);
   const seen = {};
-  let steps = 0, end = '', lastNode = 0;
+  let steps = 0, end = '', lastNode = 0, transits = 0;
   while (steps++ < 900) {
-    const st = await ev(() => { const S = window.furryV3.state; return { ph: S.phase, node: S.node, hp: S.main && S.main.hp, swap: !!S.swapCancel, aug: !!(S.aug && !S.aug.done), view: document.getElementById('app').dataset.view, ov: document.getElementById('ovBody').children.length, bh: document.getElementById('battle').hidden, sh: document.getElementById('story').hidden, oh: document.getElementById('overlay').hidden }; });
-    ctx = `${hero} r${r} node${st.node} ${st.ph}`; lastNode = st.node;
+    const st = await ev(() => { const S = window.furryV3.state; return { ph: S.phase, node: S.node, hp: S.main && S.main.hp, swap: !!S.swapCancel, tr: S.transits || 0, aug: !!(S.aug && !S.aug.done), view: document.getElementById('app').dataset.view, ov: document.getElementById('ovBody').children.length, bh: document.getElementById('battle').hidden, sh: document.getElementById('story').hidden, oh: document.getElementById('overlay').hidden }; });
+    ctx = `${hero} r${r} node${st.node} ${st.ph}`; lastNode = st.node; transits = st.tr;
     seen[st.ph] = (seen[st.ph] || 0) + 1;
     // 화면과 단계가 맞는지
     const battleP = ['aim', 'shot', 'iai', 'enemy', 'wait', 'dry', 'cutin', 'place'].includes(st.ph);
     if (battleP && st.bh && !st.swap) errs.push({ msg: `battle phase but #battle hidden (view ${st.view})`, ctx });
     if (st.ph === 'story' && st.sh) errs.push({ msg: `story phase but #story hidden (view ${st.view})`, ctx });
     if (['shop', 'event'].includes(st.ph) && (st.oh || st.ov === 0)) errs.push({ msg: `${st.ph} but overlay hidden/empty (view ${st.view}, ov ${st.ov})`, ctx });
+    if (st.ph === 'transit') { if (Math.random() < 0.6) await ev(() => window.furryV3.skip()); else await page.waitForTimeout(1200); continue; }
     if (st.ph === 'result') { await ev(() => { const b = document.getElementById('resultNext'); if (b) b.click(); }); await page.waitForTimeout(600); continue; }
     if (['title', 'lobby', 'ending', 'clear', 'lose'].includes(st.ph) || (!st.ph)) { end = st.ph; break; }
     if (st.swap) { await ev(() => { const b = document.getElementById(Math.random() < 0.6 ? 'swapGo' : 'swapCancel'); if (b) b.click(); }); await page.waitForTimeout(900); continue; }
@@ -63,7 +64,7 @@ for (let r = 0; r < +nRuns; r++) for (const hero of heroes) {
     }
     await ev(() => window.furryV3.sim(0.3)); await page.waitForTimeout(50);
   }
-  out.push({ hero, r, end, steps, lastNode, seen, errs: errs.slice(0, 8), nErr: errs.length });
+  out.push({ hero, r, end, steps, lastNode, transits, seen, errs: errs.slice(0, 8), nErr: errs.length });
   await page.close();
 }
 console.log(JSON.stringify(out.map((o) => ({ ...o, seen: undefined })), null, 1));
