@@ -486,6 +486,12 @@
 .K .og-tab { padding: 12px 24px 14px; background: var(--mat-1); color: var(--on-dark); font: 400 22px/1 var(--font-market-label); outline: 2px dashed rgba(246,236,212,.35); outline-offset: -6px; transform: translateY(8px); }
 .K .og-tab.on { background: var(--surface); color: var(--ink); outline-color: var(--stitch); transform: translateY(0) rotate(-1deg); box-shadow: 0 6px 0 0 rgba(0,0,0,.3); }
 .K .og-tab b { margin-left: 8px; font: 400 15px/1 var(--font-market-text); color: var(--accent-ink); }
+.og-tab .cdx-tabg { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.og-tab .cdx-tabbar { position: relative; flex: 1; height: 9px; background: rgba(0,0,0,.3); outline: 1px dashed rgba(246,236,212,.45); outline-offset: 2px; }
+.og-tab.on .cdx-tabbar { background: var(--surface-2); outline-color: var(--stitch); }
+.og-tab .cdx-tabbar i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--v); background: var(--accent); background-image: repeating-linear-gradient(115deg, rgba(255,255,255,.3) 0 4px, transparent 4px 9px); animation: cdx-fill .8s var(--mo-out) calc(.35s + var(--j) * .08s) both; }
+.og-tab .cdx-tabg em { font: 400 14px/1 var(--font-market-text); font-style: normal; color: var(--accent-ink); }
+.K .og-tab .cdx-tabbar i { animation: none !important; }
 /* buttons: name tapes with notched ends (primary = tomato/berry) */
 .K .og-btn { position: absolute; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 40px; background: var(--surface); color: var(--ink); font: 400 34px/1 var(--font-market-display);
   -webkit-mask: radial-gradient(14px at 0 50%, transparent 13px, #000 14px) left / 51% 100% no-repeat, radial-gradient(14px at 100% 50%, transparent 13px, #000 14px) right / 51% 100% no-repeat;
@@ -1781,22 +1787,22 @@ body { display: grid; place-items: center; }
   let T = {};
 
   // ---------- 아웃게임 데이터 (v0.10: 디자인 시스템 「원정대 본부」(og_*)의 화면과 그 화면에 담긴 규칙을 따른다. 이름 · 수치는 모두 임시) ----------
-  // 재화 두 가지: 당근젤리 = 상점 화폐 (동료 · 메인 · 시작 보급 해금), 원정 훈장 = 성장 재료 (강화 계획판). 런 안의 엽전과는 다른 재화다
+  // 재화 두 가지 (v0.10.4): 원정 훈장 = 캐릭터 해금 (상점의 동료 · 메인), 당근젤리 = 강화 계획판 · 시작 보급 해금. 유물은 재화로 사지 않는다 (보스 첫 처치 · 도전과제). 런 안의 엽전과는 다른 재화다
   const MONEY = { jelly: { name: '당근젤리', ico: 'carrot' }, medal: { name: '원정 훈장', ico: 'star' } };
   // 원정이 끝날 때 (OgChapter): 깨면 clear, 쓰러지면 닿은 구간 tiers [이 칸까지, 당근젤리, 원정 훈장]. xp 원정 경험: 지난 칸마다 · 중간 보스 · 클리어
   const REWARD = { clear: { jelly: 320, medal: 6 }, tiers: [[7, 40, 0], [15, 120, 2], [16, 200, 4]], xp: { node: 10, mid: 40, win: 120 } };
   // 레벨: 다음 레벨까지 base + step × (지금 레벨 - 1). 아직 보여 주기만 한다
   const LEVEL = { base: 100, step: 80 };
-  // 강화 계획판 (OgGrowth): 메인마다 따로 남는다. 쪽지 한 장 = 강화 칸, cost는 단계마다 드는 원정 훈장, need는 열리는 조건 (다른 칸 단계).
+  // 강화 계획판 (OgGrowth): 메인마다 따로 남는다. 쪽지 한 장 = 강화 칸, cost는 단계마다 드는 당근젤리, need는 열리는 조건 (다른 칸 단계).
   // 정비의 '메인 강화'(런 안, 엽전)와 다른 것이다. 투지 step = 전투 시작 투지, 속도 step = 공 속도 %, 스킬 step = 스킬 피해 %
   const GROW = [
     { id: 'base', name: '기본기', ico: 'paw', max: 1, cost: [], col: 'spirit' },
-    { id: 'hp', name: '체력', ico: 'heart', max: 5, step: 5, cost: [3, 4, 5, 6, 7], col: 'hp' },
-    { id: 'atk', name: '공격', ico: 'sword', max: 5, step: 1, cost: [4, 6, 8, 10, 12], col: 'accent' },
-    { id: 'gauge', name: '투지', ico: 'spirit', max: 3, step: 3, cost: [3, 5, 7], col: 'spirit' },
-    { id: 'def', name: '방어', ico: 'shield', max: 5, step: 1, cost: [3, 4, 5, 6, 7], col: 'accent-2' },
-    { id: 'spd', name: '속도', ico: 'speed', max: 3, step: 4, cost: [4, 5, 6], col: 'accent-2' },
-    { id: 'skill', name: '', ico: 'skill', max: 3, step: 6, cost: [6, 8, 10], col: 'accent', need: { atk: 3, gauge: 2 } },
+    { id: 'hp', name: '체력', ico: 'heart', max: 5, step: 5, cost: [150, 200, 250, 300, 350], col: 'hp' },
+    { id: 'atk', name: '공격', ico: 'sword', max: 5, step: 1, cost: [200, 300, 400, 500, 600], col: 'accent' },
+    { id: 'gauge', name: '투지', ico: 'spirit', max: 3, step: 3, cost: [150, 250, 350], col: 'spirit' },
+    { id: 'def', name: '방어', ico: 'shield', max: 5, step: 1, cost: [150, 200, 250, 300, 350], col: 'accent-2' },
+    { id: 'spd', name: '속도', ico: 'speed', max: 3, step: 4, cost: [200, 250, 300], col: 'accent-2' },
+    { id: 'skill', name: '', ico: 'skill', max: 3, step: 6, cost: [300, 400, 500], col: 'accent', need: { atk: 3, gauge: 2 } },
   ];
   const growOf = (id) => GROW.find((g) => g.id === id);
   // 메인 소개 (로비 정보 쪽지 · 도감 상세). 하나토 · 리토는 디자인 시스템 시안 글, 나머지는 자리표시
@@ -1823,14 +1829,14 @@ body { display: grid; place-items: center; }
   const RELIC_ORDER = Object.keys(RELICS);
   const relicOf = (k, boss) => RELIC_ORDER.find((id) => RELICS[id].from && RELICS[id].from[0] === k && RELICS[id].from[1] === boss);
   const relicSrc = (id) => { const r = RELICS[id]; return r.from ? `${HEROES[r.from[0]].name}로 ${FOES[r.from[1]].name}를 처음 쓰러뜨리면` : `도전과제 「${ACH.find((a) => a.id === r.ach).name}」`; };
-  // 상점 (OgShop): 산토의 「퍼리퍼리 창고」. 당근젤리로 해금한다 (되돌릴 수 없다). 꾸미기는 검토 중
-  // 동료: 해금한 동료만 정비 진열(공용 풀)에 나온다. own = 처음부터 있다 · price = 당근젤리 · ach = 그 도전과제로 연다
-  const SHOP_ALLY = { sato: { own: true }, oto: { price: 320 }, santo: { price: 1800 }, ryuto: { ach: 'ryuto' }, bosung: { own: true }, pongsung: { price: 320 }, jilsung: { price: 600 }, mongsung: { price: 1800 } };
-  const SHOP_MAIN = { hanato: { own: true }, doris: { own: true }, rito: { price: 600 }, hipsel: { price: 600 } };
+  // 상점 (OgShop): 산토의 「퍼리퍼리 창고」. 동료 · 메인은 원정 훈장, 시작 보급은 당근젤리로 해금한다 (되돌릴 수 없다). 꾸미기는 검토 중
+  // 동료: 해금한 동료만 정비 진열(공용 풀)에 나온다. own = 처음부터 있다 · price = 원정 훈장 · ach = 그 도전과제로 연다
+  const SHOP_ALLY = { sato: { own: true }, oto: { price: 6 }, santo: { price: 30 }, ryuto: { ach: 'ryuto' }, bosung: { own: true }, pongsung: { price: 6 }, jilsung: { price: 12 }, mongsung: { price: 30 } };
+  const SHOP_MAIN = { hanato: { own: true }, doris: { own: true }, rito: { price: 12 }, hipsel: { price: 12 } };
   // 아직 없는 그룹: 진열만 하고 잠근다 [이름, 그룹 · 역할, 열리는 때]
   const LOCKED_ALLIES = [['루나', '곤충 그룹 · 진료사', '곤충 그룹 도착 후 (DLC)'], ['오카미', '늑대 그룹 · 돌격', '늑대 그룹 도착 후'], ['롭', '바다 그룹 · 성장형', '바다 그룹 도착 후'], ['스위피', '공중 그룹 · 회복', '공중 그룹 도착 후']];
   const LOCKED_RACES = [['곤충', '곤충 원정'], ['늑대', '늑대 원정'], ['바다', '바다 원정'], ['공중', '공중 원정']];
-  // 시작 보급: 한 번 해금하면 원정을 시작할 때마다 받는다
+  // 시작 보급: 당근젤리로 한 번 해금하면 원정을 시작할 때마다 받는다
   const SUPPLY = [
     { id: 'lunch', name: '든든한 도시락', ico: 'heart', desc: '시작 체력 +10', price: 120 },
     { id: 'purse', name: '덤 주머니', ico: 'coin', desc: '시작 엽전 +5', price: 100 },
@@ -2530,7 +2536,8 @@ body { display: grid; place-items: center; }
     $('#overlay').dataset.kind = kind || 'basic';
     setView('scene');
   }
-  function hideOverlay() { setView(S.phase === 'story' ? 'story' : 'battle'); }
+  // 장면을 떠날 때도 drawN을 올린다: 떠난 화면의 연출 뒤처리(later · 구매 연출의 land)가 다음 화면 위에 그리지 않게
+  function hideOverlay() { S.drawN = (S.drawN || 0) + 1; setView(S.phase === 'story' ? 'story' : 'battle'); }
   function button(label, cls, id, fn) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = cls; b.id = id; b.innerHTML = label;
@@ -2824,6 +2831,7 @@ body { display: grid; place-items: center; }
   }
   // 정비 화면: 위 교역로 지도 띠, 왼쪽 원정대 짐, 가운데 오토의 수레, 오른쪽 오토 · 말풍선 · 상세, 아래 새로 고침 · 다음 스테이지로
   function renderShop() {
+    if (!S.fix || !S.stock) return; // 정비를 이미 떠났다
     S.phase = 'shop'; S.keys = {};
     showOverlay('', 'fix');
     const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), n = raceCount(F.race), fix = S.fix;
@@ -3289,7 +3297,7 @@ body { display: grid; place-items: center; }
       const b = button(`<i>${ico(icon)}</i><div><b>${name}</b><small>${sub}</small></div>${dot ? `<span class="dot">${dot}</span>` : ''}`, `lob-sign ${side}`, 'go_' + n, fn);
       b.style.cssText = `--k:${n};left:${x}px;top:${y}px;transform:rotate(${r}deg)`; $('#ovBody').append(b);
     };
-    sign(0, 'l', 1200, 600, -2, 'bag', '상점', '당근젤리로 동료 · 메인 · 보급', shopNew ? 'NEW' : '', () => showShop());
+    sign(0, 'l', 1200, 600, -2, 'bag', '상점', '훈장 → 동료 · 메인 · 젤리 → 보급', shopNew ? 'NEW' : '', () => showShop());
     sign(1, 'r', 1555, 620, 2, 'shieldplus', '성장', '강화 · 유물', '', () => showGrowth(k));
     sign(2, 'l', 1200, 730, 1.5, 'book', '도감', `친구 ${bookN} · 적 ${foeN} · 물건 ${devN}`, '', () => showCodex('main'));
     sign(3, 'r', 1555, 750, -1.5, 'crown', '도전과제', `${achN} / ${ACH.length}`, readyN ? `보상 ${readyN}` : '', () => showAch());
@@ -3309,7 +3317,7 @@ body { display: grid; place-items: center; }
     const half = (k, side) => {
       const h = HEROES[k], t = trained(k), lock = !unlocked(k), sp = SHOP_MAIN[k];
       return `<div class="half ${side}" data-s="${side}" data-k="${k}"><span class="burst" data-mo="off"></span><div class="fig"><img class="sticker" data-mo="off" src="${heroSrc(k)}" alt="${h.name}"${lock ? ' style="filter:grayscale(1) brightness(.45)"' : ''}></div>`
-        + `<div class="card"><b>${h.style}</b><p>${h.desc}</p><p style="color:var(--ink)">체력 ${t.hp} · 공격 ${t.atk} · 방어 ${t.def}</p><p><span class="sk">${h.skill} · ${h.sdesc}</span></p>${lock ? `<p style="color:var(--accent-ink)">잠김 · 상점에서 해금 (당근젤리 ${fmtN(sp.price)})</p>` : ''}</div><div class="nm">${h.name}</div></div>`;
+        + `<div class="card"><b>${h.style}</b><p>${h.desc}</p><p style="color:var(--ink)">체력 ${t.hp} · 공격 ${t.atk} · 방어 ${t.def}</p><p><span class="sk">${h.skill} · ${h.sdesc}</span></p>${lock ? `<p style="color:var(--accent-ink)">잠김 · 상점에서 해금 (원정 훈장 ${fmtN(sp.price)})</p>` : ''}</div><div class="nm">${h.name}</div></div>`;
     };
     add(`<div class="lob-sel"><div class="sel" data-f="${ms.indexOf(foc) ? 'R' : 'L'}">${half(ms[0], 'L')}${half(ms[1], 'R')}</div></div>`
       + `<div class="lob-vs" data-mo="off">${FACTIONS[fac].short}<br>그룹</div>`
@@ -3406,7 +3414,7 @@ body { display: grid; place-items: center; }
     let cork = `<svg viewBox="0 0 816 514">${svg}</svg>`;
     for (const g of GROW) {
       const L = gLv(k, g.id), [x, y, w] = CARD_AT[g.id], isOpen = growOpen(k, g), st = !isOpen ? 'lock' : g.id === sel ? 'on' : L > 0 ? 'lit' : 'todo';
-      const cost = L < g.max && g.cost.length ? costHtml('medal', g.cost[L]) : '';
+      const cost = L < g.max && g.cost.length ? costHtml('jelly', g.cost[L]) : '';
       cork += `<button type="button" class="shp-card ${st}" data-g="${g.id}" style="left:${x}px;top:${y}px;width:${w}px;--r:${[-1.5, 1.2, -1, 1.5, -1.2, 1, 2][GROW.indexOf(g)]}deg;--c:var(--${g.col});--d:${(0.55 + 0.12 * GROW.indexOf(g)).toFixed(2)}s;--cd:1.9s">`
         + `<div class="nd">${ico(isOpen ? g.ico : 'lock')}</div><div class="tx"><b>${growName(k, g)}</b>${isOpen ? `<div class="row">${pipsHtml(L, g.max)}${cost}</div>` : `<span class="lk">${Object.entries(g.need).map(([id, n]) => `${growOf(id).name} ${n}`).join(' · ')}에서 열림</span>`}</div></button>`;
       if (g.id !== 'skill') { const [px, py] = g.id === 'base' ? [192, 257] : pinL(g.id); cork += `<span class="shp-pin" data-n="${g.id}" style="left:${px}px;top:${py}px;--pc:var(--${L > 0 || g.id === 'base' ? 'accent' : 'accent-2'});--d:${(0.85 + 0.12 * GROW.indexOf(g)).toFixed(2)}s"></span>`; }
@@ -3416,13 +3424,13 @@ body { display: grid; place-items: center; }
     // 다음 계획 메모: 스킬이 잠겨 있으면 모자란 조건, 아니면 가장 싼 다음 칸
     const lack = Object.entries(skill.need).filter(([id, n]) => gLv(k, id) < n);
     const cheap = GROW.filter((g) => growOpen(k, g) && gLv(k, g.id) < g.max && g.cost.length).sort((a, b) => a.cost[gLv(k, a.id)] - b.cost[gLv(k, b.id)])[0];
-    const memo = lack.length ? `다음 계획!<br>${lack.map(([id, n]) => `${growOf(id).name} ${n}`).join(' · ')} 찍고<br>→ ${HEROES[k].skill} 열기` : cheap ? `다음 계획!<br>${growName(k, cheap)} ${gLv(k, cheap.id) + 1}단계<br>→ 훈장 ${cheap.cost[gLv(k, cheap.id)]}` : '다음 계획!<br>계획판을<br>다 채웠다';
+    const memo = lack.length ? `다음 계획!<br>${lack.map(([id, n]) => `${growOf(id).name} ${n}`).join(' · ')} 찍고<br>→ ${HEROES[k].skill} 열기` : cheap ? `다음 계획!<br>${growName(k, cheap)} ${gLv(k, cheap.id) + 1}단계<br>→ 젤리 ${fmtN(cheap.cost[gLv(k, cheap.id)])}` : '다음 계획!<br>계획판을<br>다 채웠다';
     cork += `<div class="shp-memo" style="left:584px;top:330px">${memo}</div><div class="shp-legend" style="left:30px;bottom:18px"><span><i style="background:var(--accent)"></i>찍은 길</span><span><i style="background:#efe3c4"></i>아직</span><span><i style="background:var(--spirit)"></i>계획한 길</span></div>`;
-    add(`<div class="og-sheet" style="left:520px;top:196px;width:860px;height:610px;transform:rotate(-0.6deg);z-index:2"><div class="og-h" style="position:absolute;left:34px;top:24px">강화 계획판</div><div class="og-sub" style="position:absolute;left:250px;top:32px">원정 훈장으로 쪽지 한 장씩 · 실을 따라 스킬이 열린다</div><div class="shp-cork">${cork}</div></div>`);
+    add(`<div class="og-sheet" style="left:520px;top:196px;width:860px;height:610px;transform:rotate(-0.6deg);z-index:2"><div class="og-h" style="position:absolute;left:34px;top:24px">강화 계획판</div><div class="og-sub" style="position:absolute;left:250px;top:32px">당근젤리로 쪽지 한 장씩 · 실을 따라 스킬이 열린다</div><div class="shp-cork">${cork}</div></div>`);
     // 미리보기
     const g = growOf(sel), L = gLv(k, sel), maxed = L >= g.max, [[nm, a, b2]] = growLine(k, g, L);
     add(`<div class="og-sheet" style="left:520px;top:830px;width:860px;height:170px;transform:rotate(0.5deg);z-index:4"><div class="og-h" style="position:absolute;left:34px;top:22px;font-size:24px">강화 후 미리보기 · ${growName(k, g)}</div>`
-      + `<div class="shp-cmp"><div><span>${nm}</span><b>${maxed || g.id === 'base' ? `<em>${a}</em>` : `<s>${a}</s>→ <em>${b2}</em>`}</b></div><div><span>단계</span><b>${L} / ${g.max}</b></div><div><span>다음 단계 비용</span><b>${maxed || !g.cost.length ? '끝' : `${g.cost[L]} <em style="font-size:20px;color:var(--ink-muted)">원정 훈장</em>`}</b></div></div></div>`);
+      + `<div class="shp-cmp"><div><span>${nm}</span><b>${maxed || g.id === 'base' ? `<em>${a}</em>` : `<s>${a}</s>→ <em>${b2}</em>`}</b></div><div><span>단계</span><b>${L} / ${g.max}</b></div><div><span>다음 단계 비용</span><b>${maxed || !g.cost.length ? '끝' : `${fmtN(g.cost[L])} <em style="font-size:20px;color:var(--ink-muted)">당근젤리</em>`}</b></div></div></div>`);
     // 유물 칸 · 선반
     const slots = Array.from({ length: RELIC.slots }, (_, i) => META.equip[i]);
     add(`<div class="og-sheet" style="left:1410px;top:196px;width:480px;height:350px;transform:rotate(1deg);z-index:3"><div class="og-h" style="position:absolute;left:30px;top:26px">유물 <small style="font:400 16px/1 var(--font-market-label);color:var(--ink-muted)">장착 ${META.equip.length}/${RELIC.slots}</small></div><div class="shp-slots">`
@@ -3433,16 +3441,16 @@ body { display: grid; place-items: center; }
         return `<button type="button" class="shp-rel${have ? '' : ' lock'}" data-rel="${id}" style="--d:${(1.3 + 0.06 * i).toFixed(2)}s"><i style="--c:var(--${have ? 'accent-2' : 'deep'})">${ico(have ? r.ico : 'lock')}</i><div><b>${have ? r.name : '???'}</b><p>${have ? r.desc() : relicSrc(id)}</p></div><em class="${eq ? 'eq' : ''}">${eq ? '장착 중' : have ? '보유' : r.from ? '보스' : '도전과제'}</em></button>`; }).join('')
       + '</div></div>'
       + '<div class="tapekeys" style="left:40px;top:1010px;z-index:7"><span><span class="key">Q</span><span class="key">E</span>캐릭터</span><span><span class="key">클릭</span>칸 고르기</span><span><span class="key">Enter</span>강화</span><span><span class="key">Esc</span>설정</span></div>');
-    const cost = !maxed && g.cost.length ? g.cost[L] : 0, can = cost && growOpen(k, g) && META.medal >= cost, mc = $('#ovBody .og-chip[data-cur="medal"]');
+    const cost = !maxed && g.cost.length ? g.cost[L] : 0, can = cost && growOpen(k, g) && META.jelly >= cost, mc = $('#ovBody .og-chip[data-cur="jelly"]');
     let lock = 0;
-    // 원본 GROW: 점 하나가 톡 켜지고 쪽지가 눌린다. 처음 찍은 쪽지는 핀 · 실이 이어지고, 미리보기 숫자가 오르고, 비용이 훈장 칩으로 날아가 칩이 줄어든다
-    const up = ogBtn(maxed || !cost ? '강화 끝' : `강화<small>원정 훈장 ${cost}</small>`, can ? 'p shp-up' : 'shp-up', 'growUp', 'left:1470px;top:948px;transform:rotate(-2deg);z-index:9', () => {
+    // 원본 GROW: 점 하나가 톡 켜지고 쪽지가 눌린다. 처음 찍은 쪽지는 핀 · 실이 이어지고, 미리보기 숫자가 오르고, 비용이 젤리 칩으로 날아가 칩이 줄어든다
+    const up = ogBtn(maxed || !cost ? '강화 끝' : `강화<small>당근젤리 ${fmtN(cost)}</small>`, can ? 'p shp-up' : 'shp-up', 'growUp', 'left:1470px;top:948px;transform:rotate(-2deg);z-index:9', () => {
       const c = $(`#ovBody .shp-card[data-g="${sel}"]`);
       if (lock) return;
       if (!can) { SHK(c); SHK(up); RE(mc, 'cdx-bump'); return; }
       lock = 1;
-      const m = META.medal, ps = c.querySelectorAll('.og-pips i'), co = c.querySelector('.og-cost'), n0 = S.drawN;
-      META.medal -= cost; META.grow[k][sel] = L + 1; saveMeta(); sfx.buy();
+      const m = META.jelly, ps = c.querySelectorAll('.og-pips i'), co = c.querySelector('.og-cost'), n0 = S.drawN;
+      META.jelly -= cost; META.grow[k][sel] = L + 1; saveMeta(); sfx.buy();
       ps[L].classList.add('on'); POP(ps[L]); SQ(c);
       if (c.classList.contains('todo')) {
         c.classList.remove('todo'); c.classList.add('lit');
@@ -3452,7 +3460,7 @@ body { display: grid; place-items: center; }
       const cb = $('#ovBody .shp-cmp b');
       if (cb && g.id !== 'base') { const [[, a2, b3]] = growLine(k, g, L + 1); cb.innerHTML = L + 1 >= g.max ? `<em>${a2}</em>` : `<s>${a2}</s>→ <em>${b3}</em>`; SQ(cb); }
       FLY(co, mc, FLY_ROOT(), () => {
-        CHIPSET(mc, m, META.medal);
+        CHIPSET(mc, m, META.jelly);
         if (L + 1 >= g.max) { if (!RM) co.animate([{ scale: '1' }, { scale: '0', opacity: 0 }], { duration: 240, fill: 'forwards' }).onfinish = () => co.remove(); else co.remove(); }
         later(() => showGrowth(k, sel), 620, n0);
       });
@@ -3482,8 +3490,8 @@ body { display: grid; place-items: center; }
 
   // 상점 (OgShop): 산토의 「퍼리퍼리 창고」. 탭 = 동료 해금 · 메인 캐릭터 · 시작 보급 · 꾸미기(검토 중)
   // 선반 두 단에 밧줄로 매단 꼬리표 (보유 / 살 수 있음 / 모자람 / 잠김), 오른쪽 상세와 「해금하기」, 아래 「오늘의 추천」
-  const SANTO_SAY = { hello: '어서 와. 외상은 안 돼. 당근젤리 한 알까지 정확히 받을 거야.', own: '그건 벌써 네 거야. 같은 걸 두 번 팔진 않아.', poor: '모자라. 원정 한 번 더 다녀와.', lock: '그건 아직 안 팔아. 조건부터 채우고 와.', done: '거래 끝. 영수증은 없어.',
-    no: { poor: '모자라. 젤리 더 벌어 와.', own: '이미 네 거라니까.', lock: '그건 진열 전이야. 손대지 마.' } };
+  const SANTO_SAY = { hello: '어서 와. 외상은 안 돼. 훈장 한 개, 젤리 한 알까지 정확히 받을 거야.', own: '그건 벌써 네 거야. 같은 걸 두 번 팔진 않아.', poor: '모자라. 원정 한 번 더 다녀와.', lock: '그건 아직 안 팔아. 조건부터 채우고 와.', done: '거래 끝. 영수증은 없어.',
+    no: { poor: '모자라. 원정 다녀와서 더 벌어 와.', own: '이미 네 거라니까.', lock: '그건 진열 전이야. 손대지 마.' } };
   function todayPicks() {
     const slot = Math.floor(Date.now() / (TODAY.hours * 3600e3)), pool = shopGoods('all').filter((o) => o.st === 'buy' || o.st === 'poor');
     const out = []; let s = slot;
@@ -3491,24 +3499,24 @@ body { display: grid; place-items: center; }
     return { list: out, left: (slot + 1) * TODAY.hours * 3600e3 - Date.now() };
   }
   function shopGoods(tab) {
-    const out = [], st = (own, price, ach) => (own ? 'own' : ach ? 'lock' : META.jelly >= price ? 'buy' : 'poor');
+    const out = [], st = (own, price, ach, cur) => (own ? 'own' : ach ? 'lock' : META[cur] >= price ? 'buy' : 'poor');
     if (tab === 'ally' || tab === 'all') for (const f of Object.values(FACTIONS)) for (const n of f.kinds) {
       const o = SHOP_ALLY[n], own = !!META.allies[n], a = o.ach && ACH.find((x) => x.id === o.ach);
-      out.push({ id: n, g: 'ally', name: KINDS[n].name, sub: `${KINDS[n].role} · ${SHORT[n](1)}`, rl: `동료 · ${KINDS[n].role} · ${KINDS[n].race}`, price: o.price || 0, st: st(own, o.price, o.ach && !own), why: a ? `도전과제 「${a.name}」` : '',
+      out.push({ id: n, g: 'ally', name: KINDS[n].name, sub: `${KINDS[n].role} · ${SHORT[n](1)}`, rl: `동료 · ${KINDS[n].role} · ${KINDS[n].race}`, price: o.price || 0, cur: 'medal', st: st(own, o.price, o.ach && !own, 'medal'), why: a ? `도전과제 「${a.name}」` : '',
         ul: [KINDS[n].desc(1), `공용 동료 풀에 추가 · ${f.short} 메인과 함께면 정비에서 만난다`, '시작 보급 「동료 소개장」으로 바로 데려갈 수 있다', `${f.short} 시너지 칸을 하나 더 채운다`] });
     }
     if (tab === 'main' || tab === 'all') {
-      for (const k of Object.keys(HEROES)) { const o = SHOP_MAIN[k], own = unlocked(k); out.push({ id: k, g: 'main', name: HEROES[k].name, sub: `${HEROES[k].style} · ${HEROES[k].race}`, rl: `메인 · ${HEROES[k].style} · ${HEROES[k].race}`, price: o.price || 0, st: st(own, o.price), ul: [HEROES[k].desc, `스킬 ${HEROES[k].skill} · ${HEROES[k].sdesc}`, '원정대 본부에서 골라 원정을 떠날 수 있다'] }); }
+      for (const k of Object.keys(HEROES)) { const o = SHOP_MAIN[k], own = unlocked(k); out.push({ id: k, g: 'main', name: HEROES[k].name, sub: `${HEROES[k].style} · ${HEROES[k].race}`, rl: `메인 · ${HEROES[k].style} · ${HEROES[k].race}`, price: o.price || 0, cur: 'medal', st: st(own, o.price, false, 'medal'), ul: [HEROES[k].desc, `스킬 ${HEROES[k].skill} · ${HEROES[k].sdesc}`, '원정대 본부에서 골라 원정을 떠날 수 있다'] }); }
       if (tab === 'main') for (const [r, w] of LOCKED_RACES) out.push({ id: 'x' + r, g: 'main', name: '???', sub: `${r} 그룹 · 메인`, rl: `${r} 그룹 · 메인`, st: 'lock', why: `${r} 그룹 도착 후`, race: r, ul: ['다른 그룹 메인 — 그룹이 도착하면 진열된다', w] });
     }
-    if (tab === 'supply' || tab === 'all') for (const s of SUPPLY) out.push({ id: s.id, g: 'supply', name: s.name, sub: s.desc, rl: '시작 보급 · 원정마다', ico: s.ico, price: s.price, st: st(META.supply[s.id], s.price), ul: [s.desc, '한 번 해금하면 원정을 시작할 때마다 받는다'] });
+    if (tab === 'supply' || tab === 'all') for (const s of SUPPLY) out.push({ id: s.id, g: 'supply', name: s.name, sub: s.desc, rl: '시작 보급 · 원정마다', ico: s.ico, price: s.price, cur: 'jelly', st: st(META.supply[s.id], s.price, false, 'jelly'), ul: [s.desc, '한 번 해금하면 원정을 시작할 때마다 받는다'] });
     return out;
   }
   function showShop(tab, sel, say) {
     tab = tab || S.shopTab || 'ally'; S.shopTab = tab;
     ogFrame('shopout', '상점', '퍼리퍼리 창고 · 산토네 보급점');
     const goods = shopGoods(tab), today = todayPicks(), sale = new Set(today.list.map((o) => o.g + o.id));
-    for (const o of goods) if (sale.has(o.g + o.id)) { o.full = o.price; o.price = Math.round(o.price * (1 - TODAY.off)); o.st = o.st === 'own' ? 'own' : META.jelly >= o.price ? 'buy' : 'poor'; }
+    for (const o of goods) if (sale.has(o.g + o.id)) { o.full = o.price; o.price = Math.max(1, Math.round(o.price * (1 - TODAY.off))); o.st = o.st === 'own' ? 'own' : META[o.cur] >= o.price ? 'buy' : 'poor'; }
     const cur = goods.find((o) => o.id === sel) || goods.find((o) => o.st === 'buy') || goods[0];
     const nOf = (t) => shopGoods(t).filter((o) => o.st === 'buy').length;
     tabs([['ally', '동료 해금', nOf('ally')], ['main', '메인 캐릭터', nOf('main')], ['supply', '시작 보급', nOf('supply')], ['deco', '꾸미기', '검토 중', true]], 560, 122, tab, (t) => showShop(t));
@@ -3516,44 +3524,44 @@ body { display: grid; place-items: center; }
     let h2 = '<div class="shp-board" style="left:520px;top:196px;width:940px;height:650px;transform:rotate(-.6deg)"><span class="shp-plank" style="top:300px"></span><span class="shp-plank" style="bottom:12px"></span></div>';
     goods.slice(0, 8).forEach((o, i) => {
       const obj = o.g === 'supply' ? `<div class="ic" style="--c:var(--accent-2)">${ico(o.ico)}</div>` : o.st === 'lock' && !KINDS[o.id] && !HEROES[o.id] ? `<div class="shp-sil">${ico('lock')}</div>` : `<div class="og-patch" style="--c:var(--char-${o.id})">${faceImg(o.id, 'fill')}</div>`;
-      const tail = o.st === 'own' ? '<span class="shp-own">보유</span>' : o.st === 'lock' ? `<div class="shp-why">${ico('lock')} ${o.why}</div>` : `${o.full ? `<s style="font:400 14px/1 var(--font-market-label);color:var(--ink-muted);margin-right:6px">${fmtN(o.full)}</s>` : ''}${costHtml('jelly', o.price)}`;
+      const tail = o.st === 'own' ? '<span class="shp-own">보유</span>' : o.st === 'lock' ? `<div class="shp-why">${ico('lock')} ${o.why}</div>` : `${o.full ? `<s style="font:400 14px/1 var(--font-market-label);color:var(--ink-muted);margin-right:6px">${fmtN(o.full)}</s>` : ''}${costHtml(o.cur, o.price)}`;
       h2 += `<button type="button" class="shp-good ${o.st === 'buy' ? '' : o.st === 'lock' ? 'lk' : o.st}${o === cur ? ' on' : ''}" data-mo="off" data-i="${i}" style="left:${XS[i % 4]}px;top:${YS[i >> 2]}px;transform:rotate(${[-1.5, 1, -1, 1.5, 1, -1.5, 1, -1][i]}deg);--d:${(0.35 + 0.09 * i).toFixed(2)}s">${obj}<b>${o.name}</b><p>${o.sub}</p>${tail}</button>`;
     });
     // 상세 (원본 S(i): 고른 꼬리표가 바뀌면 상세 · 확인 쪽지 · 버튼만 고친다)
     const detHtml = (o) => `${o.g === 'supply' ? `<span class="og-patch" style="--c:var(--accent-2);display:grid;place-items:center">${ico(o.ico)}</span>` : (KINDS[o.id] || HEROES[o.id]) ? `<span class="og-patch" style="--c:var(--char-${o.id})">${faceImg(o.id, 'fill')}</span>` : `<span class="og-patch" style="--c:var(--deep)">${silSvg(o.race)}</span>`}<div class="nm">${o.name}</div><div class="rl">${o.rl}</div><ul>${o.ul.map((x) => `<li>${x}</li>`).join('')}</ul>`;
-    const noteHtml = (o) => (o.st === 'buy' ? `<b>구매 전 확인</b> 당근젤리 ${fmtN(META.jelly)} → ${fmtN(META.jelly - o.price)} 남아요. 해금은 되돌릴 수 없어요.`
-      : o.st === 'poor' ? `<b>젤리 모자람</b> ${fmtN(o.price)} 중 ${fmtN(o.price - META.jelly)}이 모자라요. 원정을 한 번 더 다녀와요.`
+    const noteHtml = (o) => (o.st === 'buy' ? `<b>구매 전 확인</b> ${MONEY[o.cur].name} ${fmtN(META[o.cur])} → ${fmtN(META[o.cur] - o.price)} 남아요. 해금은 되돌릴 수 없어요.`
+      : o.st === 'poor' ? `<b>${o.cur === 'medal' ? '훈장' : '젤리'} 모자람</b> ${fmtN(o.price)} 중 ${fmtN(o.price - META[o.cur])}${o.cur === 'medal' ? '개가' : '이'} 모자라요. 원정을 한 번 더 다녀와요.`
         : o.st === 'own' ? '<b>보유 중</b> 이미 원정대에 있어요.' : `<b>아직 못 사요</b> ${o.why}.`);
-    const labelOf = (o) => (o.st === 'buy' ? `해금하기<small>당근젤리 ${fmtN(o.price)}</small>` : o.st === 'poor' ? `젤리 모자람<small>당근젤리 ${fmtN(o.price)}</small>` : o.st === 'own' ? '보유 중' : `잠김<small>${o.why}</small>`);
+    const labelOf = (o) => (o.st === 'buy' ? `해금하기<small>${MONEY[o.cur].name} ${fmtN(o.price)}</small>` : o.st === 'poor' ? `${o.cur === 'medal' ? '훈장' : '젤리'} 모자람<small>${MONEY[o.cur].name} ${fmtN(o.price)}</small>` : o.st === 'own' ? '보유 중' : `잠김<small>${o.why}</small>`);
     const sayOf = (o) => (o.st === 'buy' ? `${o.name}? ${fmtN(o.price)}. 깎아 달라는 말은 넣어 둬.` : SANTO_SAY[o.st === 'own' ? 'own' : o.st === 'poor' ? 'poor' : 'lock']);
     h2 += `<div class="og-sheet" style="left:1490px;top:196px;width:400px;height:650px;transform:rotate(1.2deg);z-index:5"><div class="shp-detail">${detHtml(cur)}</div><div class="shp-note">${noteHtml(cur)}</div></div>`;
     // 오늘의 추천
     const hh = Math.floor(today.left / 3600e3), mm = Math.floor(today.left % 3600e3 / 60e3);
     h2 += `<div class="shp-today" style="left:520px;top:888px;transform:rotate(-1.5deg)"><b>오늘의 추천<small>${hh}시간 ${mm}분 뒤 교체</small></b>`
-      + (today.list.length ? today.list.map((o) => `<button type="button" class="shp-pick" data-tab="${o.g}" data-id="${o.id}"><i style="--c:var(--${o.g === 'supply' ? 'spirit' : 'accent-2'})">${ico(o.ico || 'paw')}</i>${o.name} · ${o.g === 'supply' ? o.sub : o.g === 'main' ? '메인' : '동료'} <s>${fmtN(o.price)}</s> ${costHtml('jelly', Math.round(o.price * (1 - TODAY.off)))}</button>`).join('') : '<span class="shp-pick">다 샀다! 다음 진열을 기다려</span>')
+      + (today.list.length ? today.list.map((o) => `<button type="button" class="shp-pick" data-tab="${o.g}" data-id="${o.id}"><i style="--c:var(--${o.g === 'supply' ? 'spirit' : 'accent-2'})">${ico(o.ico || 'paw')}</i>${o.name} · ${o.g === 'supply' ? o.sub : o.g === 'main' ? '메인' : '동료'} <s>${fmtN(o.price)}</s> ${costHtml(o.cur, Math.max(1, Math.round(o.price * (1 - TODAY.off))))}</button>`).join('') : '<span class="shp-pick">다 샀다! 다음 진열을 기다려</span>')
       + `<span class="shp-sale">-${TODAY.off * 100}%</span></div>`;
     h2 += `<span class="og-patch shp-keeper" style="left:20px;top:360px;bottom:auto;width:380px;height:380px;--c:var(--char-santo)">${faceImg('santo', 'fill')}</span>`
       + `<div class="shp-say" style="left:60px;top:150px"><b>산토</b><span class="shp-line">${say || SANTO_SAY.hello}</span></div>`
       + '<div class="shp-sign" style="left:40px;top:860px;transform:rotate(-4deg)">퍼리퍼리 창고<small>주인 · 산토 (외상 사절)</small></div>'
       + '<div class="tapekeys" style="left:1080px;top:1018px;z-index:9"><span><span class="key">Q</span><span class="key">E</span>탭</span><span><span class="key">클릭</span>고르기</span><span><span class="key">Enter</span>해금</span><span><span class="key">Esc</span>설정</span></div>';
     add(h2);
-    const G = [...document.querySelectorAll('#ovBody .shp-good')], det = $('#ovBody .shp-detail'), note = $('#ovBody .shp-note'), line = $('#ovBody .shp-line'), kp = $('#ovBody .shp-keeper'), jc = $('#ovBody .og-chip[data-cur="jelly"]');
+    const G = [...document.querySelectorAll('#ovBody .shp-good')], det = $('#ovBody .shp-detail'), note = $('#ovBody .shp-note'), line = $('#ovBody .shp-line'), kp = $('#ovBody .shp-keeper'), chipOf = (k) => $(`#ovBody .og-chip[data-cur="${k}"]`);
     let ci = goods.indexOf(cur), lock = 0;
     const buyB = ogBtn(labelOf(cur), cur.st === 'buy' ? 'p shp-buy' : 'shp-buy off', 'shopBuy', 'left:1540px;top:880px;transform:rotate(-1.5deg);z-index:9', () => BUY());
     const fill = (i) => { const o = goods[i]; det.innerHTML = detHtml(o); note.innerHTML = noteHtml(o); buyB.innerHTML = labelOf(o); buyB.classList.toggle('off', o.st !== 'buy'); buyB.classList.toggle('p', o.st === 'buy'); };
     // 원본 PICK: 꼬리표가 눌리고, 상세 · 확인 쪽지가 뒤집히며 바뀌고, 버튼이 눌리고, 산토가 한 글자씩 말한다
     const PICK = (i) => { if (lock) return; const g = G[i]; SQ(g); if (i === ci) return; ci = i; G.forEach((o) => o.classList.toggle('on', o === g)); FLIP([det, note], () => fill(i)); setTimeout(() => SQ(buyB), 260); TYPE(line, sayOf(goods[i]), 30); };
-    // 원본 BUY: 못 사면 버튼 · 꼬리표가 고개를 젓는다. 사면 젤리 칩이 줄고, 값표가 산토에게 날아가 「보유」 도장이 찍힌다
+    // 원본 BUY: 못 사면 버튼 · 꼬리표가 고개를 젓는다. 사면 그 재화 칩이 줄고, 값표가 산토에게 날아가 「보유」 도장이 찍힌다
     const BUY = () => {
       const g = G[ci], o = goods[ci];
       if (lock) return;
       if (o.st !== 'buy') { SHK(buyB); SHK(g.querySelector('.og-patch, .ic, .shp-sil')); TYPE(line, SANTO_SAY.no[o.st === 'poor' ? 'poor' : o.st === 'own' ? 'own' : 'lock'], 30); return; }
       lock = 1;
-      const c = g.querySelector('.og-cost'), j = META.jelly, n0 = S.drawN;
-      META.jelly -= o.price;
+      const c = g.querySelector('.og-cost'), jc = chipOf(o.cur), j = META[o.cur], n0 = S.drawN;
+      META[o.cur] -= o.price;
       if (o.g === 'ally') { META.allies[o.id] = true; META.seen.ally[o.id] = 1; } else if (o.g === 'main') { META.mains[o.id] = true; META.seen.main[o.id] = 1; } else META.supply[o.id] = true;
       saveMeta(); sfx.buy();
-      CHIPSET(jc, j, META.jelly);
+      CHIPSET(jc, j, META[o.cur]);
       FLY(c, kp, FLY_ROOT(), () => {
         SQ(kp);
         const st = document.createElement('span'); st.className = 'shp-own'; st.textContent = '보유'; g.appendChild(st);
@@ -3576,10 +3584,10 @@ body { display: grid; place-items: center; }
   function codexList(tab) {
     const out = [];
     if (tab === 'main') {
-      for (const k of Object.keys(HEROES)) { const h = HEROES[k], P = PROFILE[k]; out.push({ ok: unlocked(k), key: k, race: h.race, n: h.name, s: `${P.breed} · ${P.job} · 메인`, r: h.style, q: P.quote, p: P.p, sk: `${h.skill} — ${h.sdesc}`, ps: h.desc, how: SHOP_MAIN[k].own ? '기본 지급' : `상점 · 당근젤리 ${fmtN(SHOP_MAIN[k].price)}`, art: heroSrc(k), c: [['표정', Math.min(4, 2 + META.unl.face), 4], ['컷씬', META.seen.cg[k] ? 1 : 0, 6], ['시나리오', (META.seen.story[k] || []).length, 24]] }); }
+      for (const k of Object.keys(HEROES)) { const h = HEROES[k], P = PROFILE[k]; out.push({ ok: unlocked(k), key: k, race: h.race, n: h.name, s: `${P.breed} · ${P.job} · 메인`, r: h.style, q: P.quote, p: P.p, sk: `${h.skill} — ${h.sdesc}`, ps: h.desc, how: SHOP_MAIN[k].own ? '기본 지급' : `상점 · 원정 훈장 ${fmtN(SHOP_MAIN[k].price)}`, art: heroSrc(k), c: [['표정', Math.min(4, 2 + META.unl.face), 4], ['컷씬', META.seen.cg[k] ? 1 : 0, 6], ['시나리오', (META.seen.story[k] || []).length, 24]] }); }
       for (const [r, w] of LOCKED_RACES) for (let i = 0; i < 2; i++) out.push({ ok: false, race: r, n: '???', s: `${r} 그룹 · 메인`, how: w });
     } else if (tab === 'ally') {
-      for (const k of ALL_KINDS) { const K = KINDS[k], o = SHOP_ALLY[k]; out.push({ ok: !!META.seen.ally[k], key: k, race: K.race, n: K.name, s: `${K.race} · ${K.role} · 동료`, r: K.role, q: META.unl.line[k] ? '“외상은 안 돼. 그래도 너라면… 한 번은 봐줄게.”' : '', sk: K.desc(1), ps: SHORT[k](1), how: o.own ? '기본 지급' : o.ach ? `도전과제 「${ACH.find((a) => a.id === o.ach).name}」` : `상점 · 당근젤리 ${fmtN(o.price)}`, c: [['단계', 1, 3], ['대사', META.unl.line[k] ? 1 : 0, 1]] }); }
+      for (const k of ALL_KINDS) { const K = KINDS[k], o = SHOP_ALLY[k]; out.push({ ok: !!META.seen.ally[k], key: k, race: K.race, n: K.name, s: `${K.race} · ${K.role} · 동료`, r: K.role, q: META.unl.line[k] ? '“외상은 안 돼. 그래도 너라면… 한 번은 봐줄게.”' : '', sk: K.desc(1), ps: SHORT[k](1), how: o.own ? '기본 지급' : o.ach ? `도전과제 「${ACH.find((a) => a.id === o.ach).name}」` : `상점 · 원정 훈장 ${fmtN(o.price)}`, c: [['단계', 1, 3], ['대사', META.unl.line[k] ? 1 : 0, 1]] }); }
       for (const [nm, rl, w] of LOCKED_ALLIES) out.push({ ok: false, race: rl.split(' ')[0], n: '???', s: rl, how: w });
     } else if (tab === 'foe') {
       for (const k of FOE_BOOK) out.push({ ok: !!META.seen.foe[k], key: k, race: '식물 진영', foe: true, n: FOES[k].name, s: `식물 진영 · ${FOES[k].boss ? '보스' : TRAITS[FOES[k].trait] || '몬스터'}`, r: FOES[k].boss ? '보스' : TRAITS[FOES[k].trait] || '몬스터', q: FOE_NOTE[k], sk: `체력 ${FOES[k].hp}`, ps: FOE_NOTE[k], how: '원정에서 만난다', art: ART_SRC[k] && ART_SRC[k].startsWith('data:') ? ART_SRC[k] : '' });
@@ -3593,11 +3601,14 @@ body { display: grid; place-items: center; }
     tab = tab || 'main'; race = race || '전체';
     ogFrame('codex', '도감', '마우스를 올리면 오른쪽에 펼쳐진다', back);
     const T4 = [['main', '메인 캐릭터'], ['ally', '동료'], ['foe', '식물 진영'], ['dev', '장치·보급품']];
+    const pct = (t) => { const l = codexList(t); return Math.round(100 * l.filter((e) => e.ok).length / Math.max(1, l.length)); };
     const cnt = (t) => { const l = codexList(t); return `${l.filter((e) => e.ok).length}/${l.length}`; };
-    tabs(T4.map(([t, n]) => [t, n, cnt(t)]), 50, 112, tab, (t) => showCodex(t, '', '', back));
+    tabs(T4.map(([t, n]) => [t, n, cnt(t)]), 50, 98, tab, (t) => showCodex(t, '', '', back));
+    // 분류마다 달성률 게이지 (v0.10.4)
+    T4.forEach(([t], j) => { const b = document.getElementById('tab_' + t); if (b) b.insertAdjacentHTML('beforeend', `<span class="cdx-tabg" style="--v:${pct(t)}%;--j:${j}"><span class="cdx-tabbar"><i></i></span><em>${pct(t)}%</em></span>`); });
     const all = codexList(tab), races = ['전체', ...new Set(all.map((e) => e.race))], list = all.filter((e) => race === '전체' || e.race === race).slice(0, 12);
     const tot = T4.reduce((a, [t]) => a + codexList(t).length, 0), got = T4.reduce((a, [t]) => a + codexList(t).filter((e) => e.ok).length, 0);
-    let h2 = `<div class="og-sheet dark" style="left:36px;top:230px;width:960px;height:806px;transform:rotate(-0.5deg);z-index:1"></div><div class="cdx-filt" style="left:60px;top:186px">${races.map((r, j) => `<button type="button" class="${r === race ? 'on' : ''}" data-race="${r}" style="--j:${j}">${r}</button>`).join('')}</div>`;
+    let h2 = `<div class="og-sheet dark" style="left:36px;top:230px;width:960px;height:806px;transform:rotate(-0.5deg);z-index:1"></div><div class="cdx-filt" style="left:60px;top:194px">${races.map((r, j) => `<button type="button" class="${r === race ? 'on' : ''}" data-race="${r}" style="--j:${j}">${r}</button>`).join('')}</div>`;
     list.forEach((e, i) => {
       const img = e.ok ? (e.dev ? `<span style="display:grid;place-items:center;width:100%;height:100%;color:var(--ink)">${e.item ? ico(ITEM_ICO[e.key] || 'bag') : devFace(e.key)}</span>` : e.foe ? (e.art ? `<img alt="" src="${e.art}" style="object-fit:contain">` : ico('leaf')) : faceImg(e.key, 'fill')) : `${silSvg(e.race)}<div class="og-lock"><span>${ico('lock')}</span></div>`;
       h2 += `<button type="button" class="cdx-it${e.ok ? '' : ' lk'}${i === (sel || 0) ? ' cur' : ''}" data-mo="off" data-k="${i}" style="left:${78 + 228 * (i % 4)}px;top:${286 + 246 * Math.floor(i / 4)}px;--d:${(0.4 + 0.07 * (i % 4) + 0.08 * Math.floor(i / 4)).toFixed(2)}s">${e.ok ? '<span class="cdx-own">보유</span>' : ''}<div class="og-patch" style="--c:var(--${e.ok && e.key && !e.dev && !e.foe ? 'char-' + e.key : e.dev ? 'spirit' : 'surface-2'})">${img}</div><span class="cdx-nm">${e.ok ? e.n : '???'}</span>${e.ok ? '' : `<span class="cdx-hint">${e.how}</span>`}</button>`;
@@ -5948,12 +5959,28 @@ body { display: grid; place-items: center; }
     } catch (e) { /* 없어도 된다 */ }
   }
   let last = 0;
+  // 오류가 나도 루프는 계속 돈다. 처음 보는 오류는 콘솔과 화면 구석 쪽지로 알린다 (시험하는 사람이 찍어 알려 주도록)
+  const errSeen = new Set();
+  function loopError(e) {
+    const msg = String((e && e.message) || e);
+    if (errSeen.has(msg)) return;
+    errSeen.add(msg); console.error(e);
+    let n = document.getElementById('errNote');
+    if (!n) {
+      n = document.createElement('div'); n.id = 'errNote';
+      n.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:9999;max-width:560px;padding:8px 12px;background:#2a1a12;color:#ffd9c7;font:13px/1.4 monospace;border:2px dashed #e07a5f;cursor:pointer';
+      n.title = '눌러서 닫기'; n.addEventListener('click', () => n.remove()); document.body.appendChild(n);
+    }
+    n.textContent = `오류가 났어요 (화면을 찍어 알려 주세요) · ${S.phase} · ${msg}`;
+  }
+  window.addEventListener('error', (ev) => loopError(ev.error || ev.message));
+  window.addEventListener('unhandledrejection', (ev) => loopError(ev.reason));
   function frame(t) {
+    requestAnimationFrame(frame);
     const dt = last ? Math.min(0.05, (t - last) / 1000) : 0;
     last = t;
-    if (!menuOpen()) update(dt);
-    draw(); syncUI(false); updateCombo();
-    requestAnimationFrame(frame);
+    try { if (!menuOpen()) update(dt); } catch (e) { loopError(e); }
+    try { draw(); syncUI(false); updateCombo(); } catch (e) { loopError(e); }
   }
   function start() {
     readTokens(); loadPrefs(); loadPersona();
