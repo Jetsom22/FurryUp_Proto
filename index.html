@@ -1168,6 +1168,244 @@
 
 
 
+/* 디자인 시스템 bundle.css에서 옮긴 것 (v0.11): 정비 공통 부품 (fx-) · 정비 시안 2 공통 (sh-) · 2E 게시판 (se-) · 2E v2 (sv-) · 증강 → 정비 전환 (tr-) · 증강 고르기 (ag-) */
+/* =====================================================================
+   정비 레이아웃 시안 (ig_fixlab.py) — shared pieces
+   ===================================================================== */
+.K .fx-tok { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--s); height: var(--s); border-radius: 50%; overflow: hidden; background: var(--c); color: var(--ink);
+  box-shadow: 0 0 0 calc(var(--s) * .05) var(--cream), 0 0 0 calc(var(--s) * .075) var(--mat-2), 0 calc(var(--s) * .06) 0 calc(var(--s) * .075) rgba(0,0,0,.28); }
+.K .fx-tok img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.K .fx-tok .fu-ico { width: 46%; height: 46%; }
+.K .fx-tok.sil img { filter: brightness(0) opacity(.72); }
+.K .fx-pr { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 6px; border-radius: 30px; background: var(--mat-1); color: var(--on-dark); font: 400 26px/1 var(--font-market-display); white-space: nowrap; }
+.K .fx-pr i { position: relative; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); box-shadow: inset 0 0 0 4px var(--yel-2); }
+.K .fx-pr i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px; background: var(--yel-2); }
+.K .fx-pr.poor { background: var(--a-deco, var(--a-deco, var(--accent))); color: var(--a-deco-on, var(--a-deco-on, var(--on-accent))); }
+.K .fx-pr.poor::after { content: "부족"; font: 400 15px/1 var(--font-market-label); margin-left: 2px; }
+.K .fx-pr.s { font-size: 20px; padding: 4px 11px 4px 5px; } .K .fx-pr.s i { width: 22px; height: 22px; } .K .fx-pr.s i::after { width: 6px; height: 6px; margin: -3px; }
+.K .fx-pr.l { font-size: 40px; padding: 8px 22px 8px 10px; gap: 12px; } .K .fx-pr.l i { width: 46px; height: 46px; box-shadow: inset 0 0 0 6px var(--yel-2); } .K .fx-pr.l i::after { width: 12px; height: 12px; margin: -6px; }
+.K .fx-stamp { position: absolute; left: 50%; top: 42%; z-index: 4; padding: 6px 16px; transform: translate(-50%, -50%) rotate(-12deg); border: 4px solid var(--a-deco, var(--a-deco, var(--accent))); color: var(--accent-ink);
+  background: rgba(255,250,240,.85); font: 400 30px/1 var(--font-market-display); white-space: nowrap; }
+.K .fx-pin { position: absolute; z-index: 4; padding: 5px 9px 7px; background: var(--a-deco, var(--a-deco, var(--accent))); color: var(--a-deco-on, var(--a-deco-on, var(--on-accent))); font: 400 15px/1 var(--font-market-label); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }
+.K .fx-coin { position: absolute; z-index: 6; border-radius: 50%; background: var(--gold); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 0 8px var(--yel-2), 0 6px 0 0 rgba(0,0,0,.28); }
+.K .fx-coin small { font: 400 16px/1 var(--font-market-label); } .K .fx-coin b { font: 400 54px/1 var(--font-market-display); }
+.K .fx-coin::after { content: ""; position: absolute; bottom: 14%; width: 12px; height: 12px; background: var(--yel-2); }
+.K .fx-strip { position: absolute; z-index: 6; display: flex; align-items: center; gap: 16px; padding: 12px 22px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -7px; box-shadow: 0 6px 0 0 rgba(0,0,0,.3); transform: rotate(-.8deg); }
+.K .fx-strip b { font: 400 30px/1 var(--font-market-display); color: var(--a-panel, var(--a-deco, var(--accent))); }
+.K .fx-strip span { font: 400 17px/1 var(--font-market-label); color: var(--ink-muted); white-space: nowrap; }
+.K .fx-strip em { font: 400 16px/1 var(--font-market-label); font-style: normal; color: var(--ink); white-space: nowrap; }
+.K .fx-nodes { display: flex; gap: 6px; align-items: center; }
+.K .fx-nodes i { width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--mat-2); }
+.K .fx-nodes i.d { background: var(--a-deco, var(--a-deco, var(--accent))); box-shadow: none; } .K .fx-nodes i.n { width: 22px; height: 22px; background: var(--spirit); box-shadow: 0 0 0 3px var(--a-sel, var(--a-deco, var(--accent))); }
+.K .fx-nodes i.b { border-radius: 4px; background: var(--mat-1); }
+.K .fx-svc { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 10px; background: var(--surface); color: var(--ink); outline: 2px dashed var(--stitch); outline-offset: -5px; box-shadow: 0 5px 0 0 rgba(0,0,0,.28); cursor: pointer; }
+.K .fx-svc b { display: block; font: 400 21px/1 var(--font-market-display); } .K .fx-svc small { display: block; margin-top: 5px; font: 400 14px/1 var(--font-market-text); color: var(--ink-muted); }
+.K .fx-svc .fx-pr { margin-left: auto; }
+.K .fx-bub { position: absolute; z-index: 7; padding: 16px 22px 18px; background: var(--bubble); color: var(--ink); border-radius: 22px; box-shadow: 0 6px 0 0 rgba(0,0,0,.35); font: 400 20px/1.35 var(--font-market-text); }
+.K .fx-bub b { display: block; margin-bottom: 4px; font: 400 18px/1 var(--font-market-label); color: var(--a-text, var(--a-deco, var(--accent))); }
+.K .fx-slots { display: flex; align-items: center; }
+.K .fx-slot { position: relative; display: grid; place-items: center; flex: none; width: var(--s); height: var(--s); border-radius: 50%; overflow: hidden; outline: 3px dashed var(--ink-muted); outline-offset: -3px; color: var(--ink-muted); font: 400 calc(var(--s) * .38)/1 var(--font-market-display); }
+.K .fx-slot.on { outline: none; background: var(--c, var(--spirit)); color: var(--ink); box-shadow: 0 0 0 3px var(--cream), 0 0 0 5px var(--mat-2); }
+.K .fx-slot.on img { width: 100%; height: 100%; object-fit: cover; }
+.K .fx-slot .fu-ico { width: 50%; height: 50%; }
+.K .fx-slot.dev.on { --c: var(--spirit); box-shadow: inset 0 0 0 5px var(--a-deco, var(--a-deco, var(--accent))); }
+.K .fx-slot.tin { border-radius: 14px; } .K .fx-slot.tin.on { box-shadow: inset 0 calc(var(--s) * .18) 0 0 rgba(0,0,0,.18); }
+.K .fx-slot.new { outline: 4px dashed var(--a-sel, var(--a-deco, var(--accent))); color: var(--accent-ink); animation: fx-blink 1.2s ease-in-out infinite; }
+@keyframes fx-blink { 50% { opacity: .4; } }
+.K .fx-hero { display: flex; align-items: center; gap: 14px; }
+.K .fx-hero b { display: block; font: 400 28px/1 var(--font-market-display); color: var(--ink); margin-bottom: 6px; }
+.K .fx-mbar { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.K .fx-mbar span { position: relative; width: 150px; height: 16px; background: var(--mat-1); box-shadow: inset 0 0 0 2px var(--cream); }
+.K .fx-mbar span i { position: absolute; left: 2px; top: 2px; bottom: 2px; width: calc((100% - 4px) * var(--v) / 100); background: var(--c); }
+.K .fx-mbar em { font: 400 18px/1 var(--font-market-display); font-style: normal; color: var(--ink); }
+.K .fx-lbl { font: 400 15px/1 var(--font-market-label); color: var(--ink-muted); white-space: nowrap; }
+.K .fx-cat { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 20px; background: var(--cc); color: var(--ink); font: 400 14px/1 var(--font-market-label); white-space: nowrap; }
+.K .fx-cat .fu-ico { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: reduce) { .K .fx-slot.new { animation: none; } }
+
+.K .fx-mini { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--surface-2); color: var(--ink); font: 400 20px/1 var(--font-market-display); cursor: pointer; white-space: nowrap; }
+.K .fx-mini.p { justify-content: center; background: var(--a-btn, var(--a-deco, var(--accent))); color: var(--a-btn-on, var(--a-deco-on, var(--on-accent))); font-size: 26px; }
+
+
+/* =====================================================================
+   정비 시안 2 (ig_shop2.py) — 8칸 상점. 분류 색은 고정한다(데드락처럼 테두리 색만 봐도 분류가 읽히게).
+   ===================================================================== */
+.K { --c-mate: var(--accent-2); --c-dev: var(--mat-3); --c-main: var(--a-deco, var(--a-deco, var(--accent))); --c-sup: var(--glass); --c-heal: var(--hp); }
+.K .sh-h4 { margin: 16px 0 10px; display: flex; justify-content: space-between; align-items: baseline; font: 400 19px/1 var(--font-market-label); color: var(--ink); }
+.K .sh-h4 small { font: 400 14px/1 var(--font-market-text); color: var(--ink-muted); }
+.K .sh-rare { position: absolute; z-index: 5; right: 10px; top: 10px; padding: 5px 10px; background: var(--ink); color: var(--spirit); font: 400 15px/1 var(--font-market-label); transform: rotate(4deg); }
+.K .is-rare .fx-tok { box-shadow: 0 0 0 calc(var(--s) * .05) var(--cream), 0 0 0 calc(var(--s) * .09) var(--spirit), 0 0 0 calc(var(--s) * .12) var(--c-main); }
+.K .is-poor .fx-tok { filter: saturate(.35) brightness(.9); }
+.K .is-poor > b, .K .is-poor .sh-ef { opacity: .6; }
+.K .is-sold > *:not(.fx-stamp) { opacity: .35; }
+.K .sh-tape { position: absolute; z-index: 6; display: flex; align-items: baseline; gap: 10px; padding: 8px 16px; background: var(--mat-1); color: var(--on-dark); font: 400 22px/1 var(--font-market-display); transform: rotate(-1.5deg); }
+.K .sh-tape small { font: 400 14px/1 var(--font-market-label); opacity: .8; }
+.K .sh-buy { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--a-btn, var(--a-deco, var(--accent))); color: var(--a-btn-on, var(--a-deco-on, var(--on-accent))); font: 400 22px/1 var(--font-market-display); white-space: nowrap; cursor: pointer; }
+.K .sh-reroll { cursor: pointer; }
+
+/* ---- 2E · 게시판 -------------------------------------------------------- */
+.K .se-board { position: absolute; left: 330px; top: 130px; width: 1170px; height: 800px; z-index: 2; background: #b4875a; background-color: var(--mat-3);
+  background-image: radial-gradient(rgba(0,0,0,.08) 2px, transparent 3px), radial-gradient(rgba(255,255,255,.08) 2px, transparent 3px); background-size: 22px 22px, 30px 30px; background-position: 0 0, 11px 15px;
+  box-shadow: inset 0 0 0 18px var(--mat-2), inset 0 0 0 22px rgba(0,0,0,.2), 0 10px 0 0 rgba(0,0,0,.3); }
+.K .se-post { position: absolute; z-index: 4; width: 262px; height: 372px; padding: 0 0 16px; background: var(--surface); text-align: center; cursor: pointer; box-shadow: 0 8px 0 0 rgba(0,0,0,.28); transition: translate .3s var(--mo-spring); }
+.K .se-post::before { content: ""; position: absolute; left: 50%; top: -10px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--a-deco, var(--a-deco, var(--accent))); box-shadow: inset -4px -4px 0 rgba(0,0,0,.2); z-index: 2; }
+.K .se-post .hd { padding: 20px 0 12px; background: var(--cc); color: var(--ink); font: 400 26px/1 var(--font-market-display); letter-spacing: .04em; }
+.K .se-post .fx-tok { --s: 118px; margin-top: 16px; }
+.K .se-post b { display: block; margin-top: 14px; font: 400 28px/1 var(--font-market-display); color: var(--ink); }
+.K .se-post .tg { display: block; margin-top: 6px; font: 400 14px/1 var(--font-market-label); color: var(--accent-ink); }
+.K .se-post .sh-ef { margin: 8px 18px 0; font: 400 16px/1.35 var(--font-market-text); color: var(--ink); }
+.K .se-post .tear { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; padding: 10px 0 12px; border-top: 3px dashed var(--stitch); }
+.K .se-post.is-sel { translate: 0 -10px; box-shadow: 0 0 0 6px var(--a-sel, var(--a-deco, var(--accent))), 0 18px 0 6px rgba(0,0,0,.25); }
+.K .se-post .sh-rare { top: 64px; } .K .se-post .fx-pin { left: 12px; top: 62px; }
+.K .se-post.scroll { background: var(--bubble); border-radius: 6px; } .K .se-post.scroll .hd { background: var(--ink); color: var(--spirit); }
+.K .se-tag { position: absolute; z-index: 4; width: 230px; padding: 16px 16px 14px 16px; background: var(--surface); cursor: pointer; display: grid; grid-template-columns: 70px 1fr; gap: 4px 12px; align-items: center;
+  clip-path: polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%); box-shadow: 0 6px 0 0 rgba(0,0,0,.25); }
+.K .se-tag .fx-tok { --s: 66px; grid-row: span 3; }
+.K .se-tag b { font: 400 21px/1 var(--font-market-display); color: var(--ink); }
+.K .se-tag .sh-ef { font: 400 14px/1.25 var(--font-market-text); color: var(--ink); }
+.K .se-tag.is-sold .fx-stamp { font-size: 22px; left: 60%; }
+.K .se-menu { position: absolute; z-index: 4; left: 950px; top: 600px; width: 510px; height: 290px; padding: 22px 28px; background: var(--chalk); color: var(--on-dark); box-shadow: inset 0 0 0 10px var(--mat-2), 0 8px 0 0 rgba(0,0,0,.3); transform: rotate(1deg); }
+.K .se-menu h4 { margin: 0; display: flex; justify-content: space-between; align-items: baseline; font: 400 26px/1 var(--font-market-display); }
+.K .se-menu h4 small { font: 400 14px/1 var(--font-market-label); opacity: .75; }
+.K .se-line { display: grid; grid-template-columns: 70px 1fr auto; gap: 16px; align-items: center; margin-top: 18px; cursor: pointer; }
+.K .se-line .fx-tok { --s: 66px; }
+.K .se-line b { display: block; font: 400 23px/1 var(--font-market-display); }
+.K .se-line small { display: block; margin-top: 6px; font: 400 15px/1 var(--font-market-label); opacity: .85; }
+.K .se-line .fx-pr { background: var(--cream); color: var(--ink); }
+.K .se-pop { position: absolute; z-index: 8; left: 24px; top: 150px; width: 290px; padding: 20px 22px; background: var(--bubble); color: var(--ink); border-radius: 20px; box-shadow: 0 8px 0 0 rgba(0,0,0,.32); }
+.K .se-pop::after { content: ""; position: absolute; left: 120px; bottom: -20px; border: 14px solid transparent; border-top: 20px solid var(--bubble); border-bottom: 0; }
+.K .se-pop .who { font: 400 15px/1 var(--font-market-label); color: var(--a-text, var(--a-deco, var(--accent))); }
+.K .se-pop h3 { margin: 8px 0 0; font: 400 30px/1 var(--font-market-display); }
+.K .se-pop p { margin: 10px 0 0; font: 400 18px/1.35 var(--font-market-text); }
+.K .se-pop .dst { margin-top: 10px; padding: 7px 10px; background: var(--mat-1); color: var(--on-dark); font: 400 14px/1.3 var(--font-market-label); }
+.K .se-pop .acts { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+.K .se-pack { position: absolute; left: 1530px; top: 130px; width: 360px; height: 640px; padding: 22px 22px; }
+.K .se-pack .fx-hero { width: auto !important; } .K .se-pack .fx-mbar span { width: 110px; }
+
+/* ---- 2E v2 · 메인 캐릭터 정보(왼쪽 위) + 짐 띠(아래) + 하나토 왼쪽 끝 ---- */
+.K .sv-hero { position: absolute; z-index: 3; pointer-events: none; }
+.K .sv-hero img { display: block; }
+.K .sv-info { position: absolute; left: 24px; top: 112px; width: 330px; z-index: 6; padding: 18px 20px 18px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -8px; box-shadow: 0 8px 0 0 rgba(0,0,0,.3); transform: rotate(-1deg); }
+.K .sv-info .nm { display: inline-flex; align-items: baseline; gap: 10px; margin: -34px 0 12px -30px; padding: 10px 18px 12px; background: var(--me-L, var(--a-panel, var(--a-deco, var(--accent)))); color: var(--me-on, var(--a-panel-on, var(--a-deco-on, var(--on-accent)))); font: 400 34px/1 var(--font-market-display); transform: rotate(-2deg); box-shadow: 0 5px 0 0 rgba(0,0,0,.28); }
+.K .sv-info .nm small { font: 400 16px/1 var(--font-market-label); opacity: .9; }
+.K .sv-bar { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; margin-top: 10px; }
+.K .sv-bar i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: var(--ink); }
+.K .sv-bar i .fu-ico { width: 20px; height: 20px; }
+.K .sv-bar span { position: relative; height: 22px; background: var(--mat-1); box-shadow: inset 0 0 0 3px var(--cream); }
+.K .sv-bar span em { position: absolute; left: 3px; top: 3px; bottom: 3px; width: calc((100% - 6px) * var(--v) / 100); background: var(--c); background-image: repeating-linear-gradient(115deg, rgba(255,255,255,.22) 0 5px, transparent 5px 11px); }
+.K .sv-bar b { font: 400 26px/1 var(--font-market-display); color: var(--ink); white-space: nowrap; } .K .sv-bar b small { font-size: 16px; color: var(--ink-muted); }
+.K .sv-info .st { display: flex; gap: 8px; margin-top: 14px; }
+.K .sv-info .st span { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; background: var(--surface-2); font: 400 14px/1 var(--font-market-label); white-space: nowrap; }
+.K .sv-info .st .fu-ico { width: 15px; height: 15px; }
+.K .sv-info .syn { margin-top: 10px; padding: 7px 12px; background: var(--sp-mark, var(--a-deco, var(--a-deco, var(--accent)))); color: var(--sp-on-mark, var(--a-deco-on, var(--on-accent))); font: 400 15px/1 var(--font-market-label); transform: rotate(-1deg); display: inline-block; }
+.K .sv-bag { position: absolute; left: 340px; top: 884px; width: 1160px; height: 172px; z-index: 5; display: flex; gap: 14px; padding: 14px 16px; background: var(--chalk); box-shadow: inset 0 0 0 6px var(--mat-2), 0 -4px 0 0 rgba(0,0,0,.2); }
+.K .sv-bag .pk { position: relative; padding: 12px 16px; border-radius: 10px; background: rgba(246,236,212,.07); }
+.K .sv-bag .pk:nth-child(1) { width: 340px; } .K .sv-bag .pk:nth-child(2) { width: 430px; } .K .sv-bag .pk:nth-child(3) { flex: 1; }
+.K .sv-bag h5 { margin: 0 0 12px; display: flex; gap: 8px; align-items: baseline; font: 400 21px/1 var(--font-market-display); color: var(--on-dark); }
+.K .sv-bag h5 small { font: 400 15px/1 var(--font-market-label); opacity: .75; }
+.K .sv-bag .fx-slot { outline-color: rgba(246,236,212,.4); color: rgba(246,236,212,.55); font-size: 20px; }
+.K .sv-bag .fx-slot.new { outline-color: var(--a-sel, var(--a-deco, var(--accent))); color: var(--spirit); }
+.K .sv-bag .fx-slot.on { color: var(--ink); font-size: 18px; }
+.K .sv-bag .fx-slot.tin em { position: absolute; left: 4px; top: 2px; font: 400 12px/1 var(--font-market-label); font-style: normal; color: var(--ink); opacity: .7; }
+.K .sv-bag .fx-slot.tin:not(.on) em { color: var(--on-dark); }
+.K .sv-bag .pk.hot { background: rgba(246,236,212,.16); box-shadow: inset 0 0 0 4px var(--a-sel, var(--a-deco, var(--accent))); }
+.K .sv-bag .here { display: none; position: absolute; right: 12px; top: -14px; padding: 5px 10px; background: var(--spirit); color: var(--ink); font: 400 14px/1 var(--font-market-label); }
+.K .sv-bag .pk.hot .here { display: block; }
+.K .se-board { left: 380px !important; top: 112px !important; width: 1120px !important; height: 752px !important; }
+.K .se-menu { left: 950px !important; top: 590px !important; height: 250px !important; }
+.K .se-pop { left: 1530px !important; top: 112px !important; width: 360px !important; }
+.K .se-pop::after { left: 200px !important; }
+.K .sv-bag [data-tip] { cursor: help; transition: translate .2s var(--mo-spring); }
+.K .sv-bag [data-tip]:hover, .K .sv-bag [data-tip]:focus-visible { translate: 0 -5px; outline: 3px solid var(--spirit); outline-offset: 2px; }
+.K .sv-tip { position: absolute; z-index: 30; width: 310px; padding: 14px 16px 14px; background: var(--surface); color: var(--ink); outline: 3px dashed var(--stitch); outline-offset: -7px; box-shadow: 0 8px 0 0 rgba(0,0,0,.35); pointer-events: none; transform-origin: var(--ax, 50%) 100%; }
+.K .sv-tip::after { content: ""; position: absolute; left: var(--ax, 50%); bottom: -14px; margin-left: -12px; border: 12px solid transparent; border-top: 14px solid var(--surface); border-bottom: 0; }
+.K .sv-tip.pop { animation: sv-tip .28s var(--mo-pop); }
+@keyframes sv-tip { from { scale: .6; opacity: 0; translate: 0 10px; } }
+.K .sv-tip .h { display: flex; align-items: center; gap: 12px; }
+.K .sv-tip .ic { position: relative; display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--c, var(--spirit)); color: var(--ink); font: 400 17px/1 var(--font-market-display); box-shadow: 0 0 0 3px var(--cream), 0 0 0 5px var(--mat-2); }
+.K .sv-tip .ic.tin { border-radius: 10px; } .K .sv-tip .ic.dev { box-shadow: inset 0 0 0 4px var(--a-deco, var(--a-deco, var(--accent))); } .K .sv-tip .ic:not(.on) { background: var(--surface-2); box-shadow: none; outline: 2px dashed var(--ink-muted); outline-offset: -2px; color: var(--ink-muted); }
+.K .sv-tip .ic img { width: 100%; height: 100%; object-fit: cover; } .K .sv-tip .ic .fu-ico { width: 24px; height: 24px; } .K .sv-tip .ic em { display: none; }
+.K .sv-tip b { display: block; font: 400 24px/1 var(--font-market-display); }
+.K .sv-tip small { display: block; margin-top: 5px; font: 400 14px/1 var(--font-market-label); color: var(--accent-ink); }
+.K .sv-tip p { margin: 10px 0 0; font: 400 17px/1.4 var(--font-market-text); }
+.K .sv-tip .f { margin-top: 10px; padding-top: 8px; border-top: 2px dashed var(--stitch); font: 400 14px/1 var(--font-market-label); color: var(--ink-muted); }
+@media (prefers-reduced-motion: reduce) { .K .sv-tip.pop { animation: none; } .K .sv-bag [data-tip] { transition: none; } }
+/* ---- 증강 → 정비 전환 ---- */
+.K .tr-strip { position: absolute; left: 0; top: 0; width: 3840px; height: 1080px; z-index: 2; transition: translate 1.1s cubic-bezier(.65,0,.35,1); }
+.K .tr-half { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.K .tr-hero { position: absolute; z-index: 7; pointer-events: none; transition: left 1.1s cubic-bezier(.65,0,.35,1); }
+.K .tr-hero img { display: block; transition: transform .18s ease .5s; }
+.K.go .tr-strip { translate: -1920px 0; }
+.K.go .tr-hero { left: -170px !important; }
+.K.go .tr-hero img { transform: scaleX(-1); }
+.K.go .tr-hop { animation: tr-hop 1.1s cubic-bezier(.3,.6,.4,1); }
+@keyframes tr-hop { 0% { translate: 0 0; } 15% { translate: 0 12px; } 50% { translate: 0 -90px; rotate: -4deg; } 85% { translate: 0 6px; } 100% { translate: 0 0; } }
+.K .tr-back { position: absolute; left: 50%; bottom: 14px; z-index: 9; transform: translateX(-50%); padding: 6px 14px; background: rgba(0,0,0,.45); color: var(--on-dark); font: 400 15px/1 var(--font-market-label); border-radius: 20px; opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .K .tr-strip, .K .tr-hero, .K .tr-hero img { transition: none; } .K.go .tr-hop { animation: none; } }
+
+/* =====================================================================
+   증강 고르기 — 전투 구간을 넘길 때마다 하나토 강화를 셋 중 하나
+   ===================================================================== */
+.K .ag-dim { position: absolute; inset: 0; z-index: 1; background: var(--mat-1); opacity: .55; }
+.K .ag-head { position: absolute; left: 0; right: 0; top: 50px; z-index: 5; text-align: center; }
+.K .ag-head .shout { position: static; display: inline-block; font-size: 92px; transform: rotate(-3deg); }
+.K .ag-head p { margin: 18px 0 0; font: 400 24px/1.3 var(--font-market-label); color: var(--on-bg); }
+.K .ag-head p em { font-style: normal; color: var(--spirit); }
+.K .ag-card { position: absolute; z-index: 4; top: 270px; width: 390px; height: 560px; padding: 0 0 22px; background: var(--surface); text-align: center; cursor: pointer;
+  box-shadow: inset 0 0 0 8px var(--rc), 0 10px 0 0 rgba(0,0,0,.35); transition: translate .32s var(--mo-spring), box-shadow .3s; }
+.K .ag-card .rb { display: flex; justify-content: center; align-items: center; gap: 8px; height: 54px; background: var(--rc); color: var(--ink); font: 400 22px/1 var(--font-market-display); letter-spacing: .06em; }
+.K .ag-card .fx-tok { --s: 160px; margin-top: 26px; }
+.K .ag-card b { display: block; margin-top: 22px; font: 400 36px/1 var(--font-market-display); color: var(--ink); }
+.K .ag-card .lv { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 14px; font: 400 17px/1 var(--font-market-label); color: var(--ink-muted); }
+.K .ag-card .lv .og-pips i { width: 16px; height: 16px; } .K .ag-card .lv .og-pips i.nx { background: var(--a-sel, var(--a-deco, var(--accent))); outline-color: var(--a-sel, var(--a-deco, var(--accent))); animation: fx-blink 1.1s ease-in-out infinite; }
+.K .ag-card .tags { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+.K .ag-card .tags span { padding: 5px 11px; border-radius: 14px; background: var(--surface-2); color: var(--ink); font: 400 14px/1 var(--font-market-label); }
+.K .ag-card .sh-ef { margin: 18px 30px 0; font: 400 21px/1.4 var(--font-market-text); color: var(--ink); }
+.K .ag-card .nx-t { margin: 12px 30px 0; font: 400 15px/1.35 var(--font-market-label); color: var(--ink-muted); }
+.K .ag-card .key { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); }
+.K .ag-card { transition: translate .32s var(--mo-spring), box-shadow .3s, opacity .4s, filter .4s; }
+.K .ag-card:hover { translate: 0 -12px; }
+.K .ag-card.off { opacity: .35; filter: saturate(.25); translate: 0 30px !important; }
+.K .ag-card.got { translate: 0 -40px !important; animation: ag-squish .5s var(--mo-out); }
+@keyframes ag-squish { 0% { scale: 1 1; } 30% { scale: 1.06 .92; } 60% { scale: .98 1.04; } 100% { scale: 1 1; } }
+.K .ag-got { position: absolute; left: 50%; top: 44%; z-index: 7; padding: 10px 28px 12px; border: 6px solid var(--a-deco, var(--a-deco, var(--accent))); background: rgba(255,250,240,.94); color: var(--accent-ink);
+  font: 400 58px/1 var(--font-market-display); white-space: nowrap; transform: translate(-50%, -50%) rotate(-12deg); animation: ag-stamp .42s var(--mo-pop) .12s both; pointer-events: none; }
+@keyframes ag-stamp { from { scale: 2.6; opacity: 0; } 55% { opacity: 1; } }
+.K .og-pips i.pop { animation: ag-pip .5s var(--mo-pop) .3s both; }
+@keyframes ag-pip { from { scale: 0; } 60% { scale: 1.6; } }
+.K .ag-have .ln.pop { animation: ag-squish .5s var(--mo-out) .25s; }
+.K .ag-acts .og-btn.off { opacity: .5; filter: saturate(.3); }
+.K .ag-card.is-sel { translate: 0 -26px; box-shadow: inset 0 0 0 8px var(--rc), 0 0 0 8px var(--a-sel, var(--a-deco, var(--accent))), 0 26px 0 8px rgba(0,0,0,.3); }
+.K .ag-card.r1 { --rc: var(--surface-2); } .K .ag-card.r2 { --rc: var(--accent-2); } .K .ag-card.r3 { --rc: var(--c-main); }
+.K .ag-card.r3 .rb { color: var(--on-accent); }
+.K .ag-card.r3::after { content: "✦"; position: absolute; right: 18px; top: 66px; font-size: 26px; color: var(--spirit); animation: fx-blink 1.4s ease-in-out infinite; }
+.K .ag-new { position: absolute; z-index: 5; right: 16px; top: 66px; padding: 5px 10px; background: var(--ink); color: var(--spirit); font: 400 14px/1 var(--font-market-label); transform: rotate(5deg); }
+.K .ag-have { position: absolute; left: 34px; top: 280px; width: 300px; height: 540px; z-index: 4; padding: 22px 24px; }
+.K .ag-have .ln { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.K .ag-have .ln .fx-tok { --s: 46px; }
+.K .ag-have .ln b { flex: 1; font: 400 19px/1 var(--font-market-display); color: var(--ink); }
+.K .ag-have .ln.hot { padding: 6px 8px; margin-left: -8px; margin-right: -8px; background: var(--bubble); box-shadow: inset 0 0 0 3px var(--a-sel, var(--a-deco, var(--accent))); }
+.K .ag-acts { position: absolute; left: 0; right: 0; top: 900px; z-index: 6; display: flex; justify-content: center; gap: 18px; align-items: center; }
+.K .ag-acts .fx-svc { width: 300px; }
+.K .ag-acts .og-btn { position: static; }
+@media (prefers-reduced-motion: reduce) { .K .ag-card.r3::after, .K .ag-card .lv .og-pips i.nx, .K .ag-got, .K .ag-card.got, .K .og-pips i.pop, .K .ag-have .ln.pop { animation: none; } }
+
+.fu-abs { position: absolute; }
+/* v0.11 증강 · 정비를 이 프로토에 붙이며 더한 것 */
+#overlay[data-kind="aug"]:not([hidden]) ~ .menu-btn { display: none; }
+.K .fx-svc.off { opacity: .5; filter: saturate(.3); cursor: default; }
+.K .se-tag.is-sel, .K .se-line.is-sel { box-shadow: 0 0 0 5px var(--a-sel, var(--a-deco, var(--accent))), 0 8px 0 5px rgba(0,0,0,.25); }
+.K .se-line { position: relative; width: 100%; padding: 6px 8px; margin-left: -8px; text-align: left; color: inherit; }
+.K .se-line.is-sel { background: rgba(246,236,212,.08); }
+.K .se-line .fx-stamp { font-size: 20px; left: 55%; top: 50%; }
+.K .se-tag { text-align: left; } .K .se-tag .fx-pin { left: -4px; top: -12px; }
+.K .se-pop .who { line-height: 1.35; }
+.K .sh-buy { border: 0; cursor: pointer; } .K .sh-buy.off { opacity: .55; filter: saturate(.3); }
+.K .fix-oto { position: absolute; left: 1600px; top: 500px; width: 290px; height: 290px; z-index: 3; }
+.K .sv-bag .fx-slot.sell { box-shadow: 0 0 0 4px var(--a-sel, var(--a-deco, var(--accent))); }
+.K .sv-bag [data-dev] { cursor: pointer; }
+.K .fx-tok .ini, .K .fx-slot .ini { width: 100%; height: 100%; display: grid; place-items: center; font: 400 calc(var(--s) * .38)/1 var(--font-market-display); color: var(--ink); }
+.K .fx-tok .glyph { font: 400 calc(var(--s) * .34)/1 var(--font-market-display); }
 /* ---------- 이 프로토의 배치 ---------- */
 html, body { margin: 0; height: 100%; background: #10150a; overflow: hidden; }
 body { display: grid; place-items: center; }
@@ -1417,19 +1655,6 @@ body { display: grid; place-items: center; }
 /* 캐릭터 선택: 반쪽 전체가 아니라 그림 · 설명 쪽지 · 이름에 마우스를 올릴 때만 앞으로 (빈 오른쪽을 지나 「이 친구로 출발」로 가도 안 바뀐다) */
 .K .lob-sel .sel .half { pointer-events: none; }
 .K .lob-sel .sel .half img.sticker, .K .lob-sel .sel .half .card, .K .lob-sel .sel .half .nm { pointer-events: auto; cursor: pointer; }
-/* 정비 고정 회복: 수레 들보에 늘 걸린 꼬리표. 새로 고침에 안 바뀌고 정비마다 하나 */
-.K .fix-rest { position: absolute; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 7px 14px 7px 8px; background: var(--surface); color: var(--ink); cursor: pointer; text-align: left;
-  outline: 2px dashed var(--stitch); outline-offset: -5px; box-shadow: 0 5px 0 0 rgba(0,0,0,.3); transform: rotate(1.5deg); transition: transform .3s cubic-bezier(.34,1.6,.5,1), box-shadow .2s; }
-.K .fix-rest::before, .K .fix-rest::after { content: ""; position: absolute; top: -12px; width: 3px; height: 14px; background: var(--rope); }
-.K .fix-rest::before { left: 24px; } .K .fix-rest::after { right: 24px; }
-.K .fix-rest:hover { transform: translateY(-3px) rotate(1deg); }
-.K .fix-rest .pt { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--c); color: var(--ink); box-shadow: 0 0 0 3px var(--cream), 0 0 0 5px var(--mat-2); }
-.K .fix-rest .pt .fu-ico { width: 24px; height: 24px; }
-.K .fix-rest b { display: block; font: 400 21px/1 var(--font-market-display); }
-.K .fix-rest small { display: block; margin-top: 4px; font: 400 13px/1 var(--font-market-label); color: var(--ink-muted); }
-/* 고른 표시는 .on (.sel은 캐릭터 선택 틀 이름과 겹친다) */
-.K .fix-rest.on { box-shadow: 0 0 0 5px var(--accent), 0 7px 0 5px rgba(0,0,0,.25); }
-.K .fix-rest.sold { opacity: .6; } .K .fix-rest.sold .og-cost, .K .fix-rest.poor .og-cost { opacity: .55; }
 .K .og-tab:disabled, .K .lob-sign:disabled { cursor: default; }
 .K .og-tab:disabled { opacity: .75; }
 .K .og-patch .ini { width: 100%; height: 100%; display: grid; place-items: center; font: 400 34px/1 var(--font-market-display); color: var(--ink); }
@@ -1734,10 +1959,9 @@ body { display: grid; place-items: center; }
   // iai: 벚꽃 난무 (처음 직선 수 · 강화 한 단계에 늘어나는 수 · 한 선 피해 배율)
   // storm: 부적 폭풍 (지속 초 · 강화 한 단계에 늘어나는 초 · 몇 초마다 · 한 번에 몇 장 · 한 장 피해 배율 · 폭풍 중 공이 닿을 때 연타 +n · 피해 배율)
   // gaugeUp: 투지 충전 강화 한 단계에 전투 시작 투지
-  // fixHeal: 정비마다 늘 있는 「고정 회복」의 회복량 (값은 PRICE.fixHeal). 보급품 회복(heal)보다 적고 싸다, 사면 바로 회복
-  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, fixHeal: 10, iai: { n: 3, up: 2, mul: 1.2 }, gaugeUp: 4, storm: { t: 2, up: 0.5, every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.1 } };
+  const BAL = { foeAtk: 1, foeHp: 1.4, heal: 25, healWeight: 2, iai: { n: 3, up: 2, mul: 1.2 }, gaugeUp: 4, storm: { t: 2, up: 0.5, every: 0.5, n: 6, dmg: 0.6, extra: 1, mul: 1.1 } };
   const SHOP = { allyN: 3, deviceN: 2, itemN: 3, deviceMax: 6, itemSlots: 3, partyMax: 5, mainChance: 0.1 };
-  const PRICE = { upgrade: 6, device: 5, item: 3, ally: [4, 8, 16], main: 12, fixHeal: 2 };
+  const PRICE = { device: 5, item: 3, ally: [4, 8, 16], main: 12 };
   const GOLD = { start: 10, battle: 6, mid: 12, combo: [20, 40, 60] };
   // 판 위 장치는 팩션마다 몫이 있다 (FACTIONS.devices). DEVICES는 지금 런의 몫 (setHero에서 바꾼다). 아이템은 아직 같이 쓴다
   // HOLD는 다른 종족 몫으로 보관 (배정 미정). 정의(BOARD · ITEMS)와 동작은 남겨 둔다
@@ -2124,7 +2348,7 @@ body { display: grid; place-items: center; }
     S.levels = Object.fromEntries(ALL_KINDS.map((k) => [k, 0])); S.goo = []; S.straws = []; S.waves = [];
     S.gauge = 0; S.node = 0; S.battles = 0; S.stories = 0; S.board = [];
     S.gold = 0; S.devices = []; S.held = []; S.up = {}; S.ally = null; S.trap = 0; S.unlock = 0;
-    S.gain = null; S.special = null; S.evDone = []; S.stock = null; S.drag = null; S.bGold = { combo: 0 };
+    S.gain = null; S.special = null; S.evDone = []; S.stock = null; S.aug = null; S.augReroll = AUG.rerolls; S.drag = null; S.bGold = { combo: 0 };
     S.run = { bestCombo: 0, totalHits: 0, skillUses: 0, dealt: 0, gold: 0, bumps: 0, bigHit: 0 };
     S.grow = null; S.candy = false; S.fix = null; S.pins = null; S.swapCancel = null;
     S.ball = { x: 480, y: 540, vx: 0, vy: 0, r: 30 };
@@ -2185,10 +2409,12 @@ body { display: grid; place-items: center; }
     else if (t === 'event') showEvent();
     else startBattle(t);
   }
-  // 보스를 뺀 모든 스테이지 뒤에 상점
+  // 칸이 끝나면: 전투 · 중간 보스 뒤에만 증강 고르기 → 정비 (D85 · D91 · D92), 스토리 · 이벤트는 바로 다음 칸, 보스는 엔딩
   function stageDone() {
-    if (CHAPTER[S.node] === 'boss') { showEnding(); return; }
-    openShop();
+    const t = CHAPTER[S.node];
+    if (t === 'boss') { showEnding(); return; }
+    if (t === 'battle' || t === 'mid') { openShop(); return; }
+    nextNode();
   }
   function nextNode() {
     hideOverlay();
@@ -2829,40 +3055,57 @@ body { display: grid; place-items: center; }
     again.focus({ preventScroll: true });
     syncUI(true);
   }
-  // ---------- 정비 (FixMain · FixSwap: 런 중간 상점, 떠돌이 오토의 수레) ----------
-  // 수레 네 줄 × rows: 동료 영입 (해금한 동료만 = 공용 풀) · 메인 강화 · 장치 · 보급품.
-  // 찜한 물건은 새로 고침해도 그 자리에 남고, 사지 않으면 다음 정비까지 간다. 새로 고침은 엽전 reroll부터, 누를 때마다 1씩 오른다 (정비마다 처음 값)
+  // ---------- 증강 고르기 · 정비 (fix-rework v0.3 · 디자인 시스템 AugPick → AugToFix → 정비 2E v2 게시판) ----------
+  // 전투 · 중간 보스를 이기면 증강 고르기: 카드 3장 중 하나 (무료, 건너뛰기 없음, 다시 뽑기는 원정마다 AUG.rerolls번) → 화면이 미끄러져 정비 (D85 · D89).
+  // 스토리 · 이벤트 뒤에는 정비가 없다 (D91 · D92). 증강 묶음 = 그 메인의 메인 전용 증강 + 공통 증강 (지금은 예전 정비 메인 강화를 그대로 옮김, 다시 기획한다)
+  // 정비: 쪽지 4장 (칸마다 무게로 갈래를 고른다: 동료 · 장치 · 증강 카드, D86 · D88) · 보급품 2 (D90) · 상비약 2 (정비마다 한 번씩, 새로 고침에 안 바뀐다, D87 · O12)
+  // 찜한 쪽지 · 보급품은 새로 고침해도 그 자리에 남고, 사지 않으면 다음 정비까지 간다. 새로 고침은 엽전 reroll부터, 누를 때마다 1씩 오른다 (정비마다 처음 값)
   // 칸이 가득 차면 교체 창 (FixSwap): 내보내는 것을 되팔기 값(refund, 동료는 ★ 하나마다)으로 돌려받는다
-  const FIX = { rows: 3, reroll: 2, refund: { dev: 2, item: 1, ally: 3 } };
-  const FIX_ROWS = [['ally', '동료 영입'], ['up', '메인 강화'], ['dev', '장치'], ['item', '보급품']];
-  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', pick: (n, pr) => `${n}? 눈이 높구먼! ${pr}엽전이야.`, poor: '에이, 엽전이 모자라네. 찜해 두면 다음 정비까지 챙겨 둘게.', buyPoor: '엽전이 모자라네. 찜해 두면 챙겨 둘게.', rerollPoor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: (n, pr) => `${n} 잘 골랐어! 엽전 ${pr} 받을게.`, reroll: '새 물건 꺼내 왔어! 찜한 건 그대로 뒀어.', full: '체력이 가득이야. 다치면 그때 와!', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.', sold: '그건 벌써 팔렸어.' };
+  const AUG = { cards: 3, rerolls: 1 };
+  const FIX = { wares: 4, items: 2, weight: { ally: 60, dev: 32, aug: 8 }, augPrice: 8, reroll: 2, refund: { dev: 2, item: 1, ally: 3 },
+    rest: [{ id: 'small', name: '약초 한 줌', ico: 'heal', heal: 10, price: 2 }, { id: 'big', name: '큰 회복 물약', ico: 'heart', heal: 30, price: 6 }] };
+  const OTO_SAY = { hello: '어서 와! 맛집 찾아 떠돌다 쓸 만한 걸 잔뜩 주워 왔지. 엽전만 있으면 다 네 거야.', pick: (n, pr) => `${n}? 눈이 높구먼! ${pr}엽전이야.`, rest: (n) => `${n}? 늘 있는 거니까 아끼지 말고!`, poor: '에이, 엽전이 모자라네. 찜해 두면 챙겨 둘게.', buyPoor: '엽전이 모자라네. 찜해 두면 챙겨 둘게.', rerollPoor: '엽전이 모자라네. 다음 정비 때 또 와!', pin: '찜해 둘게. 다음 정비까지 안 팔고 기다리지.', unpin: '찜 풀었어. 새로 고침하면 다른 걸로 바뀐다?', buy: (n, pr) => `${n} 잘 골랐어! 엽전 ${pr} 받을게.`, reroll: '새 물건 꺼내 왔어! 찜한 건 그대로 뒀어.', full: '체력이 가득이야. 다치면 그때 와!', sell: '되팔기 고마워. 깨끗이 닦아서 다시 팔게.' };
+  const augAll = () => [...UPGRADES[S.hero].map((u) => ({ ...u, mine: true })), ...UPGRADES.common];
+  const augPool = () => augAll().filter((u) => up(u.id) < u.max);
+  const augDesc = (u) => (typeof u.desc === 'function' ? u.desc() : u.desc);
+  const restOf = (id) => FIX.rest.find((r) => r.id === id);
+  const attr = (o) => JSON.stringify(o).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  // 전투 · 중간 보스 뒤: 정비 진열을 깔고, 고를 증강이 있으면 증강 고르기부터
   function openShop() {
     S.phase = 'shop';
     clearField();
     S.fix = { reroll: FIX.reroll, sel: null, sell: -1 };
-    S.fixHeal = { g: 'heal' }; // 고정 회복: 새로 고침과 상관없이 정비마다 하나
     rollStock();
+    S.stock.rest = FIX.rest.map((r) => ({ g: 'rest', id: r.id, row: 'r' }));
     const g = S.gain;
     S.fixSay = g && g.sum > 0 ? `${g.parts.filter(([, v]) => v > 0).map(([n, v]) => `${n} +${v}`).join(' · ')}! 엽전 ${g.sum} 챙겼네. 뭐 살래?` : OTO_SAY.hello;
-    renderShop();
+    if (augPool().length) openAug(); else renderShop();
   }
-  // 진열: 줄마다 찜한 것은 그 자리에 두고 나머지를 새로 깐다
+  // 진열: 쪽지 4장은 칸마다 무게(FIX.weight)로 갈래를 골라 그 묶음에서 하나 (한 줄에 같은 것은 한 번). 묶음이 빈 갈래는 빼고 고른다
   function rollStock() {
-    const other = facOf().mains.find((m) => m !== S.hero), old = S.stock || {};
+    const other = facOf().mains.find((m) => m !== S.hero), old = S.stock;
+    const same = (p, q) => p.g === q.g && (p.k || p.u.id) === (q.k || q.u.id);
+    const kept = (list, row) => (old ? old[list] : (S.pins || []).filter((o) => o.row === row)).map((o) => (o && o.pin && !o.sold ? o : null));
+    const keepW = kept('wares', 'w'), keepI = kept('items', 'i');
     const pools = {
       ally: [...KIND_ORDER.filter((k) => META.allies[k] && S.levels[k] < 3).map((k) => ({ g: 'ally', k })), ...(!S.ally && other && unlocked(other) && (S.forceMain || Math.random() < SHOP.mainChance) ? [{ g: 'main', k: other }] : [])],
-      up: [...UPGRADES[S.hero], ...UPGRADES.common].filter((u) => up(u.id) < u.max).map((u) => ({ g: 'up', u })),
       dev: DEVICES.map((k) => ({ g: 'dev', k })),
-      item: pickItems(FIX.rows).map((k) => ({ g: 'item', k })),
+      aug: augPool().map((u) => ({ g: 'aug', u })),
     };
     S.forceMain = false;
-    const same = (a, b) => a.g === b.g && (a.k || a.u.id) === (b.k || b.u.id);
-    S.stock = {};
-    for (const [r] of FIX_ROWS) {
-      const keep = (old[r] || (S.pins || []).filter((o) => o.row === r)).map((o) => (o && o.pin && !o.sold ? o : null));
-      const fresh = shuffle(pools[r].filter((o) => !keep.some((p) => p && same(p, o))));
-      S.stock[r] = Array.from({ length: FIX.rows }, (_, i) => keep[i] || fresh.shift() || null).map((o) => o && { ...o, row: r });
-    }
+    for (const p of Object.values(pools)) for (let i = p.length - 1; i >= 0; i--) if (keepW.some((o) => o && same(o, p[i]))) p.splice(i, 1);
+    const draw = () => {
+      const cats = Object.keys(FIX.weight).filter((c) => pools[c].length);
+      let r = Math.random() * cats.reduce((s, c) => s + FIX.weight[c], 0);
+      const c = cats.find((x) => (r -= FIX.weight[x]) < 0) || cats[cats.length - 1];
+      return c ? pools[c].splice(Math.floor(Math.random() * pools[c].length), 1)[0] : null;
+    };
+    const fresh = pickItems(3).filter((k) => !keepI.some((o) => o && o.k === k));
+    S.stock = {
+      wares: Array.from({ length: FIX.wares }, (_, i) => keepW[i] || draw()).map((o) => o && { ...o, row: 'w' }),
+      items: Array.from({ length: FIX.items }, (_, i) => keepI[i] || (fresh.length ? { g: 'item', k: fresh.shift() } : null)).map((o) => o && { ...o, row: 'i' }),
+      rest: old ? old.rest : null,
+    };
     S.pins = null;
   }
   // 아이템 진열: 무작위, 회복만 두 배로 잘 뜬다 (BAL.healWeight)
@@ -2872,8 +3115,8 @@ body { display: grid; place-items: center; }
     return got;
   }
   function priceOf(o) {
-    if (o.g === 'heal') return PRICE.fixHeal;
-    if (o.g === 'up') return PRICE.upgrade;
+    if (o.g === 'rest') return restOf(o.id).price;
+    if (o.g === 'aug') return FIX.augPrice;
     if (o.g === 'ally') return PRICE.ally[Math.min(2, S.levels[o.k])];
     if (o.g === 'main') return PRICE.main;
     return o.g === 'dev' ? PRICE.device : PRICE.item;
@@ -2893,92 +3136,196 @@ body { display: grid; place-items: center; }
   // 장치 배지 글자 (둥근 배지 안에 바로 쓴다)
   const devTxt = (k) => { const f = DEV_FACE[k] || ['?']; return f[0] || ico(f[1]); };
   const crewList = () => [...KIND_ORDER.filter((k) => S.levels[k] > 0), ...(S.ally ? [S.ally.kind] : [])];
+  // 진열 물건 한 장의 글 · 동그라미 · 들어갈 곳 (zone = 짐 띠에서 밝아지는 주머니)
   function itemInfo(o) {
-    const pr = priceOf(o), hn = HEROES[S.hero].name;
-    if (o.g === 'heal') { const m = S.main; return { name: '고정 회복', tg: '바로 회복 · 정비마다 늘 하나', ef: `${hn} 체력 +${BAL.fixHeal} · 보급품 회복(+${BAL.heal})보다 적고 싸요`, pt: `<span class="pt" style="--c:var(--hp)">${ico('heal')}</span>`, pr, dest: `<b>${hn}</b> 체력 ${m.hp} → ${Math.min(m.maxHp, m.hp + BAL.fixHeal)}` }; }
-    if (o.g === 'ally') { const L = S.levels[o.k], K = KINDS[o.k]; return { name: L ? `${K.name} ★${L + 1}` : K.name, tg: L ? `${K.role} 승급` : `${K.role} ★ · ${K.race}`, ef: L ? `이미 있는 ${K.name}${josa(K.name, '이', '가')} ★${L + 1}로 · ${SHORT[o.k](L + 1)}` : SHORT[o.k](1), pt: `<span class="pt" style="--c:var(--char-${o.k})">${faceImg(o.k)}</span>`, pr, dest: L ? `이미 있는 <b>${K.name}</b>${josa(K.name, '이', '가')} ★${L + 1}로 올라가요` : `<b>동료 빈 자리</b>에 들어가요 (${crewList().length}/4 → ${crewList().length + 1}/4)` }; }
-    if (o.g === 'main') return { name: HEROES[o.k].name, tg: '메인 합류 · 판 위 유닛', ef: HEROES[o.k].unit, pt: `<span class="pt" style="--c:var(--char-${o.k})">${faceImg(o.k)}</span>`, pr, dest: `판 위 유닛으로 <b>동료 빈 자리</b>에 들어가요` };
-    if (o.g === 'up') { const d = typeof o.u.desc === 'function' ? o.u.desc() : o.u.desc; return { name: o.u.name, tg: d, ef: `${hn}에게만 · ${up(o.u.id)}/${o.u.max}단계`, pt: `<span class="pt" style="--c:var(--accent-2)">${ico(UP_ICO[o.u.id])}</span>`, pips: pipsHtml(up(o.u.id), o.u.max), pr, dest: `<b>${hn}</b>에게 바로 (${up(o.u.id)} → ${up(o.u.id) + 1}단계)` }; }
-    if (o.g === 'dev') return { name: BOARD[o.k].name, tg: '장치 · 판 위에 놓인다', ef: BOARD[o.k].desc, pt: `<span class="pt" style="--c:var(--spirit)">${devFace(o.k)}</span>`, pr, dest: `<b>장치 ${S.devices.length + 1}번 칸</b>에 들어가요 (${S.devices.length}/6 → ${S.devices.length + 1}/6)` };
-    return { name: ITEMS[o.k].name, tg: `보급품 · ${ITEMS[o.k].use ? '누르기' : '끌어 놓기'}`, ef: itemDesc(o.k), pt: `<span class="pt" style="--c:var(--${ITEMS[o.k].use ? 'accent-2' : 'accent'})">${ico(ITEM_ICO[o.k])}</span>`, pr, dest: `<b>보급품 ${S.held.length + 1}번 깡통</b>에 들어가요 (${S.held.length}/3 → ${S.held.length + 1}/3)` };
+    const pr = priceOf(o), hn = HEROES[S.hero].name, m = S.main;
+    if (o.g === 'rest') { const R = restOf(o.id); return { name: R.name, tg: '바로 회복 · 정비마다 한 번', ef: `체력 +${R.heal}`, pr, dest: `바로 회복 (${m.hp} → ${Math.min(m.maxHp, m.hp + R.heal)})`, tok: ico(R.ico), c: 'var(--hp)', zone: 'hero' }; }
+    if (o.g === 'ally') { const L = S.levels[o.k], K = KINDS[o.k], n = crewList().length; return { name: L ? `${K.name} ★${L + 1}` : K.name, tg: L ? `${K.role} 승급 · ${K.race}` : `${K.role} ★ · ${K.race}`, ef: L ? `★${L + 1}로 · ${SHORT[o.k](L + 1)}` : SHORT[o.k](1), pr, dest: L ? `이미 있는 ${K.name} ★${L} → ★${L + 1}` : `동료 ${n + 1}번 자리 (${n}/4 → ${n + 1}/4)`, tok: faceImg(o.k), c: `var(--char-${o.k})`, zone: 'mate', hd: '동료 모집', cc: 'var(--c-mate)' }; }
+    if (o.g === 'main') { const n = crewList().length; return { name: HEROES[o.k].name, tg: '메인 합류 · 판 위 유닛', ef: HEROES[o.k].unit, pr, dest: `동료 ${n + 1}번 자리 · 판 위 유닛으로`, tok: faceImg(o.k), c: `var(--char-${o.k})`, zone: 'mate', hd: '메인 합류', cc: 'var(--c-mate)' }; }
+    if (o.g === 'aug') { const L = up(o.u.id); return { name: o.u.name, tg: `${o.u.mine ? `${hn} 전용` : '공통'} · ${L + 1}단계`, ef: augDesc(o.u), pr, dest: `${hn}에게 바로 (${L} → ${L + 1}단계)`, tok: ico(UP_ICO[o.u.id] || 'skill'), c: 'var(--accent)', zone: 'hero', hd: '희귀 비급', cc: 'var(--c-main)', rare: true }; }
+    if (o.g === 'dev') { const n = S.devices.length; return { name: BOARD[o.k].name, tg: '장치 · 판 위에 놓인다', ef: BOARD[o.k].desc, pr, dest: `장치 ${n + 1}번 칸 (${n}/6 → ${n + 1}/6)`, tok: devFace(o.k), c: 'var(--spirit)', zone: 'dev', hd: '장치 팝니다', cc: 'var(--c-dev)' }; }
+    const n = S.held.length;
+    return { name: ITEMS[o.k].name, tg: `보급품 · ${ITEMS[o.k].use ? '누르기' : '끌어 놓기'}`, ef: itemDesc(o.k), pr, dest: `보급품 ${n + 1}번 칸 (${n}/3 → ${n + 1}/3)`, tok: ico(ITEM_ICO[o.k]), c: `var(--${ITEMS[o.k].use ? 'accent-2' : 'accent'})`, zone: 'sup' };
   }
-  // 정비 화면: 위 교역로 지도 띠, 왼쪽 원정대 짐, 가운데 오토의 수레, 오른쪽 오토 · 말풍선 · 상세, 아래 새로 고침 · 다음 스테이지로
+
+  // ---------- 증강 고르기 (AugPick) ----------
+  // 카드 한 장 (원본 .ag-card). 위 띠는 등급인데, 등급은 증강을 다시 기획할 때 정한다 — 지금은 모두 일반
+  function augCardHtml(u, i) {
+    const L = up(u.id), hn = HEROES[S.hero].name;
+    const pips = Array.from({ length: u.max }, (_, j) => `<i class="${j < L ? 'on' : j === L ? 'nx' : ''}"></i>`).join('');
+    return `<div class="rb">일반</div>${L ? '' : '<span class="ag-new">새 증강</span>'}<span class="fx-tok" style="--s:160px;--c:var(--${u.mine ? 'accent' : 'accent-2'})">${ico(UP_ICO[u.id] || 'skill')}</span><b>${u.name}</b>`
+      + `<div class="lv"><span class="og-pips">${pips}</span><span>${L} → ${L + 1}단계</span></div><div class="tags"><span>${u.mine ? `${hn} 전용` : '공통'}</span></div>`
+      + `<p class="sh-ef">${augDesc(u)}</p><div class="nx-t">${L + 1 >= u.max ? '마지막 단계' : `최대 ${u.max}단계`}</div><span class="key">${i + 1}</span>`;
+  }
+  const augLeft = (i, n) => Math.round(795 + (i - (n - 1) / 2) * 415);
+  function augHtml() {
+    const A = S.aug, hn = HEROES[S.hero].name, nb = CHAPTER.slice(0, S.node + 1).filter((t) => t === 'battle').length;
+    const have = augAll().filter((u) => up(u.id) > 0);
+    return '<div class="ag-dim"></div>'
+      + `<div class="ag-head"><div class="shout">${CHAPTER[S.node] === 'mid' ? '중간 보스 격파!' : `전투 ${nb} 승리!`}</div><p>${hn} 증강을 <em>하나</em> 골라요 · 1 2 3 또는 마우스</p></div>`
+      + `<div class="og-sheet ag-have" style="transform:rotate(-.8deg)"><div class="og-h" style="font-size:26px">${hn}의 증강</div><div class="og-sub" style="margin-top:6px">같은 걸 고르면 단계가 올라요</div>`
+      + (have.length ? have.map((u) => `<div class="ln" data-id="${u.id}"><span class="fx-tok" style="--s:46px;--c:var(--${u.mine ? 'accent' : 'accent-2'})">${ico(UP_ICO[u.id] || 'skill')}</span><b>${u.name}</b>${pipsHtml(up(u.id), u.max)}</div>`).join('') : '<div class="og-sub" style="margin-top:22px">아직 없어요</div>')
+      + `<div class="og-sub" style="position:absolute;left:24px;bottom:22px">이번 원정 증강 ${have.reduce((s, u) => s + up(u.id), 0)}단계</div></div>`
+      + A.cards.map((u, i) => `<div class="ag-card r1${i === A.sel ? ' is-sel' : ''}" data-k="${i}" style="left:${augLeft(i, A.cards.length)}px">${augCardHtml(u, i)}</div>`).join('')
+      + `<div class="ag-acts"><button type="button" class="fx-svc${S.augReroll ? '' : ' off'}" id="augReroll"><span class="fx-tok" style="--s:54px;--c:var(--accent-2)">${ico('turn')}</span><div><b>다시 뽑기</b><small>이번 원정 남은 ${S.augReroll}번</small></div></button>`
+      + `<button type="button" class="og-btn p" id="augPick" style="transform:rotate(-1deg)">${A.cards[A.sel].name} 고르기<small>Enter</small></button></div>`;
+  }
+  // 증강 → 정비 (AugToFix): 두 화면을 이어 붙인 띠. 고르면 카드가 쑥 올라 「획득!」, 띠가 왼쪽으로 미끄러지고 메인이 깡충 뛰며 돌아서 정비 왼쪽 끝에 선다
+  function openAug() {
+    S.aug = { cards: shuffle(augPool()).slice(0, AUG.cards), sel: 0, done: false };
+    showOverlay('', 'aug');
+    $('#ovBody').innerHTML = `<div class="tr-strip"><div class="tr-half">${augHtml()}</div><div class="tr-half" id="trFix" style="left:1920px" inert>${fixHtml(true)}</div></div>`
+      + `<div class="tr-hero" style="left:1600px;top:400px;height:680px"><div class="tr-hop"><img class="sticker" src="${heroSrc(S.hero)}" alt="" style="height:680px"></div></div>`;
+    const cards = () => [...document.querySelectorAll('#ovBody .ag-card')], btn = $('#augPick'), rr = $('#augReroll');
+    // 원본 pick: 고른 카드가 들리고, 왼쪽 목록에서 같은 증강이 밝아진다
+    const pick = (k) => {
+      const cs = cards(); if (S.aug.done || !cs[k]) return;
+      S.aug.sel = k; cs.forEach((c, j) => c.classList.toggle('is-sel', j === k));
+      btn.firstChild.textContent = `${S.aug.cards[k].name} 고르기`;
+      for (const l of document.querySelectorAll('#ovBody .ag-have .ln')) l.classList.toggle('hot', l.dataset.id === S.aug.cards[k].id);
+      if (!RM) cs[k].animate([{ scale: '1 1' }, { scale: '1.05 .94' }, { scale: '1 1' }], { duration: 300 });
+    };
+    // 다시 뽑기: 카드가 빙글 돌며 (반 바퀴에서) 새 카드로. 보였던 것은 되도록 다시 안 나온다
+    const reroll = () => {
+      if (S.aug.done) return;
+      if (!S.augReroll) { SHK(rr); return; }
+      S.augReroll--;
+      const shown = S.aug.cards.map((u) => u.id), pool = augPool();
+      const next = [...shuffle(pool.filter((u) => !shown.includes(u.id))), ...shuffle(pool.filter((u) => shown.includes(u.id)))].slice(0, S.aug.cards.length);
+      S.aug.cards = next; S.aug.sel = 0;
+      cards().forEach((c, k) => {
+        if (!RM) c.animate([{ rotate: '0deg', scale: '1' }, { rotate: '180deg', scale: '.2', offset: 0.5 }, { rotate: '360deg', scale: '1' }], { duration: 600, delay: k * 90 });
+        setTimeout(() => { c.innerHTML = augCardHtml(next[k], k); if (k === 0) pick(0); }, RM ? 0 : k * 90 + 300);
+      });
+      rr.classList.toggle('off', !S.augReroll); rr.querySelector('small').textContent = `이번 원정 남은 ${S.augReroll}번`;
+      sfx.buy();
+    };
+    // 원본 agGot + AugToFix go
+    const got = () => {
+      if (S.aug.done) return;
+      S.aug.done = true;
+      const u = S.aug.cards[S.aug.sel], c = cards()[S.aug.sel], n0 = S.drawN;
+      give({ g: 'aug', u }); renderPanel(); sfx.place();
+      if (!RM) btn.animate([{ scale: '1 1' }, { scale: '1.08 .86' }, { scale: '1 1' }], { duration: 300 });
+      cards().forEach((x) => x.classList.toggle('off', x !== c)); c.classList.add('got'); c.insertAdjacentHTML('beforeend', '<span class="ag-got">획득!</span>');
+      const nx = c.querySelector('.og-pips i.nx'); if (nx) { nx.classList.remove('nx'); nx.classList.add('on', 'pop'); }
+      const ln = $('#ovBody .ag-have .ln.hot'); if (ln) { const e = ln.querySelector('.og-pips i:not(.on)'); if (e) e.classList.add('on', 'pop'); ln.classList.add('pop'); }
+      btn.classList.add('off'); S.keys = {};
+      setTimeout(() => {
+        if (S.drawN !== n0) return;
+        $('#trFix').innerHTML = fixHtml(true); // 고른 증강이 붙은 능력치로
+        $('#app').classList.add('go');
+        setTimeout(() => { if (S.drawN === n0) { moKey = 'fix' + S.node; renderShop(); } $('#app').classList.remove('go'); }, RM ? 0 : 1150);
+      }, RM ? 0 : 950);
+    };
+    cards().forEach((c, k) => c.addEventListener('click', () => pick(k)));
+    rr.addEventListener('click', reroll); btn.addEventListener('click', got);
+    pick(0);
+    S.keys = { 1: () => pick(0), 2: () => pick(1), 3: () => pick(2), r: reroll, Enter: got };
+    moEnter('aug' + S.node, '');
+    syncUI(true);
+  }
+
+  // ---------- 정비 화면 (2E v2 게시판) ----------
+  // 왼쪽 끝 메인 · 그 위 메인 정보와 엽전, 가운데 게시판 (쪽지 4 · 보급품 꼬리표 2 · 상비약 차림표), 오른쪽 오토 말풍선(고른 물건) · 오토, 아래 짐 띠, 새로 고침 · 다음 스테이지로
+  // preview = 증강 화면 옆에 이어 붙인 띠 안 (눌리지 않고, 메인은 띠 밖에서 건너온다)
+  function fixHtml(preview) {
+    const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), nR = raceCount(F.race), fix = S.fix, sel = fix.sel, hn = HEROES[S.hero].name;
+    const syn = F.race === '토끼' ? `속도 +${RABBIT.speed[Math.max(1, nR) - 1]}${nR >= 3 ? ` · 공격 +${RABBIT.atk}` : ''}` : `보호막 +${SLUG.shield[Math.max(1, nR) - 1]}${nR >= SLUG.dmgAt ? ` · 피해 +${SLUG.dmg * 100}%` : ''}`;
+    const nx = CHAPTER[S.node + 1], augN = augAll().reduce((s, u) => s + up(u.id), 0);
+    const I = sel && (sel.info || itemInfo(sel)), hot = sel && !sel.sold && !fullOf(sel) ? I.zone : '';
+    let h = `<div class="fx-strip" style="left:400px;top:22px;width:860px"><b>정비</b><span>${hn} 원정 · ${S.node + 1}/${CHAPTER.length}칸</span><div class="fx-nodes">${CHAPTER.map((t, i) => `<i class="${i < S.node ? 'd' : i === S.node ? 'n' : ''}${t === 'mid' || t === 'boss' ? ' b' : ''}"></i>`).join('')}</div><em>다음 · ${S.node + 2} ${NODE_LABEL[nx] || ''}</em></div>`
+      + `<div class="sv-info"><div class="nm">${hn}<small>${PROFILE[S.hero].job}</small></div>`
+      + `<div class="sv-bar" style="--c:var(--hp);--v:${Math.round(m.hp / m.maxHp * 100)}"><i>${ico('heart')}</i><span><em></em></span><b>${m.hp}<small>/${m.maxHp}</small></b></div>`
+      + `<div class="sv-bar" style="--c:var(--spirit);--v:${Math.round(S.gauge / gm * 100)}"><i>${ico('spirit')}</i><span><em></em></span><b>${S.gauge}<small>/${gm}</small></b></div>`
+      + `<div class="st"><span>${ico('sword')}공격 ${atkNow()}</span><span>${ico('shield')}방어 ${m.def}</span><span>${ico('skill')}증강 ${augN}</span></div>`
+      + `<div class="syn">${F.short} ${Math.max(1, nR)}/5 · ${syn}</div></div>`
+      + `<div class="fx-coin" style="left:258px;top:92px;width:100px;height:100px;transform:rotate(-8deg)"><small>엽전</small><b>${S.gold}</b></div>`
+      + '<div class="se-board"></div><div class="sh-tape" style="left:410px;top:100px">오늘 붙은 쪽지<small>4장 · 새로 고침 때 바뀜</small></div><div class="sh-tape" style="left:440px;top:578px">보급품<small>2장 · 새로 고침 때 바뀜</small></div>';
+    const tag = (o, I2) => `${o.pin && !o.sold ? '<span class="fx-pin">찜</span>' : ''}${o.sold ? '<span class="fx-stamp">팔림</span>' : ''}`;
+    const PL = [[415, 150, -2], [687, 166, 1.5], [959, 144, -1], [1231, 160, 2.5]];
+    S.stock.wares.forEach((o, i) => {
+      const [x, y, r] = PL[i];
+      if (!o) { h += `<div class="se-post is-sold" style="left:${x}px;top:${y}px;rotate:${r}deg;--cc:var(--surface-2)"><div class="hd">빈 자리</div><p class="sh-ef" style="margin-top:90px">오늘은 쪽지가 이것뿐</p></div>`; return; }
+      const J = o.info || itemInfo(o), poor = !o.sold && S.gold < J.pr;
+      h += `<button type="button" class="se-post${J.rare ? ' scroll is-rare' : ''}${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.pin && !o.sold ? ' is-pin' : ''}${o.sold ? ' is-sold' : ''}" data-w="${i}" style="left:${x}px;top:${y}px;rotate:${r}deg;--cc:${J.cc}"><div class="hd">${J.hd}</div><span class="fx-tok" style="--s:118px;--c:${J.c}">${J.tok}</span><b>${J.name}</b><span class="tg">${J.tg}</span><p class="sh-ef">${J.ef}</p><div class="tear"><span class="fx-pr${poor ? ' poor' : ''}"><i></i>${J.pr}</span></div>${tag(o)}${J.rare ? '<span class="sh-rare">✦ 희귀</span>' : ''}</button>`;
+    });
+    const TL = [[440, 628, -3], [695, 664, 2]];
+    S.stock.items.forEach((o, i) => {
+      if (!o) return;
+      const [x, y, r] = TL[i], J = o.info || itemInfo(o), poor = !o.sold && S.gold < J.pr;
+      h += `<button type="button" class="se-tag${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-it="${i}" style="left:${x}px;top:${y}px;rotate:${r}deg"><span class="fx-tok" style="--s:66px;--c:${J.c}">${J.tok}</span><b>${J.name}</b><div class="sh-ef">${J.ef}</div><span class="fx-pr s${poor ? ' poor' : ''}"><i></i>${J.pr}</span>${tag(o)}</button>`;
+    });
+    h += '<div class="se-menu"><h4>상비약 차림표<small>늘 있어요 · 정비마다 한 번씩</small></h4>'
+      + S.stock.rest.map((o, j) => { const R = restOf(o.id), poor = !o.sold && S.gold < R.price; return `<button type="button" class="se-line${o === sel ? ' is-sel' : ''}${poor ? ' is-poor' : ''}${o.sold ? ' is-sold' : ''}" data-rest="${j}"><span class="fx-tok" style="--s:66px;--c:var(--hp)">${ico(R.ico)}</span><div><b>${R.name}</b><small>체력 +${R.heal}</small></div><span class="fx-pr${poor ? ' poor' : ''}"><i></i>${R.price}</span>${o.sold ? '<span class="fx-stamp">이번엔 샀어요</span>' : ''}</button>`; }).join('') + '</div>';
+    const full = sel && !sel.sold && fullOf(sel);
+    h += `<div class="se-pop"><div class="who">오토 · ${S.fixSay}</div>` + (sel ? `<h3>${I.name}</h3><p>${I.ef}</p><div class="dst">들어갈 곳 · ${sel.sold ? '이미 샀어요' : full ? '칸이 가득 · 사면 하나를 골라 내보내요 (되팔기)' : I.dest}</div>`
+      + `<div class="acts">${sel.g === 'rest' ? '' : `<button type="button" class="fx-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'}</button>`}<button type="button" class="sh-buy${sel.sold || S.gold < I.pr ? ' off' : ''}" id="fixBuy">${sel.sold ? '이미 샀어요' : S.gold < I.pr ? `엽전 ${I.pr - S.gold} 모자라요` : `사기 · ${I.pr}엽전`} <span class="key">Enter</span></button></div>` : '') + '</div>'
+      + `<span class="og-patch sticker fix-oto" style="--c:var(--char-oto)">${faceImg('oto', 'fill')}</span>`;
+    // 짐 띠: 동료 4 · 장치 6 · 보급품 3. 고른 물건이 들어갈 주머니가 밝아지고 「여기로」, 칸에 마우스를 올리면 설명 쪽지
+    const mates = Array.from({ length: 4 }, (_, i) => {
+      const k = crew[i];
+      if (!k) return `<span class="fx-slot${hot === 'mate' && i === crew.length ? ' new' : ''}" style="--s:62px" data-tip="${attr({ n: `빈 자리 ${i + 1}`, t: '동료', e: '정비 · 이벤트에서 동료를 데려와요. 같은 마을이면 시너지가 올라요.', f: '' })}" tabindex="0">${i + 1}</span>`;
+      const hero = HEROES[k], L = S.levels[k];
+      return `<span class="fx-slot on" style="--s:62px;--c:var(--char-${k})" data-tip="${attr(hero ? { n: hero.name, t: '합류한 메인 · 판 위 유닛', e: hero.unit, f: '' } : { n: KINDS[k].name, t: `${KINDS[k].role} ${'★'.repeat(L)}${'☆'.repeat(3 - L)} · ${KINDS[k].race}`, e: SHORT[k](L), f: `되팔기 +${FIX.refund.ally * L} (교체할 때)` })}" tabindex="0">${faceImg(k)}</span>`;
+    }).join('');
+    const devs = Array.from({ length: SHOP.deviceMax }, (_, i) => {
+      const d = S.devices[i];
+      if (!d) return `<span class="fx-slot dev${hot === 'dev' && i === S.devices.length ? ' new' : ''}" style="--s:50px" data-tip="${attr({ n: `장치 ${i + 1}번 칸`, t: '비어 있음', e: '판 위에 놓일 장치 자리예요.', f: '' })}" tabindex="0">${hot === 'dev' && i === S.devices.length ? '+' : ''}</span>`;
+      return `<span class="fx-slot dev on${fix.sell === i ? ' sell' : ''}" style="--s:50px" data-dev="${i}" data-tip="${attr({ n: BOARD[d].name, t: '장치', e: BOARD[d].desc, f: fix.sell === i ? `한 번 더 누르면 되팔기 +${FIX.refund.dev}` : `누르면 되팔기 +${FIX.refund.dev}` })}" tabindex="0">${devTxt(d)}</span>`;
+    }).join('');
+    const tins = Array.from({ length: SHOP.itemSlots }, (_, i) => {
+      const k = S.held[i];
+      if (!k) return `<span class="fx-slot tin${hot === 'sup' && i === S.held.length ? ' new' : ''}" style="--s:56px" data-tip="${attr({ n: `보급품 ${i + 1}번 칸`, t: '비어 있음', e: '보급품을 하나 더 넣을 수 있어요.', f: '' })}" tabindex="0"><em>${i + 1}</em></span>`;
+      return `<span class="fx-slot tin on" style="--s:56px;--c:var(--${ITEMS[k].use ? 'accent-2' : 'accent'})" data-tip="${attr({ n: ITEMS[k].name, t: `보급품 · ${ITEMS[k].use ? '누르기' : '끌어 놓기'}`, e: itemDesc(k), f: `전투 중 ${i + 1} 키` })}" tabindex="0"><em>${i + 1}</em>${ico(ITEM_ICO[k])}</span>`;
+    }).join('');
+    h += `<div class="sv-bag"><div class="pk${hot === 'mate' ? ' hot' : ''}" data-zone="mate"><h5>동료 <small>${crew.length}/4</small></h5><div class="fx-slots" style="gap:12px">${mates}</div><span class="here">여기로 ↓</span></div>`
+      + `<div class="pk${hot === 'dev' ? ' hot' : ''}" data-zone="dev"><h5>장치 <small>${S.devices.length}/${SHOP.deviceMax} · 눌러서 되팔기</small></h5><div class="fx-slots" style="gap:9px">${devs}</div><span class="here">여기로 ↓</span></div>`
+      + `<div class="pk${hot === 'sup' ? ' hot' : ''}" data-zone="sup"><h5>보급품 <small>${S.held.length}/${SHOP.itemSlots}</small></h5><div class="fx-slots" style="gap:12px">${tins}</div><span class="here">여기로 ↓</span></div></div>`
+      + '<div class="sv-tip" hidden><div class="h"><span class="ic"></span><div><b></b><small></small></div></div><p></p><div class="f"></div></div>'
+      + `<button type="button" class="fx-svc sh-reroll" id="fixReroll" style="position:absolute;left:1530px;top:884px;width:360px;z-index:6"><span class="fx-tok" style="--s:54px;--c:var(--accent-2)">${ico('turn')}</span><div><b>새로 고침</b><small>쪽지 4장 + 보급품 2장 · 다음엔 엽전 ${fix.reroll + 1}</small></div><span class="fx-pr s${S.gold < fix.reroll ? ' poor' : ''}"><i></i>${fix.reroll}</span></button>`;
+    if (preview) h += `<div class="og-btn p" style="left:1490px;top:972px;transform:rotate(-1.5deg);z-index:8">다음 스테이지로<small>${S.node + 2}/${CHAPTER.length} · ${NODE_LABEL[nx] || ''}</small></div>`;
+    else h += `<div class="sv-hero" style="left:-170px;top:400px;height:680px"><img class="sticker" src="${heroSrc(S.hero)}" alt="" style="height:680px;transform:scaleX(-1)"></div>`;
+    return h;
+  }
   function renderShop() {
     if (!S.fix || !S.stock) return; // 정비를 이미 떠났다
-    S.phase = 'shop'; S.keys = {};
+    S.phase = 'shop';
     showOverlay('', 'fix');
-    const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), n = raceCount(F.race), fix = S.fix;
-    const all = [...FIX_ROWS.flatMap(([r]) => S.stock[r]).filter(Boolean), S.fixHeal];
-    let sel = fix.sel && all.includes(fix.sel) ? fix.sel : all.find((o) => !o.sold && S.gold >= priceOf(o)) || all.find((o) => !o.sold) || all[0];
-    fix.sel = sel;
-    const syn = F.race === '토끼' ? `속도 +${RABBIT.speed[Math.max(1, n) - 1]}${n >= 3 ? ` · 공격 +${RABBIT.atk}` : ''}` : `보호막 +${SLUG.shield[Math.max(1, n) - 1]}${n >= SLUG.dmgAt ? ` · 피해 +${SLUG.dmg * 100}%` : ''}`;
-    let h = `<div class="tmap">${trackHtml()}</div>`
-      + `<div class="og-sheet fix-party" style="left:24px;top:190px;width:500px;height:860px;transform:rotate(-0.6deg);z-index:4"><div class="og-h">원정대 짐</div>${patch(S.hero, 100, '').replace('og-patch', 'og-patch fix-hero')}`
-      + `<div class="fix-name">${HEROES[S.hero].name}<small>${PROFILE[S.hero].job} · 공격 ${atkNow()} · 방어 ${m.def}</small></div><div class="fix-coin"><small>엽전</small><b>${S.gold}</b></div>`
-      + `<div class="fix-bar" style="top:186px;--c:var(--hp);--v:${Math.round(m.hp / m.maxHp * 100)}"><b>체력</b><span><i></i></span><em>${m.hp}/${m.maxHp}</em></div>`
-      + `<div class="fix-bar" style="top:224px;--c:var(--spirit);--v:${Math.round(S.gauge / gm * 100)}"><b>투지</b><span><i></i></span><em>${S.gauge}/${gm}</em></div>`
-      + `<div class="fix-sec" style="top:264px">동료 ${crew.length}/4<small>최대 4명 · 같은 마을이면 시너지</small></div>`
-      + Array.from({ length: 4 }, (_, i) => { const k = crew[i]; if (!k) return `<div class="fix-mate empty" style="top:${292 + 66 * i}px"><span>+</span><b>빈 자리 ${i + 1}</b></div>`;
-        const ally = HEROES[k], L = S.levels[k];
-        return `<div class="fix-mate" style="top:${292 + 66 * i}px;--c:var(--char-${k})">${faceImg(k)}<div><b>${ally ? ally.name : KINDS[k].name}</b><small>${ally ? '합류한 메인' : `${KINDS[k].role} ${'★'.repeat(L)}${'☆'.repeat(3 - L)}`}</small><p>${ally ? ally.unit : SHORT[k](L)}</p></div></div>`; }).join('')
-      + `<div class="fix-syn" style="top:560px">시너지 · ${F.short} ${Math.max(1, n)}/5 — ${syn}</div>`
-      + `<div class="fix-sec" style="top:612px">장치 ${S.devices.length}/${SHOP.deviceMax}<small>판 위에 놓이는 범퍼 · 기둥 · 눌러서 되팔기</small></div>`
-      + `<div class="fix-dev" style="top:644px">${Array.from({ length: SHOP.deviceMax }, (_, i) => { const d = S.devices[i]; return d ? `<button type="button" class="on${fix.sell === i ? ' sell' : ''}" data-dev="${i}" title="${BOARD[d].name}">${devTxt(d)}</button>` : '<span></span>'; }).join('')}</div>`
-      + `<div class="fix-sec" style="top:726px">보급품 ${S.held.length}/${SHOP.itemSlots}</div>`
-      + `<div class="fix-tins" style="top:756px">${Array.from({ length: SHOP.itemSlots }, (_, i) => { const k = S.held[i]; return k ? `<div><span style="--c:var(--${ITEMS[k].use ? 'accent-2' : 'accent'})"><em>${i + 1}</em>${ico(ITEM_ICO[k])}</span>${ITEMS[k].name}</div>` : `<div><span class="empty"><em>${i + 1}</em></span>비었어요</div>`; }).join('')}</div></div>`;
-    h += '<div class="fix-cart" style="left:556px;top:210px;width:900px;height:730px"><div class="fix-cart__cloth"></div><div class="fix-cart__beam"></div><span class="fix-cart__lash" style="left:-14px"></span><span class="fix-cart__lash" style="right:-14px"></span><div class="fix-cart__sign">오토의 떠돌이 수레</div>';
-    { const R = S.fixHeal, RI = itemInfo(R); h += `<button type="button" class="fix-rest${R === sel ? ' on' : ''}${R.sold ? ' sold' : S.gold < RI.pr ? ' poor' : ''}" id="fixRest" style="right:34px;top:-2px">${RI.pt}<div><b>${RI.name} · 체력 +${BAL.fixHeal}</b><small>${R.sold ? '이번 정비엔 다 팔렸어요' : '늘 있어요 · 새로 고침에 안 바뀌어요'}</small></div>${costHtml('coin', RI.pr)}</button>`; }
-    const sub = { ally: `공용 풀 · ${F.short} 동료만 와요`, up: `${HEROES[S.hero].name}에게만 · 단계가 있어요`, dev: `판 위에 놓여요 · ${S.devices.length}/6`, item: `1·2·3 깡통 · ${S.held.length}/3` };
-    FIX_ROWS.forEach(([r, name], ri) => {
-      h += `<div class="fix-row" style="top:${58 + 166 * ri}px"><div class="fix-row__lab"><b>${name}</b><small>${sub[r]}</small></div>`;
-      S.stock[r].forEach((o, i) => {
-        if (!o) { h += `<div class="fix-it fix-none" style="left:${160 + 240 * i}px"><b style="left:14px">빈 자리</b><p>오늘은 수레에 이것뿐</p></div>`; return; }
-        const I = o.info || itemInfo(o), poor = !o.sold && S.gold < I.pr;
-        h += `<button type="button" class="fix-it${o === sel ? ' sel' : ''}${poor ? ' poor' : ''}${o.pin && !o.sold ? ' pin' : ''}${o.sold ? ' sold' : ''}" data-r="${r}" data-i="${i}" style="left:${160 + 240 * i}px">${I.pt}<b>${I.name}</b><span class="tg">${I.tg}</span>${I.pips || ''}<p>${I.ef}</p><span class="pr">${costHtml('coin', I.pr)}</span></button>`;
-      });
-      h += '</div>';
-    });
-    h += '</div>';
-    // 오토 · 말풍선 · 상세
-    const I = sel && (sel.info || itemInfo(sel)), full = sel && !sel.sold && fullOf(sel);
-    h += `<span class="og-patch fix-vendor sticker" style="left:1520px;top:300px;width:300px;height:300px;--c:var(--char-oto)">${faceImg('oto', 'fill')}</span>`
-      + `<div class="fix-bub" style="left:1452px;top:196px"><b>오토</b>${S.fixSay}</div>`;
-    if (sel) h += `<div class="og-sheet fix-detail" style="left:1452px;top:600px;width:440px;height:330px;transform:rotate(1deg);z-index:6"><div class="og-h">${I.name}</div><div class="og-sub" style="margin-top:6px">${I.tg}</div>`
-      + `<div class="fix-eff og-sub" style="margin-top:10px;color:var(--ink);font-size:18px">${I.ef}</div><div class="row">${costHtml('coin', I.pr)}<span class="og-sub">엽전 ${S.gold} → ${S.gold - I.pr}</span></div>`
-      + `<div class="dest">들어갈 곳 · ${sel.sold ? '이미 샀어요' : full ? `<b>칸이 가득</b> · 사면 하나를 골라 내보내요 (되팔기)` : I.dest}</div>`
-      + `<div class="acts">${sel.g === 'heal' ? '' : `<button type="button" class="fix-mini${sel.pin ? ' on' : ''}" id="fixPin">${sel.pin ? '찜 풀기' : '찜'}</button>`}<button type="button" class="fix-mini p" id="fixBuy">사기 <span class="key">Enter</span></button></div></div>`;
-    h += `<button type="button" class="fix-reroll" id="fixReroll" style="left:560px;top:950px"><i>${ico('turn')}</i><div>새로 고침<small>찜한 건 남아요 · 다음엔 엽전 ${fix.reroll + 1}</small></div>${costHtml('coin', fix.reroll)}</button>`
-      + '<div class="tapekeys" style="left:930px;top:968px;z-index:5"><span><span class="key">Enter</span>사기</span><span><span class="key">F</span>찜</span><span><span class="key">R</span>새로 고침</span><span><span class="key">Esc</span>메뉴</span></div>';
-    $('#ovBody').innerHTML = h;
+    const fix = S.fix, all = [...S.stock.wares, ...S.stock.items, ...S.stock.rest].filter(Boolean);
+    fix.sel = fix.sel && all.includes(fix.sel) ? fix.sel : all.find((o) => !o.sold && o.g !== 'rest' && S.gold >= priceOf(o)) || all.find((o) => !o.sold) || all[0];
+    const sel = fix.sel;
+    $('#ovBody').innerHTML = fixHtml(false);
     const nx = CHAPTER[S.node + 1];
-    const next = button(`다음 스테이지로<small>${S.node + 2}/${CHAPTER.length} · ${NODE_LABEL[nx] || ''}</small>`, 'og-btn p', 'shopNext', () => {
-      S.pins = FIX_ROWS.flatMap(([r]) => S.stock[r]).filter((o) => o && o.pin && !o.sold);
+    ogBtn(`다음 스테이지로<small>${S.node + 2}/${CHAPTER.length} · ${NODE_LABEL[nx] || ''}</small>`, 'p', 'shopNext', 'left:1490px;top:972px;transform:rotate(-1.5deg);z-index:8', () => {
+      S.pins = [...S.stock.wares, ...S.stock.items].filter((o) => o && o.pin && !o.sold);
       S.gain = null; S.stock = null; S.fix = null; S.keys = null; nextNode();
     });
-    next.style.cssText = 'left:1490px;top:948px;transform:rotate(-1.5deg);z-index:7'; $('#ovBody').append(next);
-    // 손맛 (원본 FixMain): 고르면 상세 · 말풍선이 바뀐다. 찜은 표시만
-    for (const b of document.querySelectorAll('#ovBody .fix-it[data-r]')) b.addEventListener('click', () => {
-      const o = S.stock[b.dataset.r][+b.dataset.i];
-      if (o === fix.sel) return;
+    // 고르기 (원본 2E): 팔린 것은 고를 수 없다. 고른 쪽지가 눌리고 오토 말풍선이 그 물건 설명이 된다
+    const choose = (o) => {
+      if (!o || o.sold || o === fix.sel) return;
       fix.sel = o; fix.sell = -1;
-      S.fixSay = o.sold ? OTO_SAY.sold : S.gold < priceOf(o) ? OTO_SAY.poor : OTO_SAY.pick(itemInfo(o).name, priceOf(o));
+      const J = itemInfo(o);
+      S.fixSay = S.gold < J.pr ? OTO_SAY.poor : o.g === 'rest' ? OTO_SAY.rest(J.name) : OTO_SAY.pick(J.name, J.pr);
       renderShop();
-    });
-    if (sel) {
-      $('#fixRest').addEventListener('click', () => { if (fix.sel === S.fixHeal) return; fix.sel = S.fixHeal; fix.sell = -1; S.fixSay = S.fixHeal.sold ? OTO_SAY.sold : S.gold < PRICE.fixHeal ? OTO_SAY.poor : OTO_SAY.pick('고정 회복', PRICE.fixHeal); renderShop(); });
-      if ($('#fixPin')) $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); });
-      $('#fixBuy').addEventListener('click', () => buy(sel));
-    }
-    // 원본 doReroll: 찜하지 않은 물건이 차례로 접혔다 펴지며 (반쯤 접혔을 때 새 물건으로) 바뀐다. 손잡이가 돌고 오토가 말한다
+      const e = $('#ovBody .se-post.is-sel, #ovBody .se-tag.is-sel, #ovBody .se-line.is-sel');
+      if (e && !RM) e.animate([{ scale: '1 1' }, { scale: '1.04 .96' }, { scale: '1 1' }], { duration: 260 });
+    };
+    for (const b of document.querySelectorAll('#ovBody .se-post[data-w]')) b.addEventListener('click', () => choose(S.stock.wares[+b.dataset.w]));
+    for (const b of document.querySelectorAll('#ovBody .se-tag[data-it]')) b.addEventListener('click', () => choose(S.stock.items[+b.dataset.it]));
+    for (const b of document.querySelectorAll('#ovBody .se-line[data-rest]')) b.addEventListener('click', () => choose(S.stock.rest[+b.dataset.rest]));
+    if (sel && $('#fixPin')) $('#fixPin').addEventListener('click', () => { if (sel.sold) return; sel.pin = !sel.pin; S.fixSay = sel.pin ? OTO_SAY.pin : OTO_SAY.unpin; renderShop(); });
+    if (sel) $('#fixBuy').addEventListener('click', () => buy(sel));
+    // 새로 고침 (원본 doReroll): 찜하지 않은 쪽지 · 보급품이 차례로 접혔다 펴지며 (반쯤 접혔을 때 새 물건으로) 바뀐다
     $('#fixReroll').addEventListener('click', () => {
       const btn = $('#fixReroll');
       if (S.gold < fix.reroll) { SHK(btn); fixSay(OTO_SAY.rerollPoor); return; }
-      const old = [...document.querySelectorAll('#ovBody .fix-it')].map((e) => [e.className, e.innerHTML]);
+      const Q = '#ovBody .se-post, #ovBody .se-tag', old = [...document.querySelectorAll(Q)].map((e) => [e.className, e.innerHTML]);
       S.gold -= fix.reroll; fix.reroll++; fix.sel = null; S.fixSay = OTO_SAY.reroll; sfx.buy();
       rollStock(); renderShop();
-      RE($('#fixReroll'), 'spin');
-      document.querySelectorAll('#ovBody .fix-it').forEach((e, i) => {
-        if (e.classList.contains('pin') || !old[i]) return;
+      const tok = $('#fixReroll .fx-tok'); if (tok && !RM) tok.animate([{ rotate: '0deg' }, { rotate: '360deg' }], { duration: 500, easing: 'ease' });
+      document.querySelectorAll(Q).forEach((e, i) => {
+        if (e.classList.contains('is-pin') || !old[i]) return;
         const nw = [e.className, e.innerHTML];
         [e.className, e.innerHTML] = old[i];
         e.animate([{ scale: '1 1', translate: '0 0' }, { scale: '0 1', translate: '0 -10px', offset: 0.45 }, { scale: '0 1', translate: '0 -30px', offset: 0.5 }, { scale: '1 1', translate: '0 0' }], { duration: RM ? 1 : 520, delay: RM ? 0 : i * 45, easing: 'ease-in-out' });
@@ -2986,59 +3333,79 @@ body { display: grid; place-items: center; }
       });
       fixSay(OTO_SAY.reroll);
     });
-    for (const d of document.querySelectorAll('#ovBody .fix-dev button')) d.addEventListener('click', () => {
+    // 장치 되팔기: 한 번 누르면 표시, 한 번 더 누르면 판다
+    for (const d of document.querySelectorAll('#ovBody .sv-bag [data-dev]')) d.addEventListener('click', () => {
       const i = +d.dataset.dev;
-      if (fix.sell !== i) { fix.sell = i; renderShop(); return; }
+      if (fix.sell !== i) { fix.sell = i; renderShop(); const e = $(`#ovBody .sv-bag [data-dev="${i}"]`); if (e) showTip(e); return; }
       S.devices.splice(i, 1); S.gold += FIX.refund.dev; fix.sell = -1; S.fixSay = OTO_SAY.sell; sfx.coin(1);
       renderPanel(); renderShop();
     });
-    S.keys = { Enter: () => sel && buy(sel), f: () => sel && $('#fixPin') && $('#fixPin').click(), r: () => $('#fixReroll').click() };
+    // 짐 띠 설명 쪽지 (원본 sv-tip)
+    for (const el of document.querySelectorAll('#ovBody .sv-bag [data-tip]')) {
+      el.addEventListener('mouseenter', () => showTip(el)); el.addEventListener('mouseleave', hideTip);
+      el.addEventListener('focus', () => showTip(el)); el.addEventListener('blur', hideTip);
+    }
+    S.keys = { Enter: () => sel && buy(sel), f: () => $('#fixPin') && $('#fixPin').click(), r: () => $('#fixReroll').click() };
     moEnter('fix' + S.node, '');
     syncUI(true);
   }
+  function showTip(el) {
+    const r = $('#ovBody'), tip = $('#ovBody .sv-tip'); if (!tip) return;
+    const d = JSON.parse(el.dataset.tip), R = r.getBoundingClientRect(), k = R.width / r.offsetWidth, b = el.getBoundingClientRect();
+    const ic = tip.querySelector('.ic'); ic.innerHTML = el.innerHTML; ic.className = 'ic ' + el.className.replace(/\b(new|fx-slot|sell)\b/g, ''); ic.style.cssText = el.getAttribute('style') || ''; ic.style.setProperty('--s', '44px');
+    tip.querySelector('b').textContent = d.n; tip.querySelector('small').textContent = d.t; tip.querySelector('p').textContent = d.e;
+    const f = tip.querySelector('.f'); f.textContent = d.f || ''; f.hidden = !d.f;
+    tip.hidden = false;
+    const x = (b.left - R.left + b.width / 2) / k, y = (b.top - R.top) / k, w = tip.offsetWidth;
+    tip.style.left = Math.max(12, Math.min(x - w / 2, r.offsetWidth - w - 12)) + 'px'; tip.style.top = (y - tip.offsetHeight - 16) + 'px';
+    tip.style.setProperty('--ax', (x - parseFloat(tip.style.left)) + 'px'); RE(tip, 'pop');
+  }
+  const hideTip = () => { const tip = $('#ovBody .sv-tip'); if (tip) tip.hidden = true; };
   // 산 것을 넣는다
   function give(o) {
-    if (o.g === 'heal') { S.main.hp = Math.min(S.main.maxHp, S.main.hp + BAL.fixHeal); return; }
-    if (o.g === 'up') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 10; S.main.hp += 10; } }
+    if (o.g === 'rest') { S.main.hp = Math.min(S.main.maxHp, S.main.hp + restOf(o.id).heal); return; }
+    if (o.g === 'aug') { S.up[o.u.id] = up(o.u.id) + 1; if (o.u.id === 'hp') { S.main.maxHp += 10; S.main.hp += 10; } }
     else if (o.g === 'ally') { if (!S.levels[o.k]) META.stat.recruits++; S.levels[o.k]++; META.seen.ally[o.k] = 1; }
     else if (o.g === 'main') { S.ally = { kind: o.k, x: -999, y: -999, r: 26, cd: 0, jig: 0 }; META.stat.recruits++; }
     else if (o.g === 'dev') { S.devices.push(o.k); META.seen.dev[o.k] = 1; }
     else { S.held.push(o.k); META.seen.dev[o.k] = 1; }
     META.stat.party = Math.max(META.stat.party, crewList().length);
   }
-  // 원본 say: 오토의 말이 바뀌며 말풍선이 통 눌린다
-  function fixSay(t) { S.fixSay = t; const b = $('#ovBody .fix-bub'); if (b) { b.innerHTML = `<b>오토</b>${t}`; RE(b, 'talk'); } }
+  // 오토의 말: 고른 물건 말풍선 첫 줄이 바뀌며 말풍선이 눌린다
+  function fixSay(t) { S.fixSay = t; const w = $('#ovBody .se-pop .who'); if (w) { w.textContent = `오토 · ${t}`; SQ($('#ovBody .se-pop')); } }
   // 원본 roll: 엽전 숫자가 굴러 바뀌고 동전이 눌린다. 원본 fix-coinpop: 엽전 아래로 -값이 떠오른다
   function fixRoll(from, to) {
-    const coin = $('#ovBody .fix-coin b'); if (!coin) return;
+    const coin = $('#ovBody .fx-coin b'); if (!coin) return;
     const t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / 600); coin.textContent = Math.round(from + (to - from) * k); if (k < 1) requestAnimationFrame(f); })(t0);
     coin.parentNode.animate([{ scale: '1 1' }, { scale: '1.2 .82' }, { scale: '.94 1.06' }, { scale: '1 1' }], { duration: 450 });
   }
   function coinPop(pr) {
-    const coin = $('#ovBody .fix-coin b'); if (!coin) return;
+    const coin = $('#ovBody .fx-coin b'); if (!coin) return;
     const p = document.createElement('span'), c = FC(coin); p.className = 'fix-coinpop'; p.textContent = '-' + pr; p.style.left = (c[0] - 20) + 'px'; p.style.top = (c[1] + 30) + 'px';
     FLY_ROOT().appendChild(p); setTimeout(() => p.remove(), 1100);
   }
-  // 원본 target: 장치 → 빈 장치 칸, 동료 → 빈 자리 (있던 동료면 그 자리), 보급품 → 빈 깡통, 메인 강화 → 메인 와펜. after = 산 뒤 다시 그린 화면에서
+  // 원본 target: 장치 → 빈 장치 칸, 동료 → 빈 자리 (있던 동료면 그 자리), 보급품 → 빈 깡통, 증강 → 메인 이름표, 상비약 → 체력 막대. after = 산 뒤 다시 그린 화면에서
   function fixSpot(o, after) {
-    if (o.g === 'dev') return after ? $(`#ovBody .fix-dev [data-dev="${S.devices.length - 1}"]`) : $('#ovBody .fix-dev > span');
-    if (o.g === 'ally' || o.g === 'main') { const i = crewList().indexOf(o.k); return i >= 0 ? document.querySelectorAll('#ovBody .fix-mate')[i] : $('#ovBody .fix-mate.empty'); }
-    if (o.g === 'item') return after ? $(`#ovBody .fix-tins > div:nth-child(${S.held.length}) span`) : $('#ovBody .fix-tins span.empty');
-    return $('#ovBody .fix-hero');
+    const zone = (z) => [...document.querySelectorAll(`#ovBody .sv-bag [data-zone="${z}"] .fx-slot`)];
+    if (o.g === 'dev') return zone('dev')[after ? S.devices.length - 1 : S.devices.length];
+    if (o.g === 'ally' || o.g === 'main') { const i = crewList().indexOf(o.k); return zone('mate')[i >= 0 ? i : crewList().length]; }
+    if (o.g === 'item') return zone('sup')[after ? S.held.length - 1 : S.held.length];
+    if (o.g === 'rest') return $('#ovBody .sv-info .sv-bar');
+    return $('#ovBody .sv-info .nm');
   }
   function buy(o) {
     if (o.sold) return;
     const pr = priceOf(o);
-    if (S.gold < pr) { fixSay(OTO_SAY.buyPoor); return; }
-    if (o.g === 'heal' && S.main.hp >= S.main.maxHp) { fixSay(OTO_SAY.full); return; }
+    if (S.gold < pr) { fixSay(OTO_SAY.buyPoor); SHK($('#fixBuy')); return; }
+    if (o.g === 'rest' && S.main.hp >= S.main.maxHp) { fixSay(OTO_SAY.full); SHK($('#fixBuy')); return; }
     const full = fullOf(o);
     if (full) { const I = itemInfo(o); openSwap({ kind: full, name: I.name, tg: I.tg, ef: I.ef, pt: o.k, price: pr, done: () => bought(o, pr, false), cancel: renderShop }); return; }
     bought(o, pr, true);
   }
-  // 원본 doBuy: 물건 조각이 수레에서 들어갈 칸으로 포물선을 그리며 날아가 칸이 눌리고, 엽전이 굴러 내려가며 -값이 뜬다
+  // 원본 doBuy: 물건 동그라미가 게시판에서 들어갈 칸으로 포물선을 그리며 날아가 칸이 눌리고, 엽전이 굴러 내려가며 -값이 뜬다
   // fly = false: 교체 창에서 이미 날아 들어갔다
   function bought(o, pr, fly) {
-    const it = $('#ovBody .fix-it.sel, #ovBody .fix-rest.on'), pt = fly && it && it.querySelector('.pt'), tg = pt && fixSpot(o, false), g0 = S.gold, n0 = S.drawN;
+    const it = $('#ovBody .se-post.is-sel, #ovBody .se-tag.is-sel, #ovBody .se-line.is-sel'), pt = fly && it && it.querySelector('.fx-tok'), tg = pt && fixSpot(o, false), g0 = S.gold, n0 = S.drawN;
     o.info = itemInfo(o);
     S.gold -= pr; give(o); o.sold = true; o.pin = false;
     if (S.levels.santo > 0) META.stat.santoBuys++;
@@ -3052,7 +3419,7 @@ body { display: grid; place-items: center; }
     f.style.left = a[0] + 'px'; f.style.top = a[1] + 'px'; FLY_ROOT().appendChild(f);
     const dx = b[0] - a[0], dy = b[1] - a[1];
     f.animate([{ translate: '0 0', scale: '1' }, { translate: `${dx * 0.5}px ${dy * 0.5 - 180}px`, scale: '1.35', offset: 0.45 }, { translate: `${dx}px ${dy}px`, scale: '.9' }], { duration: RM ? 1 : 720, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).onfinish = () => { f.remove(); if (S.drawN === n0) land(); };
-    it.classList.add('sold'); it.classList.remove('sel', 'on');
+    it.classList.add('is-sold'); it.classList.remove('is-sel');
     fixRoll(g0, S.gold); coinPop(pr); fixSay(say);
   }
   // 교체 창 (FixSwap): 정비 화면 위를 덮는 캔버스. 왼쪽 새로 들어올 것, 오른쪽 지금 칸 (모두 같은 크기), 아래 되팔기 계산과 사지 않기 · 교체
