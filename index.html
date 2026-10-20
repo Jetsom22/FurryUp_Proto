@@ -2417,7 +2417,7 @@ body { display: grid; place-items: center; }
     nextNode();
   }
   function nextNode() {
-    hideOverlay();
+    setView('battle'); // 스토리 · 이벤트에서 바로 넘어와도 판으로 (다음 칸이 스토리 · 이벤트면 그쪽이 다시 바꾼다)
     S.node++;
     if (S.node >= CHAPTER.length) { finishRun(true); return; }
     enterNode();
