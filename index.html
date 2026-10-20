@@ -2263,7 +2263,8 @@ body { display: grid; place-items: center; }
     '갯민숭달팽이': (t) => [`${SLUG.every[t - 1] ? '라운드마다' : '첫 라운드'} 보호막 +${SLUG.shield[t - 1]}`, `보호막 동안 피해 +${SLUG.dmg * 100}%`],
   };
   const synFx = (race, t, sep) => (SYN_FX[race] ? SYN_FX[race](t).filter(Boolean).join(sep) : '');
-  const synNext = (n) => SYN.at.find((a) => a > n) || SYN.at[SYN.at.length - 1];
+  // 이름표: 켜진 단의 문턱만 (토끼 2 · 3 · 5, 4명이면 3). 꺼지면 OFF
+  const synLabel = (race, t) => `${synName(race)} ${t ? SYN.at[t - 1] : 'OFF'}`;
   const targets = () => (S.gimmick === 'armor' && budsUp() ? S.enemies.filter((e) => e.alive && e.gimmick === 'bud') : onField());
   function nearest(x, y, n) { return targets().sort((a, b) => hyp(a.x - x, a.y - y) - hyp(b.x - x, b.y - y)).slice(0, n); }
 
@@ -3272,8 +3273,8 @@ body { display: grid; place-items: center; }
   // 왼쪽 끝 메인 · 그 위 메인 정보와 씨앗, 가운데 게시판 (쪽지 4 · 보급품 꼬리표 2 · 상비약 차림표), 오른쪽 오토 말풍선(고른 물건) · 오토, 아래 짐 띠, 새로 고침 · 다음 스테이지로
   // preview = 증강 화면 옆에 이어 붙인 띠 안 (눌리지 않고, 메인은 띠 밖에서 건너온다)
   function fixHtml(preview) {
-    const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), nR = raceCount(F.race), fix = S.fix, sel = fix.sel, hn = HEROES[S.hero].name;
-    const on = synOn(), syn = on.length ? on.map((o) => `${synName(o.race)} ${o.n}/${synNext(o.n)} · ${synFx(o.race, o.t, ' · ')}`).join(' / ') : `${F.short} ${nR}/${synNext(nR)} · ${SYN.at[0]}명부터`;
+    const m = S.main, gm = gaugeMax(), crew = crewList(), F = facOf(), fix = S.fix, sel = fix.sel, hn = HEROES[S.hero].name;
+    const on = synOn(), syn = on.length ? on.map((o) => `${synLabel(o.race, o.t)} · ${synFx(o.race, o.t, ' · ')}`).join(' / ') : synLabel(F.race, 0);
     const nx = CHAPTER[S.node + 1], augN = augAll().reduce((s, u) => s + up(u.id), 0);
     const I = sel && (sel.info || itemInfo(sel)), hot = sel && !sel.sold && !fullOf(sel) ? I.zone : '';
     let h = `<div class="fx-strip" style="left:400px;top:22px;width:860px"><b>정비</b><span>${hn} 원정 · ${S.node + 1}/${CHAPTER.length}칸</span><div class="fx-nodes">${CHAPTER.map((t, i) => `<i class="${i < S.node ? 'd' : i === S.node ? 'n' : ''}${t === 'mid' || t === 'boss' ? ' b' : ''}"></i>`).join('')}</div><em>다음 · ${S.node + 2} ${NODE_LABEL[nx] || ''}</em></div>`
@@ -6367,13 +6368,13 @@ body { display: grid; place-items: center; }
     $('#team').innerHTML = rows.map(([st, cls, inner], i) => `<div class="m4 ${cls}" style="top:${236 + 90 * i}px;transform:rotate(${i % 2 ? -1.5 : 1.5}deg);${st}">${inner}</div>`).join('');
     $('#teamHead').textContent = `동료 ${filled}/${cap}`;
     const F = facOf();
-    // 시너지 와펜: 켜진 시너지를 최대 둘 (D104). 하나도 없으면 메인 종족을 흐리게
+    // 시너지 와펜: 켜진 시너지를 최대 둘 (D104). 하나도 없으면 메인 종족을 회색 OFF
     const on = synOn(), wap = (el, o, big) => {
       if (!o) { el.style.display = 'none'; return; }
-      el.style.display = ''; el.style.opacity = o.t ? '' : '0.55';
+      el.style.display = ''; el.style.opacity = o.t ? '' : '0.6'; el.style.filter = o.t ? '' : 'grayscale(1)';
       // 작은 와펜(둘째)은 효과 글이 들어갈 자리가 없어 단만 적고, 효과는 올리면 보이는 풀이로
       el.title = o.t ? synFx(o.race, o.t, ' · ') : '';
-      el.innerHTML = `${big ? '<em>시너지</em>' : ''}<b>${synName(o.race)} ${o.n}/${synNext(o.n)}</b><small>${!o.t ? `${SYN.at[0]}명부터` : big ? synFx(o.race, o.t, '<br>') : `${SYN.at[o.t - 1]}명 단`}</small>`;
+      el.innerHTML = `${big ? '<em>시너지</em>' : ''}<b>${synLabel(o.race, o.t)}</b>${o.t && big ? `<small>${synFx(o.race, o.t, '<br>')}</small>` : ''}`;
     };
     wap($('#syn'), on[0] || { race: F.race, n: raceCount(F.race), t: 0 }, true);
     wap($('#syn2'), on[1], false);
