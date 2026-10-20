@@ -1327,16 +1327,74 @@ body { display: grid; place-items: center; }
 .K .cy-name input { font: 400 44px/1.2 var(--font-market-display); color: var(--ink); background: var(--surface-2); border: 0; padding: 12px 18px; width: 100%; box-sizing: border-box; }
 .K .cy-name p { margin: 16px 0 0; font: 400 22px/1.3 var(--font-market-text); color: var(--ink-muted); }
 .K .cy-name .tags { display: flex; gap: 16px; margin-top: 18px; font: 400 34px/1 var(--font-market-display); color: var(--ink); align-items: center; }
-/* 스토리 (CampStory) */
-.K #story .panel__in img.st-hero { position: absolute; left: 40px; bottom: -60px; height: 640px; transition: filter .2s ease; }
-.K #story[data-face="웃음"] img.st-hero { filter: saturate(1.3) brightness(1.06); }
-.K #story[data-face="놀람"] img.st-hero { filter: contrast(1.1); transform: translateY(-8px); }
-.K #story .st-main, .K #story .st-other { transition: filter .2s ease; }
-.K #story[data-speaker="other"] .st-main, .K #story[data-speaker="main"] .st-other { filter: brightness(.55) saturate(.6); }
-.K #story .bgtag { position: absolute; left: 700px; top: 140px; z-index: 3; padding: 6px 14px; font: 400 20px/1.1 var(--font-market-label); color: var(--ink); background: var(--surface); transform: rotate(-2deg); outline: 3px dashed var(--stitch); outline-offset: -6px; }
-.K #story .who-ph { position: absolute; left: 700px; top: 70px; width: 330px; height: 520px; border-radius: 160px 160px 40px 40px; background: var(--mat-1); opacity: .82; display: grid; place-items: center; font: 400 22px/1.2 var(--font-market-label); color: var(--on-dark); text-align: center; }
-.K #storyNext { left: 1560px; top: 860px; z-index: 6; }
-.K #story .tapekeys { left: 1180px; top: 1012px; }
+/* 스토리 (CampStory) — 디자인 시스템 bundle.css의 story 블록 그대로 */
+/* ---- story: two-sided stage, the speaker's side opens up ----------------- */
+.K .stage { position: absolute; left: 70px; top: 104px; width: 1780px; height: 600px; display: flex; gap: 24px; }
+.K .pn { position: relative; flex: 0 0 656px; height: 100%; background: var(--surface); padding: 10px; transition: flex-basis .62s cubic-bezier(.34,1.45,.52,1), transform .62s cubic-bezier(.34,1.45,.52,1); }
+.K .pn.L { clip-path: polygon(0 0, 100% 2.5%, 97.5% 100%, 1.5% 97.5%); transform: rotate(-.6deg); }
+.K .pn.R { clip-path: polygon(2.5% 0, 100% 0, 100% 96%, 0 100%); transform: rotate(.6deg); }
+.K .stage[data-sp="L"] .pn.L, .K .stage[data-sp="R"] .pn.R { flex-basis: 1100px; }
+.K .stage[data-sp="L"] .pn.L { transform: rotate(-1.4deg); } .K .stage[data-sp="R"] .pn.R { transform: rotate(1.4deg); }
+.K .pn__in { position: absolute; inset: 10px; overflow: hidden; background: var(--c); }
+.K .pn__in::after { content: ""; position: absolute; inset: 0; background: var(--mat-1); opacity: .5; transition: opacity .45s ease; pointer-events: none; z-index: 3; }
+.K .stage[data-sp="L"] .pn.L .pn__in::after, .K .stage[data-sp="R"] .pn.R .pn__in::after { opacity: 0; }
+.K .pn .who { position: absolute; transition: transform .62s cubic-bezier(.34,1.45,.52,1); transform: translateY(34px) scale(.93); transform-origin: 50% 0; z-index: 2; }
+.K .pn.L .who { left: -150px; top: -24px; height: 920px; } .K .pn.R .who { right: 30px; top: 26px; height: 740px; }
+.K .stage[data-sp="L"] .pn.L .who, .K .stage[data-sp="R"] .pn.R .who { transform: translateY(0) scale(1); }
+.K .pn .scene { position: absolute; top: 0; width: 1760px; height: 100%; } .K .pn.L .scene { left: 0; } .K .pn.R .scene { right: 0; }
+.K .pn .tag { position: absolute; top: 26px; z-index: 5; padding: 10px 22px; background: var(--a-panel, var(--accent)); color: var(--a-panel-on, var(--on-accent)); font: 400 34px/1 var(--font-market-display); transform: scale(0) rotate(-8deg); transition: transform .4s cubic-bezier(.34,1.8,.5,1) .12s; outline: 3px dashed rgba(255,255,255,.6); outline-offset: -7px; white-space: nowrap; }
+.K .pn.L .tag { left: 34px; } .K .pn.R .tag { right: 34px; transform: scale(0) rotate(8deg); }
+.K .stage[data-sp="L"] .pn.L .tag { transform: scale(1) rotate(-4deg); } .K .stage[data-sp="R"] .pn.R .tag { transform: scale(1) rotate(4deg); }
+.K .pn .tag small { margin-left: 10px; font: 400 16px/1 var(--font-market-label); opacity: .85; }
+.K .hop { animation: k-hop .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes k-hop { 0% { margin-top: 0; } 35% { margin-top: -26px; } 100% { margin-top: 0; } }
+.K .dlg { position: absolute; top: 760px; width: 980px; min-height: 150px; padding: 26px 36px 28px; background: var(--bubble); color: var(--ink); border-radius: 26px; box-shadow: 0 6px 0 0 rgba(0,0,0,.35); z-index: 6;
+  transition: left .62s cubic-bezier(.34,1.45,.52,1); }
+.K .dlg::before { content: ""; position: absolute; top: -26px; width: 44px; height: 30px; background: var(--bubble); transition: left .62s cubic-bezier(.34,1.45,.52,1); clip-path: polygon(0 100%, 100% 100%, 30% 0); }
+.K .dlg[data-sp="L"] { left: 200px; } .K .dlg[data-sp="L"]::before { left: 70px; }
+.K .dlg[data-sp="R"] { left: 740px; } .K .dlg[data-sp="R"]::before { left: 860px; clip-path: polygon(0 100%, 100% 100%, 70% 0); }
+.K .dlg b { display: block; font: 400 30px/1 var(--font-market-display); color: var(--a-text, var(--accent)); }
+.K .dlg p { margin: 12px 0 0; font: 400 30px/1.35 var(--font-market-text); min-height: 80px; }
+.K .dlg .nx { position: absolute; right: 26px; bottom: 18px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 16px solid var(--a-panel, var(--accent)); animation: k-nx 1s ease-in-out infinite; }
+@keyframes k-nx { 50% { transform: translateY(6px); } }
+.K .lines { position: absolute; left: 110px; top: 980px; display: flex; gap: 10px; z-index: 6; }
+.K .lines i { width: 16px; height: 16px; border-radius: 50%; background: var(--deep); outline: 2px solid var(--on-bg); transition: background .3s; }
+.K .lines i.on { background: var(--spirit); }
+
+/* player (P): the reader is the player, standing below the screen — tail points down at them */
+.K .stage[data-sp="P"] .pn { flex-basis: 878px; }
+.K .stage[data-sp="P"] .pn .pn__in::after { opacity: .12; }
+.K .dlg[data-sp="P"] { left: 470px; transform-origin: 50% 100%; }
+.K .dlg[data-sp="P"]::before { top: auto; bottom: -28px; left: 468px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.K .dlg[data-sp="P"][data-b="think"]::before { top: auto; bottom: -34px; left: 476px; clip-path: none; box-shadow: 20px 26px 0 -6px var(--surface-2); }
+.K .dlg[data-sp="P"] b { color: var(--ink-muted); }
+/* narration: both sides share the stage evenly, no name tags */
+.K .stage[data-sp="N"] .pn { flex-basis: 878px; }
+.K .stage[data-sp="N"] .pn .pn__in::after { opacity: .18; }
+/* bubble kinds (driven by the dialogue table: talk / shout / think / narr) */
+.K .dlg[data-sp="N"] { left: 420px; } .K .dlg[data-sp="N"]::before { display: none; }
+.K .dlg[data-sp="L"] { transform-origin: 8% 0; } .K .dlg[data-sp="R"] { transform-origin: 92% 0; } .K .dlg[data-sp="N"] { transform-origin: 50% 0; }
+.K .dlg[data-b="shout"] { box-shadow: 0 0 0 5px var(--a-panel, var(--accent)), 0 6px 0 5px rgba(0,0,0,.35); }
+.K .dlg[data-b="shout"] p { font-size: 34px; font-family: var(--font-market-label); }
+.K .dlg[data-b="think"] { background: var(--surface-2); box-shadow: none; outline: 3px dashed var(--stitch); outline-offset: -10px; }
+.K .dlg[data-b="think"]::before { width: 26px; height: 26px; top: -34px; border-radius: 50%; clip-path: none; background: var(--surface-2); box-shadow: -26px -26px 0 -6px var(--surface-2); }
+.K .dlg[data-b="think"] p { color: var(--ink-muted); font-style: italic; }
+.K .dlg[data-b="narr"] { background: var(--mat-1); color: var(--on-dark); box-shadow: 0 6px 0 0 rgba(0,0,0,.35); }
+.K .dlg[data-b="narr"] b { color: var(--spirit); } .K .dlg[data-b="narr"] .nx { border-top-color: var(--spirit); }
+.K .dlg.go[data-b="talk"] { animation: k-pop .5s cubic-bezier(.3,1.7,.5,1); }
+.K .dlg.go[data-b="shout"] { animation: k-shout .55s cubic-bezier(.3,1.7,.5,1); }
+.K .dlg.go[data-b="think"] { animation: k-think .6s ease-out; }
+.K .dlg.go[data-b="narr"] { animation: k-narr .5s ease-out; }
+@keyframes k-pop { 0% { transform: scale(.7); opacity: 0; } 60% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes k-shout { 0% { transform: scale(.6) rotate(-3deg); opacity: 0; } 45% { transform: scale(1.08) rotate(2deg); opacity: 1; } 60% { transform: rotate(-2deg); } 75% { transform: rotate(1.5deg); } 100% { transform: none; } }
+@keyframes k-think { 0% { transform: translateY(16px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes k-narr { 0% { transform: translateY(-20px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+/* 이 프로토에서 더한 것: 그림 없는 상대 자리 · 표정 시험 · 줄 점 위치 */
+.K #story .pn.R .who-ph { right: 120px; top: 40px; width: 330px; height: 520px; border-radius: 160px 160px 40px 40px; background: var(--mat-1); opacity: .82; display: grid; place-items: center; font: 400 30px/1.2 var(--font-market-display); color: var(--on-dark); text-align: center; padding: 20px; }
+.K #story[data-face="웃음"] .pn.L .who { filter: saturate(1.3) brightness(1.06); }
+.K #story[data-face="놀람"] .pn.L .who { filter: contrast(1.1); }
+.K #story .tapekeys { left: 1300px; top: 1010px; z-index: 7; }
+.K #story { cursor: pointer; }
 .K .hand-clip { position: absolute; right: 0; bottom: 0; width: 360px; height: 360px; overflow: hidden; pointer-events: none; z-index: 4; }
 .K .story-hand { position: absolute; right: 10px; bottom: -40px; width: calc(300px * var(--hand-s, 1)); height: auto; }
 .K .story-hand.go { animation: hand-in 1.8s cubic-bezier(.2, .9, .3, 1) both; }
@@ -1473,14 +1531,13 @@ body { display: grid; place-items: center; }
     <div class="tapekeys" id="keys"><span><span class="key">드래그</span>당겨서 쏘기</span><span><span class="key">Shift</span>멈추고 대쉬</span><span><span class="key">Space</span>스킬</span><span><span class="key">끌기</span>보급품 놓기 · 첫 발 전 장치 옮기기</span><span><span class="key">Esc</span>메뉴</span></div>
   </div>
 
-  <div id="story" hidden data-speaker="main">
-    <div class="panel st-main" style="left:70px;top:120px;width:560px;height:580px;clip-path:polygon(0 0,100% 3%,95% 100%,3% 97%)"><div class="panel__in" style="--c:var(--deep)"><div class="abs" style="inset:0;background-image:radial-gradient(var(--floordot) 6px,transparent 7px);background-size:40px 40px;opacity:.6"></div><img class="st-hero" id="storyHero" alt=""></div></div>
-    <div class="panel st-other" style="left:660px;top:130px;width:1190px;height:560px;clip-path:polygon(2% 0,100% 0,100% 95%,0 100%)"><div class="panel__in" id="storyBg" style="--c:#e3ecd2"><svg class="abs" id="storyBgArt" viewBox="0 0 1190 560" preserveAspectRatio="xMidYMid slice" style="left:0;top:0;width:100%;height:100%"></svg><div class="who-ph" id="storyWho"></div><div class="hand-clip" id="handClip" aria-hidden="true" hidden><img class="story-hand" id="storyHand" alt=""></div></div></div>
-    <div class="bgtag" id="talkTag"></div>
-    <div class="panel st-talk" style="left:70px;top:720px;width:1780px;height:300px;clip-path:polygon(1% 6%,100% 0,99% 100%,0 96%)"><div class="panel__in" style="--c:var(--chalk)"><div class="abs" style="inset:0;background-image:radial-gradient(var(--deep) 5px,transparent 6px);background-size:34px 34px"></div><div class="abs lab" id="storyPlace" style="left:60px;top:40px;font-size:26px;color:var(--spirit)"></div></div></div>
-    <div class="say big" id="talkBubble" style="left:640px;top:780px;font-size:30px;width:860px"><b id="talkWho" style="font-size:30px">하나토</b><br><span id="say"></span></div>
-    <button class="ticket on" id="storyNext" type="button">다음<small>Space</small></button>
-    <div class="tapekeys"><span><span class="key">Space</span>다음</span><span><span class="key">Esc</span>메뉴</span></div>
+  <div id="story" hidden>
+    <svg class="stalls" aria-hidden="true" viewBox="0 0 1920 260" preserveAspectRatio="none"><path class="far" d="M-20 260 L40 60 L100 260Z M100 260 L150 110 L200 260Z M230 260 L300 30 L370 260Z M375 260 L430 90 L485 260Z M1284 260 L1350 50 L1416 260Z M1430 260 L1480 100 L1530 260Z M1548 260 L1620 20 L1692 260Z M1702 260 L1760 80 L1818 260Z M1814 260 L1880 40 L1946 260Z"/><path d="M0 260 V170 Q200 140 420 160 T900 170 T1400 150 T1920 165 V260Z"/><path class="tent" d="M180 260 L300 120 L420 260Z M1500 260 L1600 140 L1700 260Z"/><path class="door" d="M300 260 L300 150 L340 260Z M1600 260 L1600 168 L1632 260Z"/></svg>
+    <div class="stage" id="stStage" data-sp="L"><div class="pn L"><div class="pn__in" style="--c:#e3ecd2"><svg class="scene" id="stSceneL" viewBox="0 0 1760 580" preserveAspectRatio="none"></svg><img class="who" id="storyHero" alt=""></div><span class="tag" id="stTagL"></span></div><div class="pn R"><div class="pn__in" style="--c:#e3ecd2"><svg class="scene" id="stSceneR" viewBox="0 0 1760 580" preserveAspectRatio="none"></svg><div class="who who-ph" id="storyWho"></div><div class="hand-clip" id="handClip" aria-hidden="true" hidden><img class="story-hand" id="storyHand" alt=""></div></div><span class="tag" id="stTagR"></span></div></div>
+    <div class="panel" style="left:70px;top:720px;width:1780px;height:300px;clip-path:polygon(1% 6%,100% 0,99% 100%,0 96%)"><div class="panel__in" style="--c:var(--chalk)"><div class="abs" style="inset:0;background-image:radial-gradient(var(--deep) 5px,transparent 6px);background-size:34px 34px"></div><div class="abs lab" id="storyPlace" style="left:270px;top:252px;font-size:22px;color:var(--spirit);z-index:7"></div></div></div>
+    <div class="dlg" id="storyNext" data-sp="L" data-b="talk"><b id="talkWho"></b><p id="say"></p><span class="nx"></span></div>
+    <div class="lines" id="stLines"></div>
+    <div class="tapekeys"><span class="key">Space</span>다음 <span class="key">A</span>자동 <span class="key">Esc</span>메뉴</div>
   </div>
 
   <div id="overlay" hidden>
@@ -1731,12 +1788,15 @@ body { display: grid; place-items: center; }
   const CHAPTER = ['story', 'battle', 'battle', 'event', 'battle', 'battle', 'story', 'mid', 'story', 'battle', 'battle', 'event', 'battle', 'battle', 'story', 'boss'];
   const NODE_LABEL = { story: '스토리', battle: '전투', event: '이벤트', mid: '중간 보스', boss: '보스' };
   // 스토리는 시나리오 담당이 쓴다. 여기는 형식 시험용 테스트 대사뿐
+  // 열은 CampStory 표 그대로: side (L 메인 · R 상대 · P 플레이어 · N 나레이션) · who · b (talk · shout · think · narr) · say, 그리고 face · bg · hand
   const storyLines = (no, name) => [
-    { who: name, face: '기본', bg: 'A', say: `테스트 대사 ${no}-1` },
-    { who: name, face: '웃음', bg: 'A', say: `테스트 대사 ${no}-2` },
-    { who: '테스트 인물', face: '기본', bg: 'B', say: `테스트 대사 ${no}-3` },
-    ...(no === 1 ? [{ who: '테스트 인물', face: '기본', bg: 'B', say: '테스트 대사 1-3b (물건을 건네받는 장면)', hand: true }] : []),
-    { who: name, face: '놀람', bg: 'B', say: `테스트 대사 ${no}-4` },
+    { side: 'N', who: '', b: 'narr', face: '기본', bg: 'A', say: `테스트 나레이션 ${no}-0` },
+    { side: 'L', who: name, b: 'talk', face: '기본', bg: 'A', say: `테스트 대사 ${no}-1` },
+    { side: 'L', who: name, b: 'shout', face: '웃음', bg: 'A', say: `테스트 대사 ${no}-2 (외침)` },
+    { side: 'R', who: '테스트 인물', b: 'talk', face: '기본', bg: 'B', say: `테스트 대사 ${no}-3` },
+    ...(no === 1 ? [{ side: 'R', who: '테스트 인물', b: 'talk', face: '기본', bg: 'B', say: '테스트 대사 1-3b (물건을 건네받는 장면)', hand: true }] : []),
+    { side: 'P', who: '나', b: 'think', face: '기본', bg: 'B', say: `테스트 속마음 ${no}-P (플레이어)` },
+    { side: 'L', who: name, b: 'talk', face: '놀람', bg: 'B', say: `테스트 대사 ${no}-4` },
   ];
   // 이벤트 풀 (4 · 12칸에서 하나씩). 상황 글은 테스트 글
   const EVENTS = [
@@ -2546,7 +2606,7 @@ body { display: grid; place-items: center; }
   }
   // 스토리 배경 자리표시 (A · B)
   const STORY_BG = {
-    A: '<rect width="1190" height="560" fill="#e3ecd2"/><path fill="#bfd3a0" d="M0 250 Q80 170 170 220 Q250 150 340 210 Q430 140 520 205 Q610 150 700 210 Q800 140 900 200 Q990 150 1080 205 Q1140 180 1190 200 V330 H0Z"/><path fill="#a9c389" d="M0 300 Q120 250 240 290 T520 285 T820 280 T1190 290 V360 H0Z"/><path fill="#cfdca6" d="M0 400 H1190 V560 H0Z"/><path fill="#e6d7ab" d="M300 560 Q420 470 640 440 T1190 420 V450 Q900 470 700 500 T430 560Z"/>',
+    A: '<rect width="1760" height="580" fill="#e3ecd2"/><path fill="#bfd3a0" d="M0 250 Q90 170 190 225 Q290 150 390 215 Q490 145 590 210 Q690 150 790 215 Q900 140 1010 205 Q1110 150 1210 210 Q1320 140 1430 205 Q1530 150 1640 210 Q1700 185 1760 200 V340 H0Z"/><path fill="#a9c389" d="M0 305 Q160 255 320 295 T640 290 T980 285 T1320 290 T1760 285 V370 H0Z"/><rect x="430" y="120" width="360" height="310" fill="#ecdcb8"/><path fill="#b9584a" d="M408 132 L610 34 L812 132Z"/><rect x="408" y="126" width="404" height="16" fill="#9b4a3e"/><rect x="470" y="196" width="120" height="100" fill="#8a5c3a"/><rect x="480" y="206" width="100" height="80" fill="#cfe3d8"/><rect x="528" y="206" width="4" height="80" fill="#8a5c3a"/><rect x="650" y="236" width="96" height="194" fill="#8a5c3a"/><rect x="660" y="246" width="76" height="184" fill="#a8794e"/><rect x="545" y="152" width="130" height="32" fill="#fbf3e0"/><text x="610" y="175" text-anchor="middle" font-family="Black Han Sans, sans-serif" font-size="21" fill="#b9584a">토끼 진료소</text><g fill="#a8794e"><rect x="812" y="300" width="948" height="16"/><rect x="812" y="342" width="948" height="16"/><rect x="830" y="270" width="22" height="160"/><rect x="922" y="270" width="22" height="160"/><rect x="1014" y="270" width="22" height="160"/><rect x="1106" y="270" width="22" height="160"/><rect x="1198" y="270" width="22" height="160"/><rect x="1290" y="270" width="22" height="160"/><rect x="1382" y="270" width="22" height="160"/><rect x="1474" y="270" width="22" height="160"/><rect x="1566" y="270" width="22" height="160"/><rect x="1658" y="270" width="22" height="160"/><rect x="1750" y="270" width="22" height="160"/> <rect x="0" y="300" width="430" height="16"/><rect x="0" y="342" width="430" height="16"/><rect x="20" y="270" width="22" height="160"/><rect x="112" y="270" width="22" height="160"/><rect x="204" y="270" width="22" height="160"/><rect x="296" y="270" width="22" height="160"/><rect x="388" y="270" width="22" height="160"/></g><path d="M880 250 H1180" stroke="#8a5c3a" stroke-width="4"/><path fill="#6f9a52" d="M910 250 l-14 50 h28z"/><rect x="907" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#9a7ab0" d="M960 250 l-14 50 h28z"/><rect x="957" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#6f9a52" d="M1010 250 l-14 50 h28z"/><rect x="1007" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#c9a24a" d="M1060 250 l-14 50 h28z"/><rect x="1057" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#6f9a52" d="M1110 250 l-14 50 h28z"/><rect x="1107" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#9a7ab0" d="M1155 250 l-14 50 h28z"/><rect x="1152" y="246" width="6" height="10" fill="#8a5c3a"/><path fill="#4f7a3a" d="M1760 220 C1690 240 1650 296 1580 300 C1510 304 1480 340 1420 336 C1370 332 1340 352 1300 348 L1300 364 C1350 372 1380 352 1420 356 C1490 362 1520 326 1590 322 C1670 318 1700 268 1760 252Z"/><path fill="#6f9a52" transform="translate(1720 232) rotate(-30)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#4f7a3a" transform="translate(1660 270) rotate(20)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#6f9a52" transform="translate(1600 296) rotate(-10)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#4f7a3a" transform="translate(1530 312) rotate(25)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#6f9a52" transform="translate(1460 330) rotate(-20)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#4f7a3a" transform="translate(1390 336) rotate(15)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#6f9a52" transform="translate(1330 344) rotate(-25)" d="M0 0c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#cfdca6" d="M0 420 H1760 V580 H0Z"/><path fill="#e6d7ab" d="M560 580 Q700 480 960 450 T1760 430 V462 Q1400 480 1120 510 T760 580Z"/><g transform="translate(1000 452) rotate(-12)"><rect width="124" height="76" fill="#b98552"/><rect width="124" height="14" fill="#8a5c3a"/><path d="M0 0 L124 76 M124 0 L0 76" stroke="#8a5c3a" stroke-width="6"/></g><g><path fill="#6f9a52" d="M1150 530 c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#9a7ab0" d="M1190 508 c10-14 28-14 34 0-10 12-26 12-34 0z"/><path fill="#c9a24a" d="M1110 505 c10-14 28-14 34 0-10 12-26 12-34 0z"/></g>',
     B: '<rect width="1190" height="560" fill="#ecdcb8"/><rect y="380" width="1190" height="180" fill="#b98552"/><rect y="372" width="1190" height="14" fill="#8a5c3a"/><rect x="120" y="90" width="300" height="210" fill="#8a5c3a"/><rect x="134" y="104" width="272" height="182" fill="#cfe3d8"/><rect x="267" y="104" width="6" height="182" fill="#8a5c3a"/><rect x="560" y="120" width="420" height="40" fill="#a8794e"/><rect x="560" y="210" width="420" height="40" fill="#a8794e"/><rect x="600" y="70" width="60" height="50" fill="#6f9a52"/><rect x="700" y="80" width="50" height="40" fill="#c9a24a"/><rect x="800" y="160" width="60" height="50" fill="#9a7ab0"/>',
   };
   function showStory(replay) {
@@ -2554,37 +2614,50 @@ body { display: grid; place-items: center; }
     clearField();
     const hero = replay ? replay.hero : S.hero, name = HEROES[hero].name, no = replay ? replay.no : ++S.stories, lines = storyLines(no, name), st = $('#story');
     if (!replay) { const seen = META.seen.story[hero] || (META.seen.story[hero] = []); if (!seen.includes(no)) { seen.push(no); saveMeta(); } }
-    const other = (lines.find((l) => l.who !== name) || { who: '상대' }).who;
-    let i = 0;
+    const other = (lines.find((l) => l.side === 'R') || { who: '상대' }).who;
+    let i = -1;
     hideOverlay();
-    $('#storyHero').src = heroSrc(hero);
-    $('#talkWho').textContent = name;
-    const show = () => {
-      const l = lines[i], main = l.who === name;
-      $('#talkTag').textContent = `배경 ${l.bg} · 자리표시`;
-      $('#storyPlace').textContent = `${replay ? '다시 보기 · ' : ''}스토리 ${no}${replay ? '' : ` · ${S.node + 1}/16`} · 표정 ${l.face}${l.hand && S.persona ? ` · 손 연출 (${RACES[S.persona.race].name} 손)` : ''}`;
-      $('#talkWho').textContent = l.who;
-      $('#say').textContent = l.say;
-      $('#storyBgArt').innerHTML = STORY_BG[l.bg] || STORY_BG.A;
-      $('#storyWho').textContent = `${other} (그림 없음)`;
+    $('#storyHero').src = heroSrc(hero); $('#storyHero').alt = name;
+    $('#stTagL').innerHTML = `${name}<small>${PROFILE[hero].job}</small>`; $('#stTagR').textContent = other;
+    $('#storyWho').textContent = `${other} (그림 없음)`;
+    $('#stLines').innerHTML = '<i></i>'.repeat(lines.length);
+    // 원본 CampStory 스크립트: 말하는 쪽 칸이 넓어지고, 말풍선이 그쪽으로 · 종류대로 튀어나오고, 글자는 한 자씩, 말하는 캐릭터가 폴짝
+    const dl = $('#storyNext'), stage = $('#stStage');
+    const show = (n) => {
+      i = n; const l = lines[i];
+      stage.dataset.sp = l.side; dl.dataset.sp = l.side; dl.dataset.b = l.b;
+      $('#talkWho').textContent = l.side === 'N' ? '' : l.who;
+      const p = $('#say'), tx = l.b === 'narr' ? l.say : `“${l.say}”`;
+      TYPE(p, tx, 28);
+      RE(dl, 'go');
+      $('#stLines').querySelectorAll('i').forEach((d, j) => d.classList.toggle('on', j <= i));
+      if (l.side === 'L' || l.side === 'R') RE(stage.querySelector(`.pn.${l.side} .who`), 'hop');
+      if (l.bg !== S.storyBg) for (const s of ['L', 'R']) { const sv = $('#stScene' + s); sv.setAttribute('viewBox', l.bg === 'A' ? '0 0 1760 580' : '0 0 1190 560'); sv.setAttribute('preserveAspectRatio', l.bg === 'A' ? 'none' : 'xMidYMid slice'); sv.innerHTML = STORY_BG[l.bg] || STORY_BG.A; }
+      $('#storyPlace').textContent = `${replay ? '다시 보기 · ' : ''}${l.bg === 'A' ? CH_INFO.area[0] : '배경 B (자리표시)'} · ${replay ? '' : `${S.node + 1}/16 `}스토리 ${no} · 표정 ${l.face}${l.hand && S.persona ? ` · 손 연출 (${RACES[S.persona.race].name} 손)` : ''}`;
       S.storyBg = l.bg;
-      st.dataset.speaker = main ? 'main' : 'other';
-      st.dataset.face = main ? l.face : '';
+      st.dataset.face = l.side === 'L' ? l.face : '';
       if (l.hand) showHand();
     };
-    show();
-    $('#storyNext').onclick = () => {
+    const next = () => {
       if (S.phase !== 'story') return;
-      i++;
-      if (i < lines.length) { show(); return; }
+      if (i + 1 < lines.length) { show(i + 1); return; }
+      clearInterval(S.storyAuto); S.storyAuto = null; S.storyKey = null;
       $('#handClip').hidden = true; S.storyBg = null;
       if (replay) { replay.back(); return; }
       if (no === 1) gainGold([['시작', GOLD.start], ...(S.startGold ? [['주머니', S.startGold]] : [])]);
       stageDone();
     };
-    $('#storyNext').focus({ preventScroll: true });
+    st.onclick = (e) => { if (!e.target.closest('.menu-btn')) next(); };
+    // 키: Space · Enter 다음, A 자동 (3.6초마다)
+    S.storyKey = (e) => {
+      if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); next(); }
+      else if (e.key === 'a' || e.key === 'A') { if (S.storyAuto) { clearInterval(S.storyAuto); S.storyAuto = null; } else S.storyAuto = setInterval(next, 3600); }
+    };
+    S.storyBg = null;
+    show(0);
     syncUI(true);
   }
+  document.addEventListener('keydown', (e) => { if (S.phase === 'story' && S.storyKey && !menuOpen() && !e.repeat) S.storyKey(e); });
   // 이벤트 (CampEvent): 캠프 랜턴 속 장면, 말풍선 상황, 이름표 선택지
   const lantern = (k, cap) => `<div class="lantern"><span class="ring"></span><span class="cap"></span><span class="frame"></span><span class="glass">${ico(k)}</span><span class="base"></span><span class="cap2">${cap}</span></div>`;
   function showEvent() {
