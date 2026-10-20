@@ -2685,12 +2685,36 @@ body { display: grid; place-items: center; }
     renderPanel(); renderSlots();
   }
   // 출발: 고른 메인으로 런을 연다. 강화 계획판 · 유물 · 시작 보급은 applyMeta가 얹는다
+  // 원정 도중 저장 (O23, 데이터 테이블 run 초안): 칸 사이 전환마다 · 원정 시작에 이 브라우저에 저장한다 (furryup-run).
+  // 저장하는 때는 다음 칸에 들어가기 직전이라, 전투 · 정비 도중에 창을 닫으면 그 칸 처음부터 다시 한다. 원정이 끝나면 지운다
+  const RUN_KEY = 'furryup-run';
+  const RUN_KEEP = ['node', 'load', 'relics', 'levels', 'gauge', 'battles', 'stories', 'gold', 'devices', 'held', 'up', 'ally', 'trap', 'unlock', 'evDone',
+    'augReroll', 'run', 'reviveUsed', 'runDodge', 'midDone', 'startGold', 'treeGold', 'candy', 'pins', 'transits'];
+  function saveRun() {
+    if (!S.inRun) return;
+    const R = { v: 1, hero: S.hero, at: Date.now(), main: { hp: S.main.hp, maxHp: S.main.maxHp, atk: S.main.atk, def: S.main.def } };
+    for (const k of RUN_KEEP) R[k] = S[k];
+    try { localStorage.setItem(RUN_KEY, JSON.stringify(R)); } catch (e) { /* 이번 창에서만 */ }
+  }
+  function loadRunSave() {
+    try { const R = JSON.parse(localStorage.getItem(RUN_KEY) || 'null'); return R && R.v === 1 && HEROES[R.hero] && unlocked(R.hero) && R.node < CHAPTER.length ? R : null; } catch (e) { return null; }
+  }
+  function clearRunSave() { try { localStorage.removeItem(RUN_KEY); } catch (e) { /* 없어도 된다 */ } }
+  function resumeRun() {
+    const R = loadRunSave();
+    if (!R) { showTitle(); return; }
+    META.pick = R.hero; saveMeta();
+    resetRun();
+    S.inRun = true; S.load = R.load;
+    setHero(R.hero, R);
+  }
   function beginRun(k, load) {
     if (!unlocked(k)) return;
     META.pick = k; saveMeta();
     resetRun();
     S.inRun = true; S.load = load || loadOf(k);
     setHero(k);
+    saveRun();
   }
   // 강화 계획판 · 유물 · 시작 보급을 런에 얹는다
   function applyMeta(k) {
@@ -2712,7 +2736,7 @@ body { display: grid; place-items: center; }
     META.seen.main[k] = 1; saveMeta();
   }
   const heroSrc = (k) => { const m = k || S.hero || 'hanato'; return m !== 'hanato' && ART_SRC[m] && ART_SRC[m].startsWith('data:') ? ART_SRC[m] : $('#portrait').dataset.hanato; };
-  function setHero(k) {
+  function setHero(k, saved) {
     S.hero = k;
     // 마을 진열: 데려간 마을의 동료 · 장치만 (D97 · D102 · D106). 도전과제로 얻은 장치(META.devs)는 그대로 더한다
     S.villages = ((S.load && S.load.vil.length) ? S.load.vil : [HEROES[k].fac]).map((f) => FACTIONS[f]);
@@ -2720,7 +2744,14 @@ body { display: grid; place-items: center; }
     KIND_ORDER = S.villages.flatMap((F) => F.kinds); DEVICES = [...devs, ...Object.keys(META.devs).filter((d) => !devs.includes(d))];
     const h = HEROES[k];
     Object.assign(S.main, { hp: h.hp, maxHp: h.hp, atk: h.atk, def: h.def });
-    applyMeta(k);
+    if (saved) {
+      // 이어하기: 계획판에서 오는 조작 값은 다시 셈하고, 나머지는 저장한 그대로 (시작 보급 · 유물을 다시 얹지 않는다)
+      const t = trained(k);
+      S.ctl = { shot: t.shot, dash: t.dash, moves: t.moves, think: t.think };
+      S.grow = { gauge: t.gauge, spd: t.spd / 100, skill: t.skill / 100 };
+      for (const key of RUN_KEEP) if (saved[key] !== undefined) S[key] = saved[key];
+      Object.assign(S.main, saved.main);
+    } else applyMeta(k);
     $('#portrait').src = heroSrc(k);
     $('#portrait').alt = h.name; $('#hero').setAttribute('aria-label', h.name);
     $('#heroNameTxt').textContent = h.name; $('#talkWho').textContent = h.name; $('#skillName').innerHTML = h.skill.replace(' ', '<br>') + '!';
@@ -2747,6 +2778,7 @@ body { display: grid; place-items: center; }
   function nextNode() {
     S.node++;
     if (S.node >= CHAPTER.length) { setView('battle'); finishRun(true); return; }
+    saveRun();
     showTransit(S.node - 1, enterNode);
   }
   // 칸 사이 전환: 교역로 지도 띠가 내려오고 메인이 지금 칸에서 다음 칸으로 걸어간 뒤 다음 칸 쪽지, 저절로 넘어간다.
@@ -3398,6 +3430,7 @@ body { display: grid; place-items: center; }
   }
   // 원정이 끝날 때 아웃게임 보상을 정산한다 (승패 상관없이 닿은 구간별, OgChapter의 보상 표)
   function settleRun(win, wasShop) {
+    clearRunSave();
     const k = S.hero, done = Math.min(CHAPTER.length, S.node + (win || wasShop ? 1 : 0)), crew = KIND_ORDER.filter((n) => S.levels[n] > 0);
     const ready0 = new Set(ACH.filter(achReady).map((a) => a.id)), lv0 = levelOf(k).lv, relics = [];
     const tier = REWARD.tiers.find(([n]) => done <= n) || REWARD.tiers[REWARD.tiers.length - 1];
@@ -4068,6 +4101,7 @@ body { display: grid; place-items: center; }
   // 타이틀 (CampTitle): 전구 두른 나무 간판, 한 글자씩 떨어지는 제목, 흩어 놓은 이름표 메뉴, 겹쳐 붙인 형제
   function showTitle() {
     S.phase = 'title'; S.inRun = false; S.keys = {};
+    const saved = loadRunSave();
     showOverlay('', 'title');
     let bulbs = '', i = 0;
     const bulb = (x, y) => { bulbs += `<span class="abs ttl-bulb" style="--i:${i};left:${x}px;top:${y}px;width:18px;height:18px;border-radius:50%;background:var(${i++ % 2 ? '--spirit' : '--surface'})"></span>`; };
@@ -4085,6 +4119,7 @@ body { display: grid; place-items: center; }
     const menu = document.createElement('div'); menu.className = 'ttl-menu'; menu.dataset.mo = 'off';
     const items = [
       ...(S.persona ? [['titleGo', '이어하기<small>원정대 본부</small>', 'ticket on', 150, 560, -3, () => showLobby()]] : []),
+      ...(S.persona && saved ? [['titleRun', `원정 이어하기<small>${HEROES[saved.hero].name} · ${saved.node + 1}/${CHAPTER.length}칸</small>`, 'ticket cy', 430, 640, 3, () => resumeRun()]] : []),
       ['titleNew', S.persona ? '새 원정' : '새 원정<small>처음이면 플레이어부터 만든다</small>', S.persona ? 'ticket' : 'ticket on', S.persona ? 170 : 150, S.persona ? 680 : 560, S.persona ? 2 : -3, () => (S.persona ? showSelect() : startCyoa(showLobby))],
       ['titleBook', '도감', 'ticket', 160, 790, -2, () => showCodex('main', '', '', showTitle)],
       ['titleTent', '설정', 'ticket', 420, 800, 4, () => setMenu(true)],
@@ -6895,7 +6930,7 @@ body { display: grid; place-items: center; }
   document.addEventListener('click', (ev) => { if (ev.target.closest && ev.target.closest('.ticket, .ware, .pick, .menu-btn')) sfx.ui(); });
   // 원정 그만두기 = 그 자리에서 패배와 같이 정산 (Q56)
   $('#restart').addEventListener('click', () => { setMenu(false); if (S.inRun) finishRun(false); });
-  $('#redoPersona').addEventListener('click', () => { setMenu(false); resetRun(); startCyoa(showLobby); });
+  $('#redoPersona').addEventListener('click', () => { setMenu(false); if (S.inRun) clearRunSave(); resetRun(); startCyoa(showLobby); });
   // 시험용: 재화를 넉넉히. 기록 지우기는 두 번 눌러야 지운다. 지금 아웃게임 화면이면 다시 그린다
   const redraw = () => { const f = { lobby: showLobby, select: showSelect, chapter: showChapter, growth: () => showGrowth(META.pick), shopout: () => showShop(), codex: () => showCodex(), ach: () => showAch(), gallery: () => showGallery(META.pick) }[S.phase]; if (f) { moKey = ''; f(); } };
   $('#testGift').addEventListener('click', () => { META.jelly += 2000; META.medal += 60; saveMeta(); sfx.coin(2); setMenu(false); redraw(); });
@@ -7106,6 +7141,8 @@ body { display: grid; place-items: center; }
     restock() { if (S.phase !== 'shop') return false; rollStock(); renderShop(); return true; },
     tree: () => META.tree,
     pool: () => ({ devices: [...DEVICES], kinds: [...KIND_ORDER] }),
+    runSave: () => loadRunSave(),
+    resume: () => { resumeRun(); return S.phase; },
     load: (k) => loadOf(k || S.hero || META.pick),
     treeFx: (key) => treeFx(key),
     skip() { if (S.phase !== 'transit' || !S.transitGo) return false; S.transitGo(); return true; },
