@@ -2427,7 +2427,8 @@ body { display: grid; place-items: center; }
     { n: 2, name: '덤불 숲 깊은 곳', info: { plot: '(2장 줄거리 자리표시 · 시나리오 담당이 쓴다) 약재를 되찾은 원정대 앞에, 덤불 숲 깊은 곳에서 더 굵은 덩굴이 뻗어 나온다.', area: ['덤불 숲 입구', '이끼 골짜기', '덩굴 성채'], cut: '(2장 컷씬 자리표시)' }, foe: { hp: 1.6, atk: 1.35 }, reward: 1.5 },
   ];
   const chOf = (n) => CHAPTERS[(n || S.ch || 1) - 1];
-  const chOpen = (n) => n === 1 || (CHAPTERS[n - 1] && chCleared(n - 1));
+  // 장 해금은 메인마다: 이 메인으로 앞 장을 깨야 다음 장이 열린다 (다른 메인이 깬 장은 상관없다)
+  const chOpen = (n, k) => n === 1 || (!!CHAPTERS[n - 1] && heroCleared(k, n - 1));
   // 도전과제 (OgAchieve): 원정 · 전투 · 수집 · 관계 네 줄. 조건을 채우면 「받기」를 눌러 받는다. hide = 채우기 전에는 ???
   // val() 지금 값 · goal 목표. rw: medal 원정 훈장 · ally 동료 해금 · relic 유물 · dev 정비 진열에 장치 추가 · face 표정 · line 대사
   const ACH_COLS = [['run', '원정'], ['battle', '전투'], ['collect', '수집'], ['bond', '관계']];
@@ -2474,6 +2475,8 @@ body { display: grid; place-items: center; }
   const unlocked = (k) => !!META.mains[k];
   // 원정대 강화: 찍은 칸들의 효과 합 · 장을 깼는가 (아무 메인, 지금은 1장뿐) · 칸 상태
   const treeFx = (key) => TREE.nodes.reduce((a, n) => a + (META.tree.lv[n.id] ? n.fx[key] || 0 : 0), 0);
+  // 이 메인이 n장을 깼는가. rec.clears는 모든 장을 합친 수라 1장은 2장 클리어를 뺀다
+  const heroCleared = (k, n) => { const r = META.rec[k], c2 = (r && r.ch2 && r.ch2.clears) || 0; return !!r && (n === 1 ? r.clears - c2 > 0 : n === 2 ? c2 > 0 : false); };
   const chCleared = (n) => (n === 1 ? META.stat.clears > 0 : n === 2 ? (META.stat.clears2 || 0) > 0 : false);
   // 런 안 유물 값 (지금 단계)
   const relV = (id) => (S.relics && S.relics[id] ? RELICS[id].v[S.relics[id] - 1] : 0);
@@ -2727,7 +2730,7 @@ body { display: grid; place-items: center; }
     if (!unlocked(k)) return;
     META.pick = k; saveMeta();
     resetRun();
-    S.inRun = true; S.load = load || loadOf(k); S.ch = chOpen(ch || 1) ? ch || 1 : 1;
+    S.inRun = true; S.load = load || loadOf(k); S.ch = chOpen(ch || 1, k) ? ch || 1 : 1;
     setHero(k);
     saveRun();
   }
@@ -4229,14 +4232,14 @@ body { display: grid; place-items: center; }
   // 챕터 선택 (OgChapter): 6장을 밧줄로 이은 원정 지도 조각, 고른 장의 줄거리 · 16칸 · 보상 · 실패 구간표, 보스 칠판
   function showChapter(k, sel) {
     k = unlocked(k) ? k : META.pick;
-    sel = sel && chOpen(sel) ? sel : S.chSel && chOpen(S.chSel) ? S.chSel : 1; S.chSel = sel;
+    sel = sel && chOpen(sel, k) ? sel : S.chSel && chOpen(S.chSel, k) ? S.chSel : 1; S.chSel = sel;
     const h = HEROES[k], rec = META.rec[k], C = CHAPTERS[sel - 1], recC = sel === 2 ? rec.ch2 || { best: 0 } : rec;
     ogFrame('chapter', '챕터 선택', `${h.name}의 원정 · ${sel} / ${CH_N}`);
     const PX = [140, 423, 706, 989, 1272, 1555], PY = [220, 170, 230, 165, 225, 170], PR = [-3, 2, -2, 3, -2, 2];
-    const why = (n) => (n === 5 ? '4장 + 도전과제 3' : `${n - 1}장 보스 처치`);
+    const why = (n) => (n === 5 ? '4장 + 도전과제 3' : `${h.name} · ${n - 1}장 보스 처치`);
     let h2 = '<svg class="lob-trail" viewBox="0 120 1920 300"><path d="M265 305 548 255 831 315 1114 250 1397 310 1680 255"/></svg>';
     for (let n = 1; n <= CH_N; n++) {
-      const on = chOpen(n), C2 = CHAPTERS[n - 1], best = n === 2 ? (rec.ch2 || { best: 0 }).best : rec.best;
+      const on = chOpen(n, k), C2 = CHAPTERS[n - 1], best = n === 2 ? (rec.ch2 || { best: 0 }).best : rec.best;
       h2 += `<div class="lob-ch${on ? ' on' : ''}" data-mo="off" data-ch="${n}" style="--k:${n - 1};left:${PX[n - 1]}px;top:${PY[n - 1]}px;transform:rotate(${PR[n - 1]}deg)${on ? ';cursor:pointer' : ''}${n === sel ? ';outline:5px solid var(--accent);outline-offset:4px' : ''}"><em>${n}장</em><b>${on ? C2.name : '???'}</b>`
         + (on ? `<p>${C2.info.area[0]} · ${C2.info.area[2]}</p><p style="margin-top:14px;color:var(--ink)">최고 기록 ${best}/${CHAPTER.length}</p>` : `<p>아직 길이 보이지 않는다</p><div class="og-lock"><span>${ico('lock')}</span><small>${why(n)} · 준비 중</small></div>`) + '</div>';
     }
@@ -4256,8 +4259,8 @@ body { display: grid; place-items: center; }
       + `<div class="mid"><div class="art2">${art('thistle')}</div><div><b>중간 보스 · ${FOES.thistle.name}</b><small>8칸에서 길을 막는다</small></div></div></div></div>`;
     add(h2);
     const go = ogBtn(`원정 출발<small>${h.name} · ${sel}장</small>`, 'p', 'chGo', 'left:1260px;top:912px;transform:rotate(-2deg);z-index:6;font-size:44px', () => showSetup(k));
-    for (const c of document.querySelectorAll('#ovBody .lob-ch[data-ch]')) c.addEventListener('click', () => { const n = +c.dataset.ch; if (chOpen(n) && n !== sel) showChapter(k, n); else if (!chOpen(n)) SHK(c); });
-    S.keys = { Enter: () => go.click(), ArrowRight: () => chOpen(sel + 1) && showChapter(k, sel + 1), ArrowLeft: () => sel > 1 && showChapter(k, sel - 1) };
+    for (const c of document.querySelectorAll('#ovBody .lob-ch[data-ch]')) c.addEventListener('click', () => { const n = +c.dataset.ch; if (chOpen(n, k) && n !== sel) showChapter(k, n); else if (!chOpen(n, k)) SHK(c); });
+    S.keys = { Enter: () => go.click(), ArrowRight: () => chOpen(sel + 1, k) && showChapter(k, sel + 1), ArrowLeft: () => sel > 1 && showChapter(k, sel - 1) };
     go.focus({ preventScroll: true });
     moEnter('chapter', 'lob-go');
     syncUI(true);
@@ -4468,7 +4471,7 @@ body { display: grid; place-items: center; }
     k = unlocked(k) ? k : META.pick;
     const h = HEROES[k], t = trained(k), main = h.fac;
     L = L || (S.setup && S.setup.k === k ? S.setup.L : loadOf(k)); S.setup = { k, L };
-    const ch = S.chSel && chOpen(S.chSel) ? S.chSel : 1;
+    const ch = S.chSel && chOpen(S.chSel, k) ? S.chSel : 1;
     ogFrame('setup', '출발 준비', `${h.name} · ${ch}장 ${CHAPTERS[ch - 1].name}`, () => showChapter(k, ch));
     const re = () => showSetup(k, L), have = (id) => META.relics[id] || 0;
     add(`<img class="shp-hero sticker su-hero" src="${heroSrc(k)}" alt="${h.name}">`

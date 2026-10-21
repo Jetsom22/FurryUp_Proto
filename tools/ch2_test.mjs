@@ -16,7 +16,7 @@ const log = {};
 await ev(() => window.furryV3.screen('chapter', 'hanato')); await page.waitForTimeout(300);
 await ev(() => document.querySelector('.lob-ch[data-ch="2"]').click()); await page.waitForTimeout(300);
 log.lockedSel = await ev(() => window.furryV3.state.chSel);
-await ev(() => { window.furryV3.meta().stat.clears = 1; window.furryV3.screen('chapter', 'hanato'); }); await page.waitForTimeout(300);
+await ev(() => { const M = window.furryV3.meta(); M.stat.clears = 1; M.rec.hanato.clears = 1; window.furryV3.screen('chapter', 'hanato'); }); await page.waitForTimeout(300);
 await ev(() => document.querySelector('.lob-ch[data-ch="2"]').click()); await page.waitForTimeout(2200);
 log.sel = await ev(() => ({ sel: window.furryV3.state.chSel, h3: document.querySelector('.lob-det h3').textContent }));
 await page.screenshot({ path: `${out}/ch2_select.png` });
