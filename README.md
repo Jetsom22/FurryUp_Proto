@@ -9,3 +9,4 @@
   - `node tools/shots.mjs <index.html> <폴더> [gift]` — 아웃게임 화면 찍기
   - `node tools/shots_run.mjs <index.html> <폴더> <접두>` — 전투 · 증강 · 정비 · 교체 창 찍기
   - `node tools/syn_test.mjs <index.html> <폴더>` — 종족 시너지 단 (1 ~ 5명)
+  - `node tools/ch_lock_test.mjs <index.html> <폴더>` — 장 해금이 메인마다인지 (다른 메인이 깬 장은 잠김)
