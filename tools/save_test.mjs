@@ -3,6 +3,12 @@ import { createRequire } from 'module';
 const require = createRequire('/opt/node22/lib/node_modules/');
 const { chromium } = require('playwright');
 const [file, out] = process.argv.slice(2);
+// file://로 열면 부하가 클 때 새로 고침 뒤 localStorage가 통째로 비는 일이 있다 (Chromium, 게임은 지우지 않는다 · 2026-10-29 확인).
+// 그래서 이 시험만 index.html을 작은 http 서버로 띄워 연다
+const http = await import('http'), fs = await import('fs');
+const html = fs.readFileSync(file);
+const server = http.createServer((q, r) => { r.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); r.end(html); });
+await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
 const page = await ctx.newPage();
@@ -10,7 +16,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
 await page.addInitScript(() => { try { if (!localStorage.getItem('furryup-persona')) localStorage.setItem('furryup-persona', JSON.stringify({ name: '시험', race: 'rabbit', color: 0, size: '소형', suggested: 'rabbit', custom: false })); } catch (e) {} });
-await page.goto('file://' + file);
+await page.goto(`http://127.0.0.1:${server.address().port}/`);
 await page.waitForTimeout(600);
 const ev = (f, a) => page.evaluate(f, a);
 const ph = () => ev(() => window.furryV3.state.phase);
@@ -28,7 +34,8 @@ for (let i = 0; i < 600 && (await ph()) !== 'shop'; i++) {
 }
 await page.waitForTimeout(600);
 log.preShop = await ev(() => ({ ph: window.furryV3.state.phase, aug: !!document.getElementById('augPick'), hp: window.furryV3.state.main.hp }));
-await ev(() => { const b = document.getElementById('augPick'); if (b) b.click(); }); await page.waitForTimeout(2500);
+await ev(() => { const b = document.getElementById('augPick'); if (b) b.click(); });
+await page.waitForSelector('#shopNext', { timeout: 20000 }); await page.waitForTimeout(800); // 증강 → 정비 연출 (느리면 2.5초를 넘는다)
 const before = await ev(() => { const S = window.furryV3.state; return { gold: S.gold, hp: S.main.hp, up: S.up, levels: S.levels.sato, devices: S.devices, battles: S.battles, stories: S.stories }; });
 await ev(() => document.getElementById('shopNext').click()); await page.waitForTimeout(400);
 log.atTransit = await ev(() => { const R = window.furryV3.runSave(); return { ph: window.furryV3.state.phase, node: R.node, gold: R.gold, hp: R.main.hp }; });
@@ -48,3 +55,4 @@ await ev(() => window.furryV3.screen('title')); await page.waitForTimeout(300);
 log.titleAfter = await ev(() => !!document.getElementById('titleRun'));
 console.log(JSON.stringify({ errors, log }, null, 1));
 await browser.close();
+server.close();
